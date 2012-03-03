@@ -1846,6 +1846,10 @@ ACMD(do_wizutil)
       break;
     default:
       log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);
+      /*  SYSERR_DESC:
+       *  This is the same as the unhandled case in do_gen_ps(), but this
+       *  function handles 'reroll', 'pardon', 'freeze', etc.
+       */
       break;
     }
     save_char(vict);

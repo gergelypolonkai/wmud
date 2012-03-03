@@ -33,7 +33,7 @@ int	get_filename(char *filename, size_t fbufsize, int mode, const char *orig_nam
 time_t	mud_time_to_secs(struct time_info_data *now);
 struct time_info_data *age(struct char_data *ch);
 int	num_pc_in_room(struct room_data *room);
-void	core_dump_real(const char *, int);
+void	core_dump_real(const char *who, int line);
 int	room_is_dark(room_rnum room);
 
 #define core_dump()		core_dump_real(__FILE__, __LINE__)

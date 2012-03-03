@@ -966,35 +966,30 @@ char *one_argument(char *argument, char *first_arg)
 
 
 /*
- * one_word is like one_argument, except that words in quotes ("") are
+ * one_word is like any_one_arg, except that words in quotes ("") are
  * considered one word.
+ *
+ * No longer ignores fill words.  -dak, 6 Jan 2003
  */
 char *one_word(char *argument, char *first_arg)
 {
-  char *begin = first_arg;
+  skip_spaces(&argument);
 
-  do {
-    skip_spaces(&argument);
-
-    first_arg = begin;
-
-    if (*argument == '\"') {
+  if (*argument == '\"') {
+    argument++;
+    while (*argument && *argument != '\"') {
+      *(first_arg++) = LOWER(*argument);
       argument++;
-      while (*argument && *argument != '\"') {
-        *(first_arg++) = LOWER(*argument);
-        argument++;
-      }
-      argument++;
-    } else {
-      while (*argument && !isspace(*argument)) {
-        *(first_arg++) = LOWER(*argument);
-        argument++;
-      }
     }
+    argument++;
+  } else {
+    while (*argument && !isspace(*argument)) {
+      *(first_arg++) = LOWER(*argument);
+      argument++;
+    }
+  }
 
-    *first_arg = '\0';
-  } while (fill_word(begin));
-
+  *first_arg = '\0';
   return (argument);
 }
 

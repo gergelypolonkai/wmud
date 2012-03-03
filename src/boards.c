@@ -531,6 +531,8 @@ void Board_clear_board(int board_type)
   int i;
 
   for (i = 0; i < MAX_BOARD_MESSAGES; i++) {
+    if (MSG_SLOTNUM(board_type, i) == -1)
+      continue; /* don't try to free non-existant slots */
     if (MSG_HEADING(board_type, i))
       free(MSG_HEADING(board_type, i));
     if (msg_storage[MSG_SLOTNUM(board_type, i)])

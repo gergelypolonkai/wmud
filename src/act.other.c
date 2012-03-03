@@ -657,6 +657,10 @@ ACMD(do_use)
       return;
     default:
       log("SYSERR: Unknown subcmd %d passed to do_use.", subcmd);
+      /*  SYSERR_DESC:
+       *  This is the same as the unhandled case in do_gen_ps(), but in the
+       *  function which handles 'quaff', 'recite', and 'use'.
+       */
       return;
     }
   }
@@ -820,6 +824,11 @@ ACMD(do_gen_write)
 
   if (stat(filename, &fbuf) < 0) {
     perror("SYSERR: Can't stat() file");
+    /*  SYSERR_DESC:
+     *  This is from do_gen_write() and indicates that it cannot call the
+     *  stat() system call on the file required.  The error string at the
+     *  end of the line should explain what the problem is.
+     */
     return;
   }
   if (fbuf.st_size >= max_filesize) {
@@ -828,6 +837,12 @@ ACMD(do_gen_write)
   }
   if (!(fl = fopen(filename, "a"))) {
     perror("SYSERR: do_gen_write");
+    /*  SYSERR_DESC:
+     *  This is from do_gen_write(), and will be output if the file in
+     *  question cannot be opened for appending to.  The error string
+     *  at the end of the line should explain what the problem is.
+     */
+
     send_to_char(ch, "Could not open the file.  Sorry.\r\n");
     return;
   }
@@ -943,6 +958,10 @@ ACMD(do_gen_tog)
     break;
   default:
     log("SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd);
+    /*  SYSERR_DESC:
+     *  This is the same as the unhandled case in do_gen_ps(), but in the
+     *  function which handles 'compact', 'brief', and so forth.
+     */
     return;
   }
 

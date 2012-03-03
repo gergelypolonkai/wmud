@@ -298,6 +298,8 @@ void destroy_db(void)
   while (character_list) {
     chtmp = character_list;
     character_list = character_list->next;
+    if (chtmp->master)
+      stop_follower(chtmp);
     free_char(chtmp);
   }
 

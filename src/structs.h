@@ -317,7 +317,7 @@
 
 
 /* Take/Wear flags: used by obj_data.obj_flags.wear_flags */
-#define ITEM_WEAR_TAKE		(1 << 0)  /* Item can be takes		*/
+#define ITEM_WEAR_TAKE		(1 << 0)  /* Item can be taken		*/
 #define ITEM_WEAR_FINGER	(1 << 1)  /* Can be worn on finger	*/
 #define ITEM_WEAR_NECK		(1 << 2)  /* Can be worn around neck 	*/
 #define ITEM_WEAR_BODY		(1 << 3)  /* Can be worn on body 	*/

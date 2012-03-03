@@ -171,7 +171,7 @@ ASPELL(spell_locate_object)
     if (!isname(name, i->name))
       continue;
 
-    send_to_char(ch, "%c%s", UPPER(*i->short_description), i->short_description);
+    send_to_char(ch, "%c%s", UPPER(*i->short_description), i->short_description+1);
 
     if (i->carried_by)
       send_to_char(ch, " is being carried by %s.\r\n", PERS(i->carried_by, ch));

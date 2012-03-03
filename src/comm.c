@@ -147,6 +147,7 @@ int open_logfile(const char *filename, FILE *stderr_fp);
 #if defined(POSIX)
 sigfunc *my_signal(int signo, sigfunc *func);
 #endif
+void free_bufpool(void);
 
 /* extern fcnts */
 void reboot_wizlists(void);
@@ -163,6 +164,7 @@ void free_messages(void);
 void Board_clear_all(void);
 void free_social_messages(void);
 void Free_Invalid_List(void);
+void free_mail_index(void);
 
 #ifdef __CXREF__
 #undef FD_ZERO
@@ -327,9 +329,11 @@ int main(int argc, char **argv)
 
   if (!scheck) {
     log("Clearing other memory.");
+    free_bufpool();		/* comm.c */
     free_player_index();	/* db.c */
     free_messages();		/* fight.c */
     clear_free_list();		/* mail.c */
+    free_mail_index();		/* mail.c */
     free_text_files();		/* db.c */
     Board_clear_all();		/* boards.c */
     free(cmd_sort_info);	/* act.informative.c */
@@ -2518,3 +2522,17 @@ void circle_sleep(struct timeval *timeout)
 }
 
 #endif /* CIRCLE_WINDOWS */
+
+void free_bufpool(void)
+{
+  struct txt_block *tmpblock;
+
+  while (bufpool) {
+    tmpblock = bufpool;
+    bufpool = bufpool->next;
+
+    if (tmpblock->text)
+      free(tmpblock->text);
+    free(tmpblock);
+  }
+}

@@ -614,3 +614,21 @@ void postmaster_receive_mail(struct char_data *ch, struct char_data *mailman,
     act("$N gives $n a piece of mail.", FALSE, ch, 0, mailman, TO_ROOM);
   }
 }
+
+
+void free_mail_index(void)
+{
+  while (mail_index) {
+    mail_index_type *tmp_index = mail_index;
+    mail_index = mail_index->next;
+
+    while (tmp_index->list_start) {
+      position_list_type *tmp_list;
+
+      tmp_list = tmp_index->list_start;
+      tmp_index->list_start = tmp_index->list_start->next;
+      free(tmp_list);
+    }
+    free(tmp_index);
+  }
+}

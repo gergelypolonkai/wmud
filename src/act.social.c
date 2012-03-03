@@ -179,6 +179,11 @@ char *fread_action(FILE *fl, int nr)
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl)) {
     log("SYSERR: fread_action: unexpected EOF near action #%d", nr);
+    /*  SYSERR_DESC:
+     *  fread_action() will fail if it discovers an end of file marker
+     *  before it is able to read in the expected string.  This can be
+     *  caused by a truncated socials file.
+     */
     exit(1);
   }
   if (*buf == '#')
@@ -220,6 +225,11 @@ void boot_social_messages(void)
   /* open social file */
   if (!(fl = fopen(SOCMESS_FILE, "r"))) {
     log("SYSERR: can't open socials file '%s': %s", SOCMESS_FILE, strerror(errno));
+    /*  SYSERR_DESC:
+     *  This error, from boot_social_messages(), occurs when the server
+     *  fails to open the file containing the social messages.  The error
+     *  at the end will indicate the reason why.
+     */
     exit(1);
   }
   /* count socials & allocate space */
@@ -236,10 +246,25 @@ void boot_social_messages(void)
       break;
     if (fscanf(fl, " %d %d \n", &hide, &min_pos) != 2) {
       log("SYSERR: format error in social file near social '%s'", next_soc);
+      /*  SYSERR_DESC:
+       *  From boot_social_messages(), this error is output when the
+       *  server is expecting to find the remainder of the first line of the
+       *  social ('hide' and 'minimum position').  These must follow the
+       *  name of the social with a single space such as: 'accuse 0 5\n'.
+       *  This error often occurs when one of the numbers is missing or the
+       *  social name has a space in it (i.e., 'bend over').
+       */
       exit(1);
     }
     if (++curr_soc > list_top) {
       log("SYSERR: Ran out of slots in social array. (%d > %d)", curr_soc, list_top);
+      /*  SYSERR_DESC:
+       *  The server creates enough space for all of the socials that it finds
+       *  in the command structure (cmd_info[] in interpreter.c).  These are
+       *  designated with the 'do_action' command call.  If there are more
+       *  socials in the file than in the cmd_info structure, the
+       *  boot_social_messages() function will fail with this error.
+       */
       break;
     }
  
@@ -251,6 +276,13 @@ void boot_social_messages(void)
 #ifdef CIRCLE_ACORN
     if (fgetc(fl) != '\n')
       log("SYSERR: Acorn bug workaround failed.");
+      /*  SYSERR_DESC:
+       *  The only time that this error should ever arise is if you are running
+       *  your CircleMUD on the Acorn platform.  The error arises when the
+       *  server cannot properly read a '\n' out of the file at the end of the
+       *  first line of the social (that with 'hide' and 'min position').  This
+       *  is in boot_social_messages().
+       */
 #endif
 
     soc_mess_list[curr_soc].char_no_arg = fread_action(fl, nr);
@@ -270,6 +302,14 @@ void boot_social_messages(void)
     /* If social not found, re-use this slot.  'curr_soc' will be reincremented. */
     if (nr < 0) {
       log("SYSERR: Unknown social '%s' in social file.", next_soc);
+      /*  SYSERR_DESC:
+       *  This occurs when the find_command() function in interpreter.c cannot
+       *  find the social of the name in the file in the cmd_info[] structure.
+       *  This is returned to boot_social_messages(), and the function
+       *  reassigns that slot to another social to avoid running out of memory.
+       *  The solution is to add this social to the cmd_info[] array in
+       *  interpreter.c or to remove the social from the file.
+       */
       memset(&soc_mess_list[curr_soc--], 0, sizeof(struct social_messg));
       continue;
     }
@@ -277,6 +317,11 @@ void boot_social_messages(void)
     /* If the command we found isn't do_action, we didn't count it for the CREATE(). */
     if (cmd_info[nr].command_pointer != do_action) {
       log("SYSERR: Social '%s' already assigned to a command.", next_soc);
+      /*  SYSERR_DESC:
+       *  This error occurs when boot_social_messages() reads in a social and
+       *  then discovers that it is not assigned 'do_action' as a command in
+       *  the cmd_info[] array in interpreter.c
+       */
       memset(&soc_mess_list[curr_soc--], 0, sizeof(struct social_messg));
     }
   }

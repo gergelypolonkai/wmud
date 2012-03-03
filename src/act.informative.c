@@ -100,6 +100,12 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mode)
 {
   if (!obj || !ch) {
     log("SYSERR: NULL pointer in show_obj_to_char(): obj=%p ch=%p", obj, ch);
+    /*  SYSERR_DESC:
+     *  Somehow a NULL pointer was sent to show_obj_to_char() in either the
+     *  'obj' or the 'ch' variable.  The error will indicate which was NULL
+     *  be listing both of the pointers passed to it.  This is often a
+     *  difficult one to trace, and may require stepping through a debugger.
+     */
     return;
   }
 
@@ -136,6 +142,13 @@ void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mode)
 
   default:
     log("SYSERR: Bad display mode (%d) in show_obj_to_char().", mode);
+    /*  SYSERR_DESC:
+     *  show_obj_to_char() has some predefined 'mode's (argument #3) to tell
+     *  it what to display to the character when it is called.  If the mode
+     *  is not one of these, it will output this error, and indicate what
+     *  mode was passed to it.  To correct it, you will need to find the
+     *  call with the incorrect mode and change it to an acceptable mode.
+     */
     return;
   }
 
@@ -1289,6 +1302,14 @@ ACMD(do_gen_ps)
     break;
   default:
     log("SYSERR: Unhandled case in do_gen_ps. (%d)", subcmd);
+    /*  SYSERR_DESC:
+     *  General page string function for such things as 'credits', 'news',
+     *  'wizlist', 'clear', 'version'.  This occurs when a call is made to
+     *  this routine that is not one of the predefined calls.  To correct
+     *  it, either a case needs to be added into the function to account for
+     *  the subcmd that is being passed to it, or the call to the function
+     *  needs to have the correct subcmd put into place.
+     */
     return;
   }
 }

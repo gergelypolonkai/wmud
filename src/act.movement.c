@@ -620,7 +620,7 @@ ACMD(do_rest)
   default:
     send_to_char(ch, "You stop floating around, and stop to rest your tired bones.\r\n");
     act("$n stops floating around, and rests.", FALSE, ch, 0, 0, TO_ROOM);
-    GET_POS(ch) = POS_SITTING;
+    GET_POS(ch) = POS_RESTING;
     break;
   }
 }
