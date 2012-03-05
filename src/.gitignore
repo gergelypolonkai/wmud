@@ -2,4 +2,3 @@ conf.h
 .accepted
 Makefile
 *.o
-*.swp
