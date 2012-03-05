@@ -913,7 +913,11 @@ ACMD(do_gen_tog)
     {"Autoexits disabled.\r\n",
     "Autoexits enabled.\r\n"},
     {"Will no longer track through doors.\r\n",
-    "Will now track through doors.\r\n"}
+    "Will now track through doors.\r\n"},
+    {"AutoLoot disabled.\r\n",
+    "AutoLoot enabled.\r\n"},
+    {"AutoDrain disabled.\r\n",
+    "AutoDrain enabled.\r\n"}
   };
 
 
@@ -968,6 +972,12 @@ ACMD(do_gen_tog)
     break;
   case SCMD_AUTOEXIT:
     result = PRF_TOG_CHK(ch, PRF_AUTOEXIT);
+    break;
+  case SCMD_AUTOLOOT:
+    result = PRF_TOG_CHK(ch, PRF_AUTOLOOT);
+    break;
+  case SCMD_AUTODRAIN:
+    result = PRF_TOG_CHK(ch, PRF_AUTODRAIN);
     break;
   case SCMD_TRACK:
     result = (track_through_doors = !track_through_doors);

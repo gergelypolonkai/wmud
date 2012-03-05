@@ -1611,10 +1611,12 @@ ACMD(do_toggle)
 	  "           Deaf: %-3s    "
 	  "     Wimp Level: %-3s\r\n"
 
-	  " Gossip Channel: %-3s    "
-	  "Auction Channel: %-3s    "
-	  "  Grats Channel: %-3s\r\n"
+	  "      Auto Loot: %-3s    "
+	  "     Auto Drain: %-3s    "
+	  " Gossip Channel: %-3s\r\n"
 
+	  "Auction Channel: %-3s    "
+	  "  Grats Channel: %-3s    "
 	  "    Color Level: %s\r\n",
 
 	  ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
@@ -1632,6 +1634,8 @@ ACMD(do_toggle)
 	  ONOFF(PRF_FLAGGED(ch, PRF_AUTOEXIT)),
 	  YESNO(PRF_FLAGGED(ch, PRF_DEAF)),
 	  buf2,
+	  ONOFF(PRF_FLAGGED(ch, PRF_AUTOLOOT)),
+	  ONOFF(PRF_FLAGGED(ch, PRF_AUTODRAIN)),
 
 	  ONOFF(!PRF_FLAGGED(ch, PRF_NOGOSS)),
 	  ONOFF(!PRF_FLAGGED(ch, PRF_NOAUCT)),

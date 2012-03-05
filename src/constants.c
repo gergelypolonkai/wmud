@@ -184,6 +184,8 @@ const char *preference_bits[] = {
   "NO_GOS",
   "NO_GTZ",
   "RMFLG",
+  "AUTOLOOT",
+  "AUTODRAIN",
   "\n"
 };
 

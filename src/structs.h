@@ -215,6 +215,8 @@
 #define PRF_NOGRATZ	(1 << 20) /* Can't hear grats channel		*/
 #define PRF_ROOMFLAGS	(1 << 21) /* Can see room flags (ROOM_x)	*/
 #define PRF_DISPAUTO	(1 << 22) /* Show prompt HP, MP, MV when < 30%.	*/
+#define PRF_AUTOLOOT    (1 << 23) /* Automatically loot corpses         */
+#define PRF_AUTODRAIN   (1 << 24) /* Automatically drain corpses        */
 
 /* Affect bits: used in char_data.char_specials.saved.affected_by */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
