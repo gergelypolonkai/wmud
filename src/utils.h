@@ -400,6 +400,7 @@ void	update_pos(struct char_data *victim);
 					GET_OBJ_VAL((obj), 3) == 1)
 
 #define CAN_WEAR(obj, part)	OBJWEAR_FLAGGED((obj), (part))
+#define IS_BURIED(obj)          (IS_SET(GET_OBJ_EXTRA((obj)), ITEM_BURIED))
 
 
 /* compound utilities and other macros **********************************/
@@ -452,10 +453,10 @@ void	update_pos(struct char_data *victim);
    (!obj->worn_by || CAN_SEE(sub, obj->worn_by)))
 
 #define MORT_CAN_SEE_OBJ(sub, obj) \
-  (LIGHT_OK(sub) && INVIS_OK_OBJ(sub, obj) && CAN_SEE_OBJ_CARRIER(sub, obj))
+  (LIGHT_OK(sub) && INVIS_OK_OBJ(sub, obj) && CAN_SEE_OBJ_CARRIER(sub, obj) )
 
 #define CAN_SEE_OBJ(sub, obj) \
-   (MORT_CAN_SEE_OBJ(sub, obj) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
+   ((MORT_CAN_SEE_OBJ(sub, obj) && !IS_BURIED(obj)) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 
 #define CAN_CARRY_OBJ(ch,obj)  \
    (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) &&   \

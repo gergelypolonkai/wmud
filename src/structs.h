@@ -314,6 +314,7 @@
 #define ITEM_PEN       21		/* Item is a pen		*/
 #define ITEM_BOAT      22		/* Item is a boat		*/
 #define ITEM_FOUNTAIN  23		/* Item is a fountain		*/
+#define ITEM_BURIED    24               /* Item is buried               */
 
 
 /* Take/Wear flags: used by obj_data.obj_flags.wear_flags */

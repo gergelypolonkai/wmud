@@ -24,6 +24,19 @@
 #include "house.h"
 #include "constants.h"
 
+const char *digbury_msgs[][2] = {
+	{ "You start to break some floor boards when you dig.",                  "$n starts to break some floor boards as $e starts digging." },
+	{ "You wonder if this is a good place after all, with all the gravel.",  "$n breaks a sweat digging up all the gravel here."          },
+	{ "You make a nice hold while digging up a lot of dirt.",                "$n digs a hole and goes about $s business."                 },
+	{ "You seem to be hitting a lot of roots when you dig.",                 "$n looks like $e is trying to dig up a tree."               },
+	{ "You dig up more clay than dirt here.",                                "$n seems to be digging up a lot of clay."                   },
+	{ "You start to chip away the rock here.",                               "$n bangs away at the side of the mountain."                 },
+	{ "You can't dig in the water!",                                         NULL                                                         },
+	{ "You can't dig in the water!",                                         NULL                                                         },
+	{ "You can't dig up air!",                                               NULL                                                         },
+	{ "If you see this, please tell a Prophet!",                             NULL                                                         }
+};
+
 /* extern variables */
 extern struct spell_info_type spell_info[];
 extern const char *class_abbrevs[];
@@ -65,6 +78,9 @@ ACMD(do_wimpy);
 ACMD(do_display);
 ACMD(do_gen_write);
 ACMD(do_gen_tog);
+ACMD(do_bury);
+ACMD(do_dig);
+ACMD(do_drain);
 
 
 ACMD(do_quit)
@@ -972,3 +988,177 @@ ACMD(do_gen_tog)
 
   return;
 }
+
+ACMD(do_bury)
+{
+	struct obj_data *obj;
+	char buf[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
+
+	half_chop(argument, arg, buf);
+	if (!*arg)
+	{
+		send_to_char(ch, "What do you want to %s?\r\n", CMD_NAME);
+
+		return;
+	}
+
+	if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
+	{
+		send_to_char(ch, "You don't have %s %s\r\n", AN(arg), arg);
+
+		return;
+	}
+
+	/*
+	 ** find the sector types that you don't want people
+	 ** to be able to dig or bury in.
+	 */
+	if (
+		(world[IN_ROOM(ch)].sector_type == SECT_WATER_SWIM)
+		|| (world[IN_ROOM(ch)].sector_type == SECT_WATER_NOSWIM)
+		|| (world[IN_ROOM(ch)].sector_type == SECT_UNDERWATER)
+		|| (world[IN_ROOM(ch)].sector_type == SECT_FLYING)
+	)
+	{
+		/* display the messages if available */
+		if (digbury_msgs[world[IN_ROOM(ch)].sector_type][0] != NULL)
+			send_to_char(ch, "%s\r\n", digbury_msgs[world[IN_ROOM(ch)].sector_type][0]);
+
+		if (digbury_msgs[world[IN_ROOM(ch)].sector_type][1] != NULL)
+			act(digbury_msgs[world[IN_ROOM(ch)].sector_type][1], TRUE, ch, NULL, NULL, TO_ROOM);
+
+		return;
+	}
+
+	/* set a wait state */
+	WAIT_STATE(ch, 10 RL_SEC);
+
+	if(digbury_msgs[world[IN_ROOM(ch)].sector_type][0] != NULL)
+		send_to_char(ch, "%s\r\n", digbury_msgs[world[IN_ROOM(ch)].sector_type][0]);
+
+	if(digbury_msgs[world[IN_ROOM(ch)].sector_type][1] != NULL)
+		act(digbury_msgs[world[IN_ROOM(ch)].sector_type][1], TRUE, ch, NULL, NULL, TO_ROOM);
+
+	act("You bury $a $o here.\r\n", TRUE, ch, obj, NULL, TO_CHAR);
+	act("$n buries $a $o here.\r\n", TRUE, ch, obj, NULL, TO_ROOM);
+
+	obj_from_char(obj);
+
+	SET_BIT(GET_OBJ_EXTRA(obj), ITEM_BURIED);
+
+	obj_to_room(obj, IN_ROOM(ch));
+}
+
+ACMD(do_dig)
+{
+	struct obj_data *obj;
+	int found_item = 0;
+
+	/*
+	 ** find the sector types that you don't want people
+	 ** to be able to dig or bury in.
+	 */
+	if (
+		(world[IN_ROOM(ch)].sector_type == SECT_WATER_SWIM)
+		|| (world[IN_ROOM(ch)].sector_type == SECT_WATER_NOSWIM)
+		|| (world[IN_ROOM(ch)].sector_type == SECT_UNDERWATER)
+		|| (world[IN_ROOM(ch)].sector_type == SECT_FLYING)
+	)
+	{
+		/* display the messages if available */
+		if (digbury_msgs[world[IN_ROOM(ch)].sector_type][0] != NULL)
+			send_to_char(ch, "%s\r\n", digbury_msgs[world[IN_ROOM(ch)].sector_type][0]);
+
+		if (digbury_msgs[world[IN_ROOM(ch)].sector_type][1] != NULL)
+			act(digbury_msgs[world[IN_ROOM(ch)].sector_type][1], TRUE, ch, NULL, NULL, TO_ROOM);
+
+		return;
+	}
+
+	/* set a wait state */
+	WAIT_STATE(ch, 10 RL_SEC);
+
+	/*
+	 ** Now that we have established that we can dig lets go
+	 ** ahead and do it!
+	 */
+	if (digbury_msgs[world[IN_ROOM(ch)].sector_type][0] != NULL)
+		send_to_char(ch, "%s\r\n", digbury_msgs[world[IN_ROOM(ch)].sector_type][0]);
+
+	if (digbury_msgs[world[IN_ROOM(ch)].sector_type][1] != NULL)
+		act(digbury_msgs[world[IN_ROOM(ch)].sector_type][1], TRUE, ch, NULL, NULL,TO_ROOM);
+
+	/*
+	 ** search for an object in the room that has a ITEM_BURIED flag
+	 */
+	obj = world[IN_ROOM(ch)].contents;
+
+	while (obj != NULL)
+	{
+		if (IS_BURIED(obj))
+		{
+			/* Remove the buried bit so the player can see it. */
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), ITEM_BURIED);
+
+			if(CAN_SEE_OBJ(ch, obj))
+			{
+				found_item = 1;     /* player found something */
+
+				act("You found $a $o buried here.\r\n", TRUE, ch, obj, NULL, TO_CHAR);
+				act("$n has found $a $o buried here.\r\n", TRUE, ch, obj, NULL,TO_ROOM);
+
+				obj_from_room(obj);
+				obj_to_char(obj, ch);
+			}
+			else
+			{
+				/* add the bit back becuase the player can't unbury what
+				 ** what he can't find...  */
+				SET_BIT(GET_OBJ_EXTRA(obj), ITEM_BURIED);
+			}
+		}
+
+		/* go to the next obj */
+		obj = obj->next;
+	}
+
+	/* if the player didn't find anything */
+	if (!found_item)
+		send_to_char(ch, "Sorry! You didn't find anything.\r\n");
+}
+
+ACMD(do_drain)
+{
+	char arg[MAX_INPUT_LENGTH];
+	struct obj_data *obj;
+	int HIT = 0,
+	    MANA = 0,
+	    MOVE = 0;
+
+	one_argument(argument, arg);
+
+	if (!*arg)
+	{
+		send_to_char(ch, "Drain what?\r\n");
+		return;
+	}
+
+	if (!(obj = get_obj_in_list_vis(ch, arg, NULL, world[ch->in_room].contents)))
+	{
+		send_to_char(ch, "That object is not here.\r\n");
+		return;
+	}
+
+	act("$n bends down and touches $p which slowly disappears.\r\n", FALSE, ch, obj, NULL, TO_ROOM);
+	act("You bend down and drain $p.\r\n", FALSE, ch, obj, NULL, TO_ROOM);
+
+	HIT = rand() % GET_LEVEL(ch) * 2 + 1;
+	MANA = rand() % GET_LEVEL(ch) + 1;
+	MOVE = rand() % 15 + 1;
+	GET_HIT(ch) = GET_HIT(ch) + HIT;
+	GET_MANA(ch) = GET_MANA(ch) + MANA;
+	GET_MOVE(ch) = GET_MOVE(ch) + MOVE;
+
+	extract_obj(obj);
+}
+

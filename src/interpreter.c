@@ -70,6 +70,7 @@ ACMD(do_at);
 ACMD(do_backstab);
 ACMD(do_ban);
 ACMD(do_bash);
+ACMD(do_bury);
 ACMD(do_cast);
 ACMD(do_color);
 ACMD(do_commands);
@@ -78,7 +79,9 @@ ACMD(do_credits);
 ACMD(do_date);
 ACMD(do_dc);
 ACMD(do_diagnose);
+ACMD(do_dig);
 ACMD(do_display);
+ACMD(do_drain);
 ACMD(do_drink);
 ACMD(do_drop);
 ACMD(do_eat);
@@ -233,6 +236,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "brb"      , POS_RESTING , do_action   , 0, 0 },
   { "brief"    , POS_DEAD    , do_gen_tog  , 0, SCMD_BRIEF },
   { "burp"     , POS_RESTING , do_action   , 0, 0 },
+  { "bury"     , POS_STANDING, do_bury     , 0, 0 },
   { "buy"      , POS_STANDING, do_not_here , 0, 0 },
   { "bug"      , POS_DEAD    , do_gen_write, 0, SCMD_BUG },
 
@@ -264,8 +268,10 @@ cpp_extern const struct command_info cmd_info[] = {
   { "dc"       , POS_DEAD    , do_dc       , LVL_GOD, 0 },
   { "deposit"  , POS_STANDING, do_not_here , 1, 0 },
   { "diagnose" , POS_RESTING , do_diagnose , 0, 0 },
+  { "dig"      , POS_STANDING, do_dig      , 0, 0 },
   { "display"  , POS_DEAD    , do_display  , 0, 0 },
   { "donate"   , POS_RESTING , do_drop     , 0, SCMD_DONATE },
+  { "drain"    , POS_STANDING, do_drain    , 0, 0 },
   { "drink"    , POS_RESTING , do_drink    , 0, SCMD_DRINK },
   { "drop"     , POS_RESTING , do_drop     , 0, SCMD_DROP },
   { "drool"    , POS_RESTING , do_action   , 0, 0 },
