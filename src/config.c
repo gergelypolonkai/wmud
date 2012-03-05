@@ -58,7 +58,7 @@ int pk_allowed = NO;
 int pt_allowed = NO;
 
 /* minimum level a player must be to shout/holler/gossip/auction */
-int level_can_shout = 1;
+int level_can_shout = 2;
 
 /* number of movement points it costs to holler */
 int holler_move_cost = 20;
@@ -93,7 +93,7 @@ int dts_are_dumps = YES;
  * able to carry around things like boards.  That's not necessarily a bad
  * thing, but this will be left at a default of 'NO' for historic reasons.
  */
-int load_into_inventory = NO;
+int load_into_inventory = YES;
 
 /* "okay" etc. */
 const char *OK = "Okay.\r\n";
