@@ -36,6 +36,8 @@ extern int max_npc_corpse_time, max_pc_corpse_time;
 /* External procedures */
 char *fread_action(FILE *fl, int nr);
 ACMD(do_flee);
+ACMD(do_get);
+ACMD(do_drain);
 int backstab_mult(int level);
 int thaco(int ch_class, int level);
 int ok_damage_shopkeeper(struct char_data *ch, struct char_data *victim);
@@ -832,6 +834,15 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 	forget(ch, victim);
     }
     die(victim);
+
+    /* If AUTOLOOT is enabled, loot everything from corpse */
+    if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTOLOOT))
+      do_get(ch, "all corpse", 0, 0);
+
+    /* IF AUTODRAIN is enabled, drain corpse */
+    if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTODRAIN))
+      do_drain(ch, "corpse", 0, 0);
+
     return (-1);
   }
   return (dam);

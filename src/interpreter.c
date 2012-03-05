@@ -223,6 +223,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "ask"      , POS_RESTING , do_spec_comm, 0, SCMD_ASK },
   { "auction"  , POS_SLEEPING, do_gen_comm , 0, SCMD_AUCTION },
   { "autoexit" , POS_DEAD    , do_gen_tog  , 0, SCMD_AUTOEXIT },
+  { "autoloot" , POS_DEAD    , do_gen_tog  , 0, SCMD_AUTOLOOT },
+  { "autodrain", POS_DEAD    , do_gen_tog  , 0, SCMD_AUTODRAIN },
 
   { "bounce"   , POS_STANDING, do_action   , 0, 0 },
   { "backstab" , POS_STANDING, do_backstab , 1, 0 },
