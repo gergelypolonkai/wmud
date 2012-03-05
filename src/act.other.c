@@ -1091,16 +1091,14 @@ ACMD(do_dig)
 	/*
 	 ** search for an object in the room that has a ITEM_BURIED flag
 	 */
-	obj = world[IN_ROOM(ch)].contents;
-
-	while (obj != NULL)
+	for (obj = world[IN_ROOM(ch)].contents; obj; obj = obj->next)
 	{
 		if (IS_BURIED(obj))
 		{
 			/* Remove the buried bit so the player can see it. */
 			REMOVE_BIT(GET_OBJ_EXTRA(obj), ITEM_BURIED);
 
-			if(CAN_SEE_OBJ(ch, obj))
+			if (CAN_SEE_OBJ(ch, obj))
 			{
 				found_item = 1;     /* player found something */
 
@@ -1113,13 +1111,10 @@ ACMD(do_dig)
 			else
 			{
 				/* add the bit back becuase the player can't unbury what
-				 ** what he can't find...  */
+				 ** he can't find...  */
 				SET_BIT(GET_OBJ_EXTRA(obj), ITEM_BURIED);
 			}
 		}
-
-		/* go to the next obj */
-		obj = obj->next;
 	}
 
 	/* if the player didn't find anything */
@@ -1133,7 +1128,8 @@ ACMD(do_drain)
 	struct obj_data *obj;
 	int HIT = 0,
 	    MANA = 0,
-	    MOVE = 0;
+	    MOVE = 0,
+	    reward;
 
 	one_argument(argument, arg);
 
@@ -1150,14 +1146,31 @@ ACMD(do_drain)
 	}
 
 	act("$n bends down and touches $p which slowly disappears.\r\n", FALSE, ch, obj, NULL, TO_ROOM);
-	act("You bend down and drain $p.\r\n", FALSE, ch, obj, NULL, TO_ROOM);
+	act("You bend down and drain $p.\r\n", FALSE, ch, obj, NULL, TO_CHAR);
 
-	HIT = rand() % GET_LEVEL(ch) * 2 + 1;
-	MANA = rand() % GET_LEVEL(ch) + 1;
-	MOVE = rand() % 15 + 1;
-	GET_HIT(ch) = GET_HIT(ch) + HIT;
-	GET_MANA(ch) = GET_MANA(ch) + MANA;
-	GET_MOVE(ch) = GET_MOVE(ch) + MOVE;
+	if ((reward = rand_number(1, 2)) == 1)
+	{
+		HIT = rand_number(1, GET_LEVEL(ch) * 2);
+		MANA = rand_number(1, GET_LEVEL(ch));
+		MOVE = rand_number(1, 15);
+		GET_HIT(ch) += HIT;
+		GET_MANA(ch) += MANA;
+		GET_MOVE(ch) += MOVE;
+		send_to_char(ch, "The Gods rewarded you with %dH %dM %dV\r\n", HIT, MANA, MOVE);
+	}
+	else if (reward == 2)
+	{
+		int amount = rand_number(1, 5);
+		GET_GOLD(ch) += amount;
+		send_to_char(ch, "The Gods rewarded you with %d gold coin%s\r\n", amount, (amount > 1) ? "s" : "");
+	}
+	else
+	{
+		int amount = rand_number(1, GET_LEVEL(ch) * 5);
+
+		gain_exp(ch, amount);
+		send_to_char(ch, "The Gods rewarded you with %d experience point%s.\r\n", amount, (amount >1) ? "s" : "");
+	}
 
 	extract_obj(obj);
 }

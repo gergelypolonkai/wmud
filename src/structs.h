@@ -314,7 +314,6 @@
 #define ITEM_PEN       21		/* Item is a pen		*/
 #define ITEM_BOAT      22		/* Item is a boat		*/
 #define ITEM_FOUNTAIN  23		/* Item is a fountain		*/
-#define ITEM_BURIED    24               /* Item is buried               */
 
 
 /* Take/Wear flags: used by obj_data.obj_flags.wear_flags */
@@ -353,6 +352,7 @@
 #define ITEM_ANTI_THIEF	   (1 << 14)	/* Not usable by thieves	*/
 #define ITEM_ANTI_WARRIOR  (1 << 15)	/* Not usable by warriors	*/
 #define ITEM_NOSELL	   (1 << 16)	/* Shopkeepers won't touch it	*/
+#define ITEM_BURIED        (1 << 17)    /* Item is buried               */
 
 
 /* Modifier constants used with obj affects ('A' fields) */

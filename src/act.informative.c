@@ -173,6 +173,9 @@ void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
 
   if (OBJ_FLAGGED(obj, ITEM_HUM))
     send_to_char(ch, " ..It emits a faint humming sound!");
+
+  if (IS_BURIED(obj))
+    send_to_char(ch, " ... It is buried!");
 }
 
 
