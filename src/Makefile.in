@@ -19,9 +19,9 @@ PROFILE =
 
 BINDIR = ../bin
 
-CFLAGS = @CFLAGS@ $(MYFLAGS) $(PROFILE)
+CFLAGS = @CFLAGS@ @SQLITE3_CFLAGS@ $(MYFLAGS) $(PROFILE)
 
-LIBS = @LIBS@ @CRYPTLIB@ @NETLIB@
+LIBS = @LIBS@ @SQLITE3_LIBS@ @CRYPTLIB@ @NETLIB@
 
 OBJFILES = act.comm.o act.informative.o act.item.o act.movement.o \
 	act.offensive.o act.other.o act.social.o act.wizard.o alias.o ban.o \
@@ -29,7 +29,7 @@ OBJFILES = act.comm.o act.informative.o act.item.o act.movement.o \
 	graph.o handler.o house.o interpreter.o limits.o magic.o mail.o \
 	mobact.o modify.o objsave.o olc.o random.o shop.o spec_assign.o \
 	spec_procs.o spell_parser.o spells.o utils.o weather.o \
-	bsd-snprintf.o
+	bsd-snprintf.o races.o
 
 CXREF_FILES = act.comm.c act.informative.c act.item.c act.movement.c \
 	act.offensive.c act.other.c act.social.c act.wizard.c alias.c ban.c \
@@ -37,7 +37,7 @@ CXREF_FILES = act.comm.c act.informative.c act.item.c act.movement.c \
 	graph.c handler.c house.c interpreter.c limits.c magic.c mail.c \
 	mobact.c modify.c objsave.c olc.c random.c shop.c spec_assign.c\
 	spec_procs.c spell_parser.c spells.c utils.c weather.c \
-	bsd-snprintf.c
+	bsd-snprintf.c races.c
 
 default: all
 
@@ -179,6 +179,8 @@ objsave.o: objsave.c conf.h sysdep.h structs.h comm.h handler.h db.h \
 olc.o: olc.c conf.h sysdep.h structs.h utils.h comm.h interpreter.h handler.h db.h \
   olc.h
 	$(CC) -c $(CFLAGS) olc.c
+races.o: races.c conf.h sysdep.h structs.h interpreter.h utils.h
+	$(CC) -c $(CFLAGS) races.c
 random.o: random.c utils.h
 	$(CC) -c $(CFLAGS) random.c
 shop.o: shop.c conf.h sysdep.h structs.h comm.h handler.h db.h interpreter.h \
