@@ -238,6 +238,7 @@ const char *connected_types[] = {
   "Changing PW 3",
   "Self-Delete 1",
   "Self-Delete 2",
+  "Select race",
   "Disconnecting",
   "\n"
 };

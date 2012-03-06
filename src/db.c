@@ -2217,6 +2217,7 @@ void store_to_char(struct char_file_u *st, struct char_data *ch)
 
   GET_SEX(ch) = st->sex;
   GET_CLASS(ch) = st->chclass;
+  GET_RACE(ch) = st->race;
   GET_LEVEL(ch) = st->level;
 
   ch->player.short_descr = NULL;
@@ -2335,6 +2336,7 @@ void char_to_store(struct char_data *ch, struct char_file_u *st)
   st->height = GET_HEIGHT(ch);
   st->sex = GET_SEX(ch);
   st->chclass = GET_CLASS(ch);
+  st->race = GET_RACE(ch);
   st->level = GET_LEVEL(ch);
   st->abilities = ch->real_abils;
   st->points = ch->points;

@@ -29,6 +29,7 @@ extern room_rnum r_mortal_start_room;
 extern room_rnum r_immort_start_room;
 extern room_rnum r_frozen_start_room;
 extern const char *class_menu;
+extern const char *race_menu;
 extern char *motd;
 extern char *imotd;
 extern char *background;
@@ -46,6 +47,7 @@ void echo_on(struct descriptor_data *d);
 void echo_off(struct descriptor_data *d);
 void do_start(struct char_data *ch);
 int parse_class(char arg);
+int parse_race(char *arg);
 int special(struct char_data *ch, int cmd, char *arg);
 int isbanned(char *hostname);
 int Valid_Name(char *newname);
@@ -1510,6 +1512,19 @@ void nanny(struct descriptor_data *d, char *arg)
 		"What IS your sex? ");
       return;
     }
+
+    write_to_output(d, "%s\r\nRace: ", race_menu);
+    STATE(d) = CON_QRACE;
+    break;
+  case CON_QRACE:
+    load_result = parse_race(arg);
+    if (load_result == RACE_UNDEFINED)
+    {
+	    write_to_output(d, "\r\nThat's not a race.\r\nRace: ");
+	    return;
+    }
+    else
+	    GET_RACE(d->character) = load_result;
 
     write_to_output(d, "%s\r\nClass: ", class_menu);
     STATE(d) = CON_QCLASS;

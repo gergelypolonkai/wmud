@@ -1,5 +1,7 @@
-#include "sysdep.h"
+#include <string.h>
+
 #include "conf.h"
+#include "sysdep.h"
 #include "structs.h"
 #include "interpreter.h"
 #include "utils.h"
@@ -20,30 +22,27 @@ const char *pc_race_types[] = {
 
 const char *race_menu = "\r\n"
 "Select race:\r\n"
-"(1) Haoon\r\n"
-"(2) Utnir\r\n"
-"(3) Duaron\r\n";
+"( 1) Haoon\r\n"
+"( 2) Utnir\r\n"
+"( 3) Duaron\r\n";
 
 int
-parse_race(char arg)
+parse_race(char *arg)
 {
-	arg = LOWER(arg);
-
-	switch (arg)
+	if (strcmp(arg, "1") == 0)
 	{
-		case '1':
-			return RACE_HAOON;
-			break;
-		case '2':
-			return RACE_UTNIR;
-			break;
-		case '3':
-			return RACE_DUARON;
-			break;
-		default:
-			return RACE_UNDEFINED;
-			break;
+		return RACE_HAOON;
 	}
+	else if (strcmp(arg, "2") == 0)
+	{
+		return RACE_UTNIR;
+	}
+	else if (strcmp(arg, "3") == 0)
+	{
+		return RACE_DUARON;
+	}
+
+	return RACE_UNDEFINED;
 }
 
 long

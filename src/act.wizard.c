@@ -45,6 +45,7 @@ void appear(struct char_data *ch);
 void reset_zone(zone_rnum zone);
 void roll_real_abils(struct char_data *ch);
 int parse_class(char arg);
+int parse_race(char *arg);
 void run_autowiz(void);
 
 /* local functions */
@@ -2171,6 +2172,7 @@ ACMD(do_show)
    { "age",		LVL_GRGOD,	BOTH,	NUMBER },
    { "height",		LVL_GOD,	BOTH,	NUMBER },
    { "weight",		LVL_GOD,	BOTH,	NUMBER },  /* 50 */
+   { "race",            LVL_GRGOD,      PC,     MISC },
    { "\n", 0, BOTH, MISC }
   };
 
@@ -2495,6 +2497,15 @@ int perform_set(struct char_data *ch, struct char_data *vict, int mode,
   case 50:
     GET_WEIGHT(vict) = value;
     affect_total(vict);
+    break;
+
+  case 51:
+    if ((i == parse_race(val_arg)) == RACE_UNDEFINED)
+    {
+	    send_to_char(ch, "That is not a race.\r\n");
+	    return (0);
+    }
+    GET_RACE(vict) = i;
     break;
 
   default:
