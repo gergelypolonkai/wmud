@@ -174,6 +174,7 @@
 #define PLR_INVSTART	(1 << 14)  /* Player should enter game wizinvis	*/
 #define PLR_CRYO	(1 << 15)  /* Player is cryo-saved (purge prog)	*/
 #define PLR_NOTDEADYET	(1 << 16)  /* (R) Player being extracted.	*/
+#define PLR_DEAD        (1 << 17)  /* Player is dead                    */
 
 
 /* Mobile flags: used by char_data.char_specials.act */
@@ -467,6 +468,10 @@
 #define LVL_GRGOD	33
 #define LVL_GOD		32
 #define LVL_IMMORT	31
+
+/* Room numbers for the Passage ******************************************/
+#define PASSAGE_MIN 101
+#define PASSAGE_MAX 101
 
 /* Level of the 'freeze' command */
 #define LVL_FREEZE	LVL_GRGOD

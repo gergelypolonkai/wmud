@@ -363,16 +363,40 @@ void death_cry(struct char_data *ch)
 
 void raw_kill(struct char_data *ch)
 {
-  if (FIGHTING(ch))
-    stop_fighting(ch);
+	if (FIGHTING(ch))
+		stop_fighting(ch);
 
-  while (ch->affected)
-    affect_remove(ch, ch->affected);
+	while (ch->affected)
+		affect_remove(ch, ch->affected);
 
-  death_cry(ch);
+	death_cry(ch);
 
-  make_corpse(ch);
-  extract_char(ch);
+	if (IS_NPC(ch))
+	{
+		make_corpse(ch);
+		extract_char(ch);
+	}
+	else
+	{
+		send_to_char(ch, "You feel yourself being pulled into a bright light...\r\n");
+		char_from_room(ch);
+		char_to_room(ch, real_room(rand_number(PASSAGE_MIN, PASSAGE_MAX)));
+		GET_HIT(ch) = GET_MAX_HIT(ch);
+		GET_MANA(ch) = GET_MAX_MANA(ch);
+		GET_MOVE(ch) = GET_MAX_MOVE(ch);
+		update_pos(ch);
+		look_at_room(ch, 0);
+		if (!PLR_FLAGGED(ch, PLR_DEAD))
+		{
+			/* TODO: Do something here, like temporarily remove the player's gold...
+			GET_TEMP_GOLD(ch) = GET_GOLD(ch);
+			GET_GOLD(ch) = 0;
+			*/
+			/* TODO: Set the DEAD flag on the player. Later it has to be removed somehow!
+			SET_BIT(PLR_FLAGS(ch), PLR_DEAD);
+			*/
+		}
+	}
 }
 
 
@@ -819,35 +843,44 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (GET_POS(victim) <= POS_STUNNED && FIGHTING(victim) != NULL)
     stop_fighting(victim);
 
-  /* Uh oh.  Victim died. */
-  if (GET_POS(victim) == POS_DEAD) {
-    if (ch != victim && (IS_NPC(victim) || victim->desc)) {
-      if (AFF_FLAGGED(ch, AFF_GROUP))
-	group_gain(ch, victim);
-      else
-        solo_gain(ch, victim);
-    }
+	/* Uh oh.  Victim died. */
+	if (GET_POS(victim) == POS_DEAD)
+	{
+		if (
+			(ch != victim)
+			&& (
+				IS_NPC(victim)
+				|| victim->desc
+			)
+		)
+		{
+			if (AFF_FLAGGED(ch, AFF_GROUP))
+				group_gain(ch, victim);
+			else
+				solo_gain(ch, victim);
+		}
 
-    if (!IS_NPC(victim)) {
-      mudlog(BRF, LVL_IMMORT, TRUE, "%s killed by %s at %s", GET_NAME(victim), GET_NAME(ch), world[IN_ROOM(victim)].name);
-      if (MOB_FLAGGED(ch, MOB_MEMORY))
-	forget(ch, victim);
-    }
-    die(victim);
+		if (!IS_NPC(victim))
+		{
+			mudlog(BRF, LVL_IMMORT, TRUE, "%s killed by %s at %s", GET_NAME(victim), GET_NAME(ch), world[IN_ROOM(victim)].name);
+			if (MOB_FLAGGED(ch, MOB_MEMORY))
+				forget(ch, victim);
+		}
+		die(victim);
 
-    /* If AUTOLOOT is enabled, loot everything from corpse */
-    if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTOLOOT))
-      do_get(ch, "all corpse", 0, 0);
+		/* If AUTOLOOT is enabled, loot everything from corpse */
+		if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTOLOOT))
+			do_get(ch, "all corpse", 0, 0);
 
-    /* IF AUTODRAIN is enabled, drain corpse */
-    if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTODRAIN))
-      do_drain(ch, "corpse", 0, 0);
+		/* IF AUTODRAIN is enabled, drain corpse */
+		if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTODRAIN))
+			do_drain(ch, "corpse", 0, 0);
 
-    return (-1);
-  }
-  return (dam);
+		return (-1);
+	}
+
+	return (dam);
 }
-
 
 /*
  * Calculate the THAC0 of the attacker.
