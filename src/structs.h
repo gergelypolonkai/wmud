@@ -130,6 +130,13 @@
 #define CLASS_DRAGON      4
 #define CLASS_GIANT       5
 
+/* Race */
+#define RACE_UNDEFINED (-1)
+#define RACE_HAOON     0
+#define RACE_UTNIR     1
+#define RACE_DUARON    2
+
+#define NUM_RACES      3 /* This must be the number of races! */
 
 /* Sex */
 #define SEX_NEUTRAL   0
@@ -263,6 +270,7 @@
 #define CON_DELCNF1	 15	/* Delete confirmation 1		*/
 #define CON_DELCNF2	 16	/* Delete confirmation 2		*/
 #define CON_DISCONNECT	 17	/* In-game link loss (leave character)	*/
+#define CON_QRACE        18     /* Race?                                */
 
 /* Character equipment positions: used as index for char_data.equipment[] */
 /* NOTE: Don't confuse these constants with the ITEM_ bitvectors
@@ -734,6 +742,7 @@ struct char_player_data {
    char	*title;        /* PC / NPC's title                     */
    byte sex;           /* PC / NPC's sex                       */
    byte chclass;       /* PC / NPC's class		       */
+   byte race;          /* PC / NPC's race                      */
    byte level;         /* PC / NPC's level                     */
    sh_int hometown;    /* PC s Hometown (zone)                 */
    struct time_data time;  /* PC's AGE in days                 */
@@ -943,6 +952,7 @@ struct char_file_u {
    char	title[MAX_TITLE_LENGTH+1];
    byte sex;
    byte chclass;
+   byte race;
    byte level;
    sh_int hometown;
    time_t birth;   /* Time of birth of character     */

@@ -275,6 +275,7 @@ void	update_pos(struct char_data *victim);
     GET_LEVEL(ch))
 
 #define GET_CLASS(ch)   ((ch)->player.chclass)
+#define GET_RACE(ch)    ((ch)->player.race)
 #define GET_HOME(ch)	((ch)->player.hometown)
 #define GET_HEIGHT(ch)	((ch)->player.height)
 #define GET_WEIGHT(ch)	((ch)->player.weight)
@@ -483,6 +484,7 @@ void	update_pos(struct char_data *victim);
 
 
 #define CLASS_ABBR(ch) (IS_NPC(ch) ? "--" : class_abbrevs[(int)GET_CLASS(ch)])
+#define RACE_ABBR(ch) (IS_NPC(ch) ? "--" : race_abbrevs[(int)GET_RACE(ch)])
 
 #define IS_MAGIC_USER(ch)	(!IS_NPC(ch) && \
 				(GET_CLASS(ch) == CLASS_MAGIC_USER))
