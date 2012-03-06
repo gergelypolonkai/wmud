@@ -164,8 +164,16 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   char_from_room(ch);
   char_to_room(ch, world[was_in].dir_option[dir]->to_room);
 
-  if (!AFF_FLAGGED(ch, AFF_SNEAK))
-    act("$n has arrived.", TRUE, ch, 0, 0, TO_ROOM);
+	if (!AFF_FLAGGED(ch, AFF_SNEAK))
+	{
+		char buf2[MAX_STRING_LENGTH];
+
+		snprintf(buf2, sizeof(buf2), "$n has arrived from %s%s.",
+				(((dir == UP) || (dir == DOWN)) ? "" : "the "),
+				(dir == UP ? "below": dir == DOWN ? "above" : dirs[rev_dir[dir]])
+		);
+		act(buf2, TRUE, ch, 0, 0, TO_ROOM);
+	}
 
   if (ch->desc != NULL)
     look_at_room(ch, 0);
