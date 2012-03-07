@@ -14,5 +14,6 @@ if test "$enable_memcached" = "yes"; then
 fi
 
 PKG_CHECK_MODULES([GLIB], glib-2.0)
+PKG_CHECK_MODULES([SQLITE3], sqlite3)
 
 AC_OUTPUT(Makefile src/Makefile)
