@@ -30,6 +30,15 @@ INSERT INTO preferences (id, internal_name, description) VALUES (23, 'DISPAUTO',
 INSERT INTO preferences (id, internal_name, description) VALUES (23, 'AUTOLOOT',  'Automatically loot corpses on kill');
 INSERT INTO preferences (id, internal_name, description) VALUES (24, 'AUTODRAIN', 'Automatically drain corpses on kill');
 
+CREATE TABLE affections (
+	id integer NOT NULL PRIMARY KEY,
+	spell_type integer NOT NULL UNIQUE,
+	duration integer,
+	modifier int2,
+	location int2,
+	bitvector unsigned big int
+);
+
 CREATE TABLE players (
 	id integer NOT NULL, -- Used to be idnum!
 	name varchar(20) UNIQUE NOT NULL PRIMARY KEY,
@@ -50,19 +59,17 @@ long /*bitvector_t*/ act;    /* act flag for NPC's; player flag for PC's */
 long /*bitvector_t*/ affected_by; /* Bitvector for spells/skills affected by */
 sh_int apply_saving_throw[5]; /* Saving throw (Bonuses)              */
 
-byte skills[MAX_SKILLS+1];   /* array of skills plus skill 0         */
-bool talks[MAX_TONGUE];      /* PC s Tongues 0 for NPC               */
+byte skills[201];   /* array of skills plus skill 0         */
+bool talks[3];      /* PC s Tongues 0 for NPC               */
 	wimp integer,
 	freeze_level int2,
 	invis_level int2,
 	load_room unsigned big int,
-long /*bitvector_t*/ pref;   /* preference flags for PC's.           */
 	bad_pws integer NOT NULL DEFAULT 0,
 	drunk_level int2,
 	hunger_level int2,
 	thirst_level int2,
 	spells_to_learn integer,
-
 	strength int2,
 	strength_add int2,
 	intelligence int2,
@@ -70,7 +77,6 @@ long /*bitvector_t*/ pref;   /* preference flags for PC's.           */
 	dexterity int2,
 	constitution int2,
 	charisma int2,
-
 	cur_mana integer,
 	max_mana integer,
 	cur_hit integer,
@@ -83,9 +89,6 @@ long /*bitvector_t*/ pref;   /* preference flags for PC's.           */
 	experience bigint,
 	hitroll int2,
 	damroll int2,
-
-struct affected_type affected[MAX_AFFECT];
-
 	last_logon datetime,
 	last_host varchar(100)
 );
@@ -93,5 +96,10 @@ struct affected_type affected[MAX_AFFECT];
 CREATE TABLE player_preferences (
 	player_id integer NOT NULL REFERENCES players(id),
 	preference_id integer NOT NULL REFERENCES preferences(id)
+);
+
+CREATE TABLE player_affections (
+	player_id integer NOT NULL REFERENCES players(id),
+	affection_id integer NOT NULL REFERENCES affenctions(id)
 );
 
