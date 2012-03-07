@@ -1,0 +1,287 @@
+wMUD TODO file
+
+* Store EVERYTHING in an SQLite3 database
+
+* At least two threads. One of them should continuously write everything back
+  to the database, while the other one should serve the connections. Maybe the
+  out-of-game chat should be outsourced to a separate thread, either.
+
+* All descriptions should be written in a markup language to support bold,
+  underline, colours, and such
+
+* Movement
+  o 10 directions (N, E, S, W, NE, NW, SE, SW, U, D)
+  o Also, some rooms may have other exits, like portals, which can be ENTER'ed.
+  o Doors can be locked or hidden
+
+* Planets/Planes
+  o Rooms are connected to Planets
+  o Planets are connected to Planes
+  o Rooms may have different descriptions depending on the Plane the Character
+    is active on
+
+* Commands already defined in Zim Wiki:
+  o DROP
+  o GET
+  o PRACISE/PRACTICE
+  o PRAY
+  o RECALL should take back the character to their house, or the Inn room they
+    have rented. Specific rooms may have a flag so there must be no recall from
+    them (this should also mean that upon logout/login, the character will get
+    back to this room)
+  o SURVEY
+  o TALE
+
+* Commands that should be present
+  o AFFECTS to show all the spells that affects the character (spell name,
+    apply count, duration, applier name)
+  o SCORE to show the player's statistics
+  o INVENTORY to show the character's inventory
+  o EQUIPMENT to show the equipped items
+  o AUTOEXIT to toggle exit display on LOOK
+  o LOOK
+  o EXITS
+  o EXAMINE should be an alias to LOOK, except it should work only on objects
+  o CONSIDER
+  o SET
+    . AUTOLOOT    [OFF]
+    . AUTOSKIN    [OFF]
+    . AUTODRAIN   [OFF]
+    . AUTOSPLIT   [OFF]
+    . COLOR       [ON ]
+    . AUTOLOOK    [ON ]
+    . WIMPY       [OFF]
+    . AUTOCONSUME [OFF] (To automatically consume food and drink when
+                         hungry/thirsty)
+    . GROUPINV    [ON ]
+    . PAGELENGTH  [30 ]
+  o BURY/DIG
+  o EQUIP/WIELD
+  o IGNORE/UNIGNORE
+  o WHO/WHOIS
+  o QUIT should exit the game
+  o LOGOUT should go back to intro menu
+  o USE may use objects in hand (map, weapons with spells, etc.), or in room
+    (buttons, levers, etc.)
+
+* Player grouping (AKA Party)
+
+* Housing system should automatically expand towns (this will be fun to write).
+  Maybe a better alternative is to check for free housing and if the amount
+  goes too low, manually create some new one.
+  o Housing should be decorated with different objects.
+
+* The whole world should have one fallback start location (Tree of Memories?)
+
+* All Races have at least one possible start locations
+
+* People start in a well-defined start location (randomly selected during
+  character generation)
+
+* Characters can set their hometown in an Inn; however, Inns have only a
+  limited amount of rooms. Inn rooms cost some amount of gold per day, which is
+  pre-paid. If the rent is over, the character's start location is set to one
+  of the racial defaults. If the character is online when the rent is over,
+  they should get a warning message about this. If the player gets an own
+  house, their home location should be automatically set to it
+
+* Item creation (AKA combining or Professions, like Blacksmithing and Alchemy)
+  o Trainers, who know only specific recipes
+  o Recipe scrolls (e.g to be dropped by mobs and such)
+  o Corpse skinning (only specific corpses)
+  o Corpse butching (only specific corpses)
+  o Fishing
+  o Mining
+  o Foraging
+
+* Container items (bags)
+
+* Companions
+  o Combat/Pack animals
+  o Mounts (may also act as combat/pack animals)
+  o Charming
+
+* Auction system
+
+* Item donation
+
+* Gods
+  o Gods may be chosen upon character creation (for wMUD, a character MUST have
+    at least two Gods)
+
+* Reputation system
+
+* Player Guilds
+
+* Sacrifices
+
+* Prayers
+
+* Item types
+  o Armour/Clothing
+    . Shields
+  o Weapon
+    . Ballista
+    . Bashing
+    . Bow
+    . Crossbow
+    . Club
+    . Knuckle
+    . Lash
+    . Net
+    . Piercing
+    . Slashing
+    . Whip
+  o Potion
+  o Poison (appliable to weapons)
+  o Food/Water/Alcohol/Sugar
+  o Light
+    . Maybe these objects (or some of them) should be seen in the dark
+  o Spell reagent
+  o Material
+  o Artifacts
+
+* Death system, Rebirth
+
+* War Machines
+
+* Shops
+  o Most shops should open/close depending on the in-game time
+
+* Skills/Spells/Talents granted by the Gods
+  o Fear
+
+* Magic Profession
+
+* Fighting Professions with practicing
+  o Disarm
+  o Dual Wield
+  o Stun
+
+* The whole system should be built with class support, although wMUD will
+  technically have only one "Adventurer" class. Also, multiclassing should be
+  possible
+
+* Character aging, with racial maximum age. When a character is too old, they
+  can retire (e.g they will become story tellers or such), or die and rebirth.
+  Reborn characters have a bonus to their maximum age. Upon rebirth they create
+  a totally new character, with all their old data remaining in the database.
+  Reborn characters have the possibility to regain all their old powers after a
+  few years
+
+* Quests given by NPCs
+
+* Player creatable quests
+
+* In-game chat (whisper, say, shout, emotes, group/party, guild). Guild chat
+  should be accessible without entering the game (from the Circle-like main
+  menu), or even via IRC or something like that
+
+* Speedwalking?
+
+* Arenas
+
+* Player killing/thieving should be enabled/disabled per world
+
+* Mercy mob flag: mobs will stop attacking if their enemy is unable to fight
+  any more
+
+* Mobs should be able to wear/wield items, have an inventory, have Skills,
+  Spells and Talents
+
+* Sneaking, thieving, robbery
+  o A mob may steal stuff from you, you may detect it, and maybe able to catch
+    it and get your stuff back. However, killing them in a city may result in
+    punishment by the guards.
+
+* Gossips
+
+* Bragging NPCs: if a character gets killed by a specific NPCs, those NPCs will
+  humiliate that character for a while
+
+* Weapon USE: wielded weapons may do something (like cast spells or such) if a
+  specific attribute is set. The item spell should recharge over time, or
+  recharge upon a specific condition
+
+* Money (with the possibility to create several money types, like different
+  currencies for different Races)
+
+* Banks
+  o Money deposit (with interest in some banks)
+  o Storage, for a fee
+  o Loans
+
+* Guild bank
+
+* All looted items should be used in some way or another. Sacrifice is a common
+  way, but some items may be milled (e.g bones and herbs) or disassembled (e.g
+  Mechanics objects or armour), others may be used as raw materials. Extracted
+  body parts (e.g blood or meat) should decompose over time, even in an
+  inventory, unless put in a special container
+
+* Object affects and attribute modifiers, like an earring which make the
+  character deaf. These affects may be hidden, and even delayed (e.g the
+  character puts on the earring that gives a high amount of charisma, but after
+  wearing it for a specific time, they will become deaf, and they will have no
+  idea what caused it. The same object can also be cursed, so it cannot be
+  removed except by some professional magicians
+
+* Item modifiers, like sharpening stones
+
+* Item durability. Items must have a Profession and a Profession Level
+  associated to them to show who can repair it
+
+* <mob> arrives from <direction>
+
+* Character bounty, which can be placed by other characters for a fee (should
+  be enabled per world), or NPCs.
+
+* Guild wars (Players from a Guild may PK players from another Guild if the two
+  Guilds are in war with each other)
+
+* Mob glowing (e.g they will be unable to sneak)
+
+* Polls
+
+* Configurable prompt
+
+* Marriage?
+
+* Character titles, which can be rewards for quests, or be bought for a high
+  amount of money
+
+* Spirit world
+  o Some rooms (at least one) should be marked as Spirit World. Upon death,
+    characters get the DEAD flag, and get to this room. They must find their
+    way to remove the DEAD flag, and/or find a way back to the real world.
+
+* Blood may remain on the floor during a fight (even without a kill)
+
+* Death trap rooms
+
+* Regeneration rooms
+
+* Teleportation objects (portal machines) and rooms (elevators)
+
+* Languages
+
+* Books
+
+* Rivers should have some kind of a current. If you get into a river (even on a
+  boat, or by swimming), it will move you automatically somewhere
+
+* Gambling (may be illegal in some towns ;) )
+
+* Guides that can be payed for. E.g in a big city, a guide can lead you to the
+  Inn, or something like that for a small fee.
+
+* Automatically hiding/appearing exits (e.g to created mazes to hide stuff)
+
+* Mailing
+
+* Abilities
+  o Rolled upon character creation
+  o May be trained
+  o There should be a racial maximum
+  o May be modified by affections and worn items
+  o May increase/decrease with age
