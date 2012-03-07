@@ -1,5 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/act.comm.c)
+AC_CONFIG_MACRO_DIR([.])
 AC_SUBST(MYFLAGS)
 AC_SUBST(NETLIB)
 AC_SUBST(CRYPTLIB)
@@ -209,6 +210,10 @@ AC_CHECK_PROTO(time)
 AC_CHECK_PROTO(unlink)
 AC_CHECK_PROTO(vsnprintf)
 AC_CHECK_PROTO(write)
+
+PKG_CHECK_MODULES([SQLITE3], sqlite3)
+AC_SUBST(SQLITE3_CFLAGS)
+AC_SUBST(SQLITE3_LIBS)
 
 AC_OUTPUT(src/Makefile src/util/Makefile)
 #
