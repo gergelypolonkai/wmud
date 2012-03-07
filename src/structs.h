@@ -471,7 +471,7 @@
 
 /* Room numbers for the Passage ******************************************/
 #define PASSAGE_MIN 101
-#define PASSAGE_MAX 101
+#define PASSAGE_MAX 103
 
 /* Level of the 'freeze' command */
 #define LVL_FREEZE	LVL_GRGOD

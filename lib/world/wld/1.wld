@@ -3,21 +3,37 @@ The Passage~
    You are walking the domain of Thoradrin.
 ~
 1 cefgh 1
-D0
+D1
 More of the Passage
 ~
 ~
-0 -1 173
+0 -1 102
 S
-#173
+#102
 The Passage~
    You are walking the domain of Thoradrin.
 ~
 1 cefgh 1
-D2
+D1
+More of the Passage
+~
+~
+0 -1 103
+D3
 More of the Passage
 ~
 ~
 0 -1 101
+S
+#103
+The Passage~
+   You are walking the domain of Thoradrin.
+~
+1 cefgh 1
+D3
+More of the Passage
+~
+~
+0 -1 102
 S
 $
