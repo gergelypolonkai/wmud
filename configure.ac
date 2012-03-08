@@ -13,7 +13,7 @@ if test "$enable_memcached" = "yes"; then
 	AC_DEFINE([ENABLE_MEMCACHED], [1], [Define to compile with Memcached support])
 fi
 
-PKG_CHECK_MODULES([GNET], gnet-2.0)
+PKG_CHECK_MODULES([GIO], gio-2.0)
 PKG_CHECK_MODULES([GLIB], glib-2.0)
 PKG_CHECK_MODULES([SQLITE3], sqlite3)
 
