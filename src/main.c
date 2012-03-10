@@ -1,5 +1,8 @@
 #include <glib.h>
 #include <gio/gio.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 struct {
 	char *file;
@@ -27,6 +30,7 @@ rl_sec_elapsed(gpointer user_data)
 	return TRUE;
 }
 
+#ifdef DEBUG
 void
 debug_context(char *file, int line)
 {
@@ -37,6 +41,9 @@ debug_context(char *file, int line)
 	debug_context_loc.line = line;
 }
 #define DebugContext debug_context(__FILE__, __LINE__)
+#else
+#define DebugContext
+#endif
 
 int
 main(int argc, char **argv)

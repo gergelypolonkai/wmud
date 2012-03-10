@@ -7,6 +7,12 @@ AM_INIT_AUTOMAKE([wMUD], [0.1.0])
 AC_PROG_CC
 PKG_PROG_PKG_CONFIG
 
+AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [Enable debugging support (default: disabled)]), [enable_debug=yes; CFLAGS="$CFLAGS -g -Wall"], [enable_debug=no])
+AM_CONDITIONAL([ENABLE_DEBUG], [test "$enable_debug" = "yes"])
+if test "$enable_debug" = "yes"; then
+	AC_DEFINE([DEBUG], [1], [Define to compile with debugging support])
+fi
+
 AC_ARG_ENABLE([memcached], AS_HELP_STRING([--disable-memcached], [Disable Memcached support (default: enabled)]), [], [enable_memcached=yes])
 AM_CONDITIONAL([ENABLE_MEMCACHED], [test "$enable_memcached" = "yes"])
 if test "$enable_memcached" = "yes"; then
