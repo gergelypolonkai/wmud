@@ -4,6 +4,8 @@
 #include "config.h"
 #endif
 
+#define MAX_RECV_LEN 1024
+
 struct {
 	char *file;
 	int line;
@@ -15,14 +17,30 @@ struct AcceptData {
 };
 
 gboolean
-client_callback(GSocket *client, GIOCondition condition, gpointer user_data)
+client_callback(GSocket *client, GIOCondition condition, struct AcceptData *accept_data)
 {
-	gssize len;
-	gchar *buf = g_malloc0(sizeof(gchar) * 1024);
-	gsize max_len = 1024;
+	if (condition & G_IO_HUP)
+	{
+		g_print("Connection closed.\n");
+		g_socket_close(client, NULL);
+		return FALSE;
+	}
+	else if ((condition & G_IO_IN) || (condition & G_IO_PRI))
+	{
+		gssize len;
+		gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
 
-	len = g_socket_receive(client, buf, max_len, NULL, NULL);
-	g_print("Client data arrived (%d bytes): \"%s\"\n", len, buf);
+		if ((len = g_socket_receive(client, buf, MAX_RECV_LEN, NULL, NULL)) == 0)
+		{
+			g_print("Connection closed.\n");
+			g_socket_close(client, NULL);
+			g_free(buf);
+			return FALSE;
+		}
+		g_print("Client data arrived (%d bytes): \"%s\"\n", len, buf);
+		g_free(buf);
+	}
+
 	return TRUE;
 }
 
@@ -32,11 +50,12 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	GSocket *client_socket;
 	GSource *client_source;
 
-	g_print("New connection.\n");
 	client_socket = g_socket_listener_accept_socket(accept_data->listener, NULL, NULL, NULL);
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
 	g_source_set_callback(client_source, (GSourceFunc)client_callback, client_socket, NULL);
 	g_source_attach(client_source, accept_data->context);
+	g_print("New connection.\n");
+
 	return TRUE;
 }
 
