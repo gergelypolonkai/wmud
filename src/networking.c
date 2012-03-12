@@ -2,6 +2,7 @@
 #include <gio/gio.h>
 
 #include "main.h"
+#include "networking.h"
 
 #define MAX_RECV_LEN 1024
 
@@ -10,8 +11,10 @@ struct AcceptData {
 	GSocketListener *listener;
 };
 
+GSList *clients;
+
 gboolean
-client_callback(GSocket *client, GIOCondition condition, struct AcceptData *accept_data)
+client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data)
 {
 	GError *err = NULL;
 
@@ -20,6 +23,9 @@ client_callback(GSocket *client, GIOCondition condition, struct AcceptData *acce
 		g_print("Connection closed.\n");
 		/* TODO: Error checking */
 		g_socket_close(client, &err);
+		clients = g_slist_remove(clients, client_data);
+		if (client_data->buffer)
+			g_string_free(client_data->buffer, TRUE);
 
 		return FALSE;
 	}
@@ -35,6 +41,9 @@ client_callback(GSocket *client, GIOCondition condition, struct AcceptData *acce
 			/* TODO: Error checking */
 			g_socket_close(client, &err);
 			g_free(buf);
+			clients = g_slist_remove(clients, client_data);
+			if (client_data->buffer)
+				g_string_free(client_data->buffer, TRUE);
 			return FALSE;
 		}
 		g_print("Client data arrived (%d bytes): \"%s\"\n", len, buf);
@@ -50,11 +59,17 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	GSocket *client_socket;
 	GSource *client_source;
 	GError *err = NULL;
+	wmudClient *client_data;
 
 	/* TODO: Error checking */
 	client_socket = g_socket_listener_accept_socket(accept_data->listener, NULL, NULL, &err);
+
+	client_data = g_new0(wmudClient, 1);
+	client_data->socket = client_socket;
+	clients = g_slist_prepend(clients, client_data);
+
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
-	g_source_set_callback(client_source, (GSourceFunc)client_callback, client_socket, NULL);
+	g_source_set_callback(client_source, (GSourceFunc)client_callback, client_data, NULL);
 	g_source_attach(client_source, accept_data->context);
 	g_print("New connection.\n");
 
@@ -73,6 +88,7 @@ wmud_networking_init(guint port_number)
 	GSource *game_net_source4 = NULL,
 		*game_net_source6 = NULL;
 
+	clients = NULL;
 	game_listener = g_socket_listener_new();
 
 	/* The following snippet is borrowed from GLib 2.30's gsocketlistener.c
