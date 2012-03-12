@@ -1,5 +1,6 @@
 #include <glib.h>
 #include <gio/gio.h>
+#include <string.h>
 
 #include "main.h"
 #include "networking.h"
@@ -32,6 +33,7 @@ client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data
 	else if ((condition & G_IO_IN) || (condition & G_IO_PRI))
 	{
 		gssize len;
+		gchar *buf2;
 		gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
 
 		/* TODO: Error checking */
@@ -46,7 +48,51 @@ client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data
 				g_string_free(client_data->buffer, TRUE);
 			return FALSE;
 		}
-		g_print("Client data arrived (%d bytes): \"%s\"\n", len, buf);
+
+		buf2 = buf;
+		while (TRUE)
+		{
+			char *r = strchr((char *)buf2, '\r'),
+			     *n = strchr((char *)buf2, '\n');
+
+			if (r || n)
+			{
+				if ((r < n) && r)
+				{
+					if (client_data->buffer->len > 0)
+						g_string_append_len(client_data->buffer, buf2, (r - buf2));
+					else
+						g_string_overwrite_len(client_data->buffer, 0, buf2, (r - buf2));
+					buf2 = r;
+				}
+				else if (n)
+				{
+					if (client_data->buffer->len > 0)
+						g_string_append_len(client_data->buffer, buf2, (n - buf2));
+					else
+						g_string_overwrite_len(client_data->buffer, 0, buf2, (n - buf2));
+					buf2 = n;
+				}
+
+				g_print("Will process input '%s'\n", client_data->buffer->str);
+				/* TODO: interpret command before erasing */
+				g_string_erase(client_data->buffer, 0, -1);
+
+				for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
+				if (!*buf2)
+					break;
+			}
+			else
+			{
+				if (client_data->buffer->len > 0)
+					g_string_append(client_data->buffer, buf2);
+				else
+					g_string_overwrite(client_data->buffer, 0, buf2);
+
+				break;
+			}
+		}
+
 		g_free(buf);
 	}
 
@@ -66,6 +112,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 
 	client_data = g_new0(wmudClient, 1);
 	client_data->socket = client_socket;
+	client_data->buffer = g_string_new("");
 	clients = g_slist_prepend(clients, client_data);
 
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
