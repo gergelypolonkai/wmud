@@ -97,6 +97,7 @@ main(int argc, char **argv)
 	gboolean need_ipv4_socket = TRUE;
 	GSocketListener *game_listener;
 
+	g_thread_init();
 	g_type_init();
 
 	g_print("Starting up...\n");
