@@ -15,11 +15,19 @@ struct {
 } debug_context_loc = {NULL, 0};
 
 GMainContext *game_context;
+guint32 elapsed_seconds = 0;
+guint32 elapsed_cycle = 0;
 
 gboolean
 rl_sec_elapsed(gpointer user_data)
 {
-	g_print("RL sec elapsed.\n");
+	elapsed_seconds++;
+	if (elapsed_seconds == G_MAXUINT32)
+	{
+		elapsed_seconds = 0;
+		elapsed_cycle++;
+	}
+	g_print("%ld RL sec elapsed.\n", elapsed_seconds);
 
 	return TRUE;
 }
@@ -47,7 +55,7 @@ main(int argc, char **argv)
 	guint timeout_id;
 	GSocketListener *game_listener;
 
-	g_thread_init();
+	g_thread_init(NULL);
 	g_type_init();
 
 	g_print("Starting up...\n");
