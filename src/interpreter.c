@@ -2,7 +2,15 @@
 #include <gio/gio.h>
 #include <string.h>
 
+#include "interpreter.h"
 #include "networking.h"
+
+#define IS_SPACE(c) (g_ascii_isspace((c)) || (!(c)))
+
+static wmudCommand command_list[] = {
+	{ "quit", gcmd_quit },
+	{ NULL, NULL },
+};
 
 static void
 command_part_print(GString *data, gpointer user_data)
@@ -24,41 +32,47 @@ wmud_interpret_game_command(wmudClient *client)
 
 	for (a = client->buffer->str; (a - client->buffer->str) < client->buffer->len + 1; a++)
 	{
-		if ((!g_ascii_isspace(*a) && *a) || in_string)
-		{
-			if (prev_space)
-			{
-				last_start = a;
-				g_print("New token starts here: %s\n", a);
-			}
-
-			prev_space = FALSE;
-		}
-
-		if ((!in_string && ((*a == '\'') || (*a == '"'))) || (in_string && (*a == string_delim)))
-		{
-			g_print("String %s\n", (in_string) ? "ended" : "started");
-			in_string = !in_string;
-			if (!in_string)
-				string_delim = 0;
-			prev_space = FALSE;
-			continue;
-		}
-
-		if (in_string)
+		if (IS_SPACE(*a) && prev_space)
 			continue;
 
-		if (g_ascii_isspace(*a) || !*a)
+		if (IS_SPACE(*a) && !prev_space && !in_string)
 		{
-			g_print("Space found.\n");
-			if (!prev_space)
-			{
-				GString *token = g_string_new_len(last_start, a - last_start);
-				command_parts = g_slist_prepend(command_parts, token);
-				g_print("Found new token, %d long\n", a - last_start);
-			}
+			GString *token = g_string_new_len(last_start, a - last_start);
+			command_parts = g_slist_prepend(command_parts, token);
 			prev_space = TRUE;
+			continue;
 		}
+
+		if (!IS_SPACE(*a) && prev_space)
+		{
+			last_start = a;
+			prev_space = FALSE;
+		}
+
+		if (((*a == '\'') || (*a == '"')) && !in_string)
+		{
+			in_string = TRUE;
+			string_delim = *a;
+			prev_space = TRUE;
+			continue;
+		}
+
+		if (in_string && (*a == string_delim))
+		{
+			in_string = FALSE;
+			string_delim = 0;
+			prev_space = TRUE;
+			continue;
+		}
+	}
+
+	if (in_string)
+	{
+		GString *buf = g_string_new("");
+		g_string_printf(buf, "You should close quotation characters, like %c...\r\n", string_delim);
+		/* TODO: error checking */
+		g_socket_send(client->socket, buf->str, buf->len, NULL, NULL);
+		g_string_free(buf, TRUE);
 	}
 
 	command_parts = g_slist_reverse(command_parts);
