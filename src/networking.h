@@ -1,6 +1,9 @@
 #ifndef __WMUD_NETWORKING_H__
 # define __WMUD_NETWORKING_H__
 
+#include  <glib.h>
+#include <gio/gio.h>
+
 typedef struct _wmudClient {
 	GSocket *socket;
 	GString *buffer;
