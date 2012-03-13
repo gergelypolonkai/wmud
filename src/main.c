@@ -27,7 +27,7 @@ rl_sec_elapsed(gpointer user_data)
 		elapsed_seconds = 0;
 		elapsed_cycle++;
 	}
-	g_print("%ld RL sec elapsed.\n", elapsed_seconds);
+	g_print("%d RL sec elapsed.\n", elapsed_seconds);
 
 	return TRUE;
 }
