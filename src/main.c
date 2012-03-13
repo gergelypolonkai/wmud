@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "networking.h"
+#include "interpreter.h"
 
 #define MAX_RECV_LEN 1024
 
@@ -70,6 +71,7 @@ main(int argc, char **argv)
 
 	game_listener = g_socket_listener_new();
 
+	wmud_interpreter_init();
 	wmud_networking_init(4000);
 
 	g_print("Startup finished\n");

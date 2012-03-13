@@ -4,6 +4,7 @@
 
 #include "main.h"
 #include "networking.h"
+#include "interpreter.h"
 
 #define MAX_RECV_LEN 1024
 
@@ -74,8 +75,7 @@ client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data
 					buf2 = n;
 				}
 
-				g_print("Will process input '%s'\n", client_data->buffer->str);
-				/* TODO: interpret command before erasing */
+				wmud_interpret_game_command(client_data);
 				g_string_erase(client_data->buffer, 0, -1);
 
 				for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
