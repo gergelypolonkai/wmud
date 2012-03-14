@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "main.h"
 #include "networking.h"
@@ -113,6 +114,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	client_data = g_new0(wmudClient, 1);
 	client_data->socket = client_socket;
 	client_data->buffer = g_string_new("");
+	client_data->state = WMUD_CLIENT_STATE_MENU;
 	clients = g_slist_prepend(clients, client_data);
 
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
@@ -233,5 +235,20 @@ wmud_networking_init(guint port_number)
 	}
 
 	return TRUE;
+}
+
+void
+wmud_client_send(wmudClient *client, const gchar *fmt, ...)
+{
+	va_list ap;
+	GString *buf = g_string_new("");
+
+	va_start(ap, fmt);
+	g_string_vprintf(buf, fmt, ap);
+	va_end(ap);
+
+	/* TODO: error checking */
+	g_socket_send(client->socket, buf->str, buf->len, NULL, NULL);
+	g_string_free(buf, TRUE);
 }
 
