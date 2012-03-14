@@ -4,6 +4,7 @@
 
 #include "interpreter.h"
 #include "networking.h"
+#include "main.h"
 
 #define IS_SPACE(c) (g_ascii_isspace((c)) || (!(c)))
 
@@ -95,7 +96,7 @@ wmud_interpret_game_command(wmudClient *client)
 	{
 		wmud_client_send(client, "You should close quotes of any kind, like %c, shouldn't you?\r\n", str_delim);
 #if GLIB_CHECK_VERSION(2, 28, 0)
-		g_slist_free_full(command_parts, destroy_string);
+		g_slist_free_full(command_parts, (GDestroyNotify)destroy_string);
 #else
 		g_slist_foreach(command_parts, (GFunc)destroy_string, NULL);
 		g_slist_free(command_parts);
@@ -131,13 +132,27 @@ wmud_interpret_game_command(wmudClient *client)
 		}
 	}
 
-	if (match_count == 1)
+	switch (match_count)
 	{
-		((wmudCommand *)(matches->data))->commandFunc(client, ((GString *)(command_parts->data))->str, command_parts->next);
-	}
-	else
-	{
-		wmud_client_send(client, "This command could mean several things, please try a more exact form!\r\n");
+		case 0:
+			switch (random_number(1, 3))
+			{
+				case 1:
+					wmud_client_send(client, "Huh?\r\n");
+					break;
+				case 2:
+					wmud_client_send(client, "What?\r\n");
+					break;
+				case 3:
+					wmud_client_send(client, "I can hardly understand you...\r\n");
+					break;
+			}
+			break;
+		case 1:
+			((wmudCommand *)(matches->data))->commandFunc(client, ((GString *)(command_parts->data))->str, command_parts->next);
+			break;
+		default:
+			wmud_client_send(client, "This command could mean several things, please try a more exact form!\r\n");
 	}
 
 	g_slist_free(matches);

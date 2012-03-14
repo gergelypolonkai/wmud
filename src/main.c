@@ -18,6 +18,7 @@ struct {
 GMainContext *game_context;
 guint32 elapsed_seconds = 0;
 guint32 elapsed_cycle = 0;
+GRand *main_rand = NULL;
 
 gboolean
 rl_sec_elapsed(gpointer user_data)
@@ -60,6 +61,8 @@ main(int argc, char **argv)
 	g_type_init();
 
 	g_print("Starting up...\n");
+
+	main_rand = g_rand_new();
 
 	game_context = g_main_context_new();
 	game_loop = g_main_loop_new(game_context, FALSE);
