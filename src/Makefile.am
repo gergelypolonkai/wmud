@@ -1,5 +1,5 @@
 bin_PROGRAMS = wmud
 AM_CFLAGS = $(MEMCACHED_CFLAGS) $(GLIB_CFLAGS) $(GIO_CFLAGS) $(GTHREAD_CFLAGS) $(SQLITE3_CFLAGS)
 
-wmud_SOURCES = main.c networking.c interpreter.c
+wmud_SOURCES = main.c networking.c interpreter.c db.c
 wmud_LDADD = $(MEMCACHED_LIBS) $(GLIB_LIBS) $(GIO_LIBS) $(GTHREAD_LIBS) $(SQLITE3_LIBS)
