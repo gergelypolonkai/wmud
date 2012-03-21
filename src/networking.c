@@ -6,6 +6,7 @@
 #include "main.h"
 #include "networking.h"
 #include "interpreter.h"
+#include "players.h"
 
 #define MAX_RECV_LEN 1024
 
@@ -16,6 +17,24 @@ struct AcceptData {
 
 GSList *clients;
 
+void
+client_close(wmudClient *client, gboolean send_goodbye)
+{
+	GError *err = NULL;
+	if (send_goodbye)
+	{
+		/* TODO: Send some goodbye text */
+	}
+
+	g_print("Connection closed.\n");
+	/* TODO: Error checking */
+	g_socket_close(client->socket, &err);
+	clients = g_slist_remove(clients, client);
+	if (client->buffer)
+		g_string_free(client->buffer, TRUE);
+	g_free(client);
+}
+
 gboolean
 client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data)
 {
@@ -23,13 +42,7 @@ client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data
 
 	if (condition & G_IO_HUP)
 	{
-		g_print("Connection closed.\n");
-		/* TODO: Error checking */
-		g_socket_close(client, &err);
-		clients = g_slist_remove(clients, client_data);
-		if (client_data->buffer)
-			g_string_free(client_data->buffer, TRUE);
-
+		client_close(client_data, FALSE);
 		return FALSE;
 	}
 	else if ((condition & G_IO_IN) || (condition & G_IO_PRI))
@@ -41,13 +54,8 @@ client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data
 		/* TODO: Error checking */
 		if ((len = g_socket_receive(client, buf, MAX_RECV_LEN, NULL, &err)) == 0)
 		{
-			g_print("Connection closed.\n");
-			/* TODO: Error checking */
-			g_socket_close(client, &err);
 			g_free(buf);
-			clients = g_slist_remove(clients, client_data);
-			if (client_data->buffer)
-				g_string_free(client_data->buffer, TRUE);
+			client_close(client_data, FALSE);
 			return FALSE;
 		}
 
@@ -76,7 +84,24 @@ client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data
 					buf2 = n;
 				}
 
-				wmud_interpret_game_command(client_data);
+				switch (client_data->state)
+				{
+					case WMUD_CLIENT_STATE_FRESH:
+						wmud_client_start_login(client_data);
+						break;
+					case WMUD_CLIENT_STATE_PASSWAIT:
+						wmud_player_auth(client_data);
+						break;
+					case WMUD_CLIENT_STATE_MENU:
+						//wmud_client_interpret_menu_command(client_data);
+						break;
+					case WMUD_CLIENT_STATE_INGAME:
+						wmud_interpret_game_command(client_data);
+						break;
+					case WMUD_CLIENT_STATE_QUITWAIT:
+						//wmud_interpret_quit_answer(client_data);
+						break;
+				}
 				g_string_erase(client_data->buffer, 0, -1);
 
 				for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
@@ -100,6 +125,10 @@ client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data
 	return TRUE;
 }
 
+/* game_source_callback()
+ *
+ * This function is called whenever a new connection is available on the game socket
+ */
 gboolean
 game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData *accept_data)
 {
@@ -114,7 +143,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	client_data = g_new0(wmudClient, 1);
 	client_data->socket = client_socket;
 	client_data->buffer = g_string_new("");
-	client_data->state = WMUD_CLIENT_STATE_MENU;
+	client_data->state = WMUD_CLIENT_STATE_FRESH;
 	clients = g_slist_prepend(clients, client_data);
 
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);

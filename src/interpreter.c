@@ -167,5 +167,6 @@ wmud_interpreter_init(void)
 WMUD_COMMAND(gcmd_quit)
 {
 	wmud_client_send(client, "Are you sure you want to get back to that freaky other reality? [y/N] ");
+	client->state = WMUD_CLIENT_STATE_QUITWAIT;
 }
 
