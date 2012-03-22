@@ -157,6 +157,15 @@ wmud_config_init(GError **err)
 	return TRUE;
 }
 
+gpointer
+game_thread_func(GMainLoop *game_loop)
+{
+	/* Run the game loop */
+	g_main_loop_run(game_loop);
+
+	return NULL;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -164,6 +173,7 @@ main(int argc, char **argv)
 	GSource *timeout_source;
 	guint timeout_id;
 	GError *err = NULL;
+	GThread *game_thread;
 
 	/* Initialize the thread and type system */
 	g_thread_init(NULL);
@@ -237,8 +247,14 @@ main(int argc, char **argv)
 	g_clear_error(&err);
 	wmud_db_players_load(&err);
 
-	/* Run the game loop */
-	g_main_loop_run(game_loop);
+	/* Initialization ends here */
+
+	g_clear_error(&err);
+	game_thread = g_thread_create((GThreadFunc)game_thread_func, game_loop, TRUE, &err);
+
+	/* Initialize other threads here */
+
+	g_thread_join(game_thread);
 
 	return 0;
 }
