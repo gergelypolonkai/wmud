@@ -87,7 +87,6 @@ main(int argc, char **argv)
 
 	/* TODO: Create signal handlers! */
 
-	game_listener = g_socket_listener_new();
 
 	wmud_interpreter_init();
 	/* TODO: Change 4000 to the port number coming from configuration */

@@ -158,12 +158,6 @@ wmud_interpret_game_command(wmudClient *client)
 	g_slist_free(matches);
 }
 
-gboolean
-wmud_interpreter_init(void)
-{
-	return TRUE;
-}
-
 WMUD_COMMAND(gcmd_quit)
 {
 	wmud_client_send(client, "Are you sure you want to get back to that freaky other reality? [y/N] ");
