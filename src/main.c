@@ -4,6 +4,7 @@
 #include "config.h"
 #endif
 
+#include "wmud_types.h"
 #include "main.h"
 #include "networking.h"
 #include "interpreter.h"
@@ -19,6 +20,9 @@ GMainContext *game_context;
 guint32 elapsed_seconds = 0;
 guint32 elapsed_cycle = 0;
 GRand *main_rand = NULL;
+GQuark WMUD_CONFIG_ERROR = 0;
+guint port = 0;
+gchar *database_file = NULL;
 
 /* rl_sec_elapsed()
  *
@@ -59,17 +63,84 @@ debug_context(char *file, int line)
 #define DebugContext
 #endif
 
+void
+wmud_type_init(void)
+{
+	WMUD_CONFIG_ERROR = g_quark_from_string("wmud_config_error");
+}
+
+gboolean
+wmud_config_init(GError **err)
+{
+	GString *config_file = g_string_new(WMUD_CONFDIR);
+	GKeyFile *config;
+	GError *in_err;
+
+	g_string_append(config_file, "/wmud.conf");
+
+	config = g_key_file_new();
+	/* TODO: Error checking */
+	g_key_file_load_from_file(config, config_file->str, 0, &in_err);
+
+	if (!g_key_file_has_group(config, "global"))
+	{
+		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOGLOBAL, "Config file (%s) does not contain a [global] group", config_file->str);
+		g_key_file_free(config);
+		g_string_free(config_file, TRUE);
+
+		return FALSE;
+	}
+
+	port = g_key_file_get_integer(config, "global", "port", &in_err);
+	if (in_err)
+	{
+		if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND))
+		{
+			port = DEFAULT_PORT;
+		}
+		else if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE))
+		{
+			g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_BADPORT, "Config file (%s) contains an invalid port number", config_file->str);
+			g_key_file_free(config);
+			g_string_free(config_file, TRUE);
+			port = 0;
+
+			return FALSE;
+		}
+	}
+	g_clear_error(&in_err);
+
+	database_file = g_key_file_get_string(config, "global", "world file", &in_err);
+	if (in_err)
+	{
+		if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND))
+		{
+			g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOWORLD, "Config file (%s) does not contain a world file path", config_file->str);
+			g_string_free(config_file, TRUE);
+			g_string_free(config_file, TRUE);
+			database_file = NULL;
+
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
 int
 main(int argc, char **argv)
 {
 	GMainLoop *game_loop;
 	GSource *timeout_source;
 	guint timeout_id;
-	GSocketListener *game_listener;
+	GError *err = NULL;
 
 	/* Initialize the thread and type system */
 	g_thread_init(NULL);
 	g_type_init();
+	wmud_type_init();
+
+	/* TODO: Command line parsing */
 
 	/* Initialize random number generator */
 	main_rand = g_rand_new();
@@ -87,10 +158,23 @@ main(int argc, char **argv)
 
 	/* TODO: Create signal handlers! */
 
+	if (!wmud_config_init(&err))
+	{
+		if (err)
+		{
+			g_critical("Config file parsing error: %s", err->message);
+		}
+		else
+		{
+			g_critical("Config file parsing error!");
+		}
 
-	wmud_interpreter_init();
-	/* TODO: Change 4000 to the port number coming from configuration */
-	wmud_networking_init(4000);
+		return 1;
+	}
+
+	g_assert(port != 0);
+	g_assert(database_file != NULL);
+	wmud_networking_init(port);
 
 	/* Run the game loop */
 	g_main_loop_run(game_loop);

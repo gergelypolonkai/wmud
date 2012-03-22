@@ -1,0 +1,3 @@
+[global]
+world file = iminiru.db
+port = 4000

@@ -29,5 +29,11 @@ typedef struct _wmudClient {
 	wmudPlayer *player;
 } wmudClient;
 
+enum {
+	WMUD_CONFIG_ERROR_SUCCESS,
+	WMUD_CONFIG_ERROR_NOGLOBAL,
+	WMUD_CONFIG_ERROR_BADPORT,
+	WMUD_CONFIG_ERROR_NOWORLD
+};
 #endif /* __WMUD_TYPES_H__ */
 

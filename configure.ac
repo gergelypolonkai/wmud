@@ -20,6 +20,8 @@ if test "$enable_memcached" = "yes"; then
 	AC_DEFINE([ENABLE_MEMCACHED], [1], [Define to compile with Memcached support])
 fi
 
+AC_DEFINE([DEFAULT_PORT], [4000], [The default port number if not specified in the config file])
+
 PKG_CHECK_MODULES([GIO], gio-2.0)
 PKG_CHECK_MODULES([GLIB], glib-2.0)
 PKG_CHECK_MODULES([GTHREAD], gthread-2.0)
