@@ -20,6 +20,11 @@ guint32 elapsed_seconds = 0;
 guint32 elapsed_cycle = 0;
 GRand *main_rand = NULL;
 
+/* rl_sec_elapsed()
+ *
+ * This function keeps track of elapsed real-world time. It is inaccurate by
+ * design, but it doesn't actually matter.
+ */
 gboolean
 rl_sec_elapsed(gpointer user_data)
 {
@@ -29,13 +34,18 @@ rl_sec_elapsed(gpointer user_data)
 		elapsed_seconds = 0;
 		elapsed_cycle++;
 	}
-	g_print("%d RL sec elapsed.\n", elapsed_seconds);
 
 	return TRUE;
 }
 
 #ifdef DEBUG
 void
+/* debug_context()
+ *
+ * This function keeps track of the code flow in some way. It can help with
+ * debugging, as during a SIGSEGV or such signal this will print out the last
+ * place of DebugContext in the code.
+ */
 debug_context(char *file, int line)
 {
 	if (debug_context_loc.file != NULL)
@@ -57,28 +67,33 @@ main(int argc, char **argv)
 	guint timeout_id;
 	GSocketListener *game_listener;
 
+	/* Initialize the thread and type system */
 	g_thread_init(NULL);
 	g_type_init();
 
-	g_print("Starting up...\n");
-
+	/* Initialize random number generator */
 	main_rand = g_rand_new();
 
+	/* Create the game context and main loop */
 	game_context = g_main_context_new();
 	game_loop = g_main_loop_new(game_context, FALSE);
 
+	/* Create the timeout source which keeps track of elapsed real-world
+	 * time */
 	timeout_source = g_timeout_source_new(1000);
 	g_source_set_callback(timeout_source, rl_sec_elapsed, NULL, NULL);
 	timeout_id = g_source_attach(timeout_source, game_context);
 	g_source_unref(timeout_source);
 
+	/* TODO: Create signal handlers! */
+
 	game_listener = g_socket_listener_new();
 
 	wmud_interpreter_init();
+	/* TODO: Change 4000 to the port number coming from configuration */
 	wmud_networking_init(4000);
 
-	g_print("Startup finished\n");
-
+	/* Run the game loop */
 	g_main_loop_run(game_loop);
 
 	return 0;
