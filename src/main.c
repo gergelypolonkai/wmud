@@ -10,8 +10,6 @@
 #include "interpreter.h"
 #include "db.h"
 
-#define MAX_RECV_LEN 1024
-
 struct {
 	char *file;
 	int line;
