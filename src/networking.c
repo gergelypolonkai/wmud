@@ -30,7 +30,7 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 		wmud_client_send(client, "\r\nHave a nice real-world day!\r\n\r\n");
 	}
 
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Connection closed.");
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Connection closed.");
 	/* TODO: Error checking */
 	g_socket_close(client->socket, &err);
 	clients = g_slist_remove(clients, client);
