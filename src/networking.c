@@ -3,13 +3,15 @@
 #include <string.h>
 #include <stdarg.h>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include "main.h"
 #include "networking.h"
 #include "interpreter.h"
 #include "players.h"
 #include "db.h"
-
-#define MAX_RECV_LEN 1024
 
 struct AcceptData {
 	GMainContext *context;

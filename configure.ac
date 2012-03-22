@@ -21,6 +21,7 @@ if test "$enable_memcached" = "yes"; then
 fi
 
 AC_DEFINE([DEFAULT_PORT], [4000], [The default port number if not specified in the config file])
+AC_DEFINE([MAX_RECV_LEN], [1024])
 
 PKG_CHECK_MODULES([GIO], gio-2.0)
 PKG_CHECK_MODULES([GLIB], glib-2.0)
