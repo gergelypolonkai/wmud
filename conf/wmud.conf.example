@@ -1,3 +1,4 @@
 [global]
 world file = iminiru.db
 port = 4000
+admin email = polesz@w00d5t0ck.info

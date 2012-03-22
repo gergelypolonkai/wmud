@@ -21,8 +21,44 @@
 #include "networking.h"
 #include "players.h"
 
+GSList *players = NULL;
+
 gboolean
 wmud_player_auth(wmudClient *client)
 {
 	return FALSE;
 }
+
+static gint
+find_player_by_name(wmudPlayer *player, gchar *player_name)
+{
+	return g_ascii_strcasecmp(player->player_name, player_name);
+}
+
+wmudPlayer *
+wmud_player_exists(gchar *player_name)
+{
+	GSList *player_elem;
+	
+	if ((player_elem = g_slist_find_custom(players, player_name, (GCompareFunc)find_player_by_name)) == NULL)
+		return NULL;
+
+	return player_elem->data;
+
+}
+
+void
+wmud_player_free(wmudPlayer **player)
+{
+	if (!*player)
+		return;
+	if ((*player)->player_name)
+		g_free((*player)->player_name);
+	if ((*player)->cpassword)
+		g_free((*player)->cpassword);
+	if ((*player)->email)
+		g_free((*player)->email);
+	g_free(*player);
+	*player = NULL;
+}
+
