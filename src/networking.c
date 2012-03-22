@@ -281,3 +281,9 @@ wmud_client_send(wmudClient *client, const gchar *fmt, ...)
 	g_string_free(buf, TRUE);
 }
 
+void
+wmud_client_start_login(wmudClient *client)
+{
+	g_print("Trying to login with playername '%s'\n", client->buffer->str);
+}
+

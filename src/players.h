@@ -21,13 +21,7 @@
 
 #include <glib.h>
 
-#include "networking.h"
-
-typedef struct _wmudPlayer {
-	guint32 id;          /* User ID */
-	gchar *player_name;  /* Player login name */
-	gchar *cpassword;    /* Crypted password */
-} wmudPlayer;
+#include "wmud_types.h"
 
 gboolean wmud_player_auth(wmudClient *client);
 

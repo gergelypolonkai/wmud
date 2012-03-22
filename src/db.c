@@ -1,3 +1,4 @@
+#include <glib.h>
 #include <sqlite3.h>
 
 #include "db.h"
@@ -5,8 +6,8 @@
 sqlite3 *dbh = NULL;
 
 gboolean
-wmud_db_init(void)
+wmud_db_init(GError **err)
 {
-	sqlite3_open(
+	return FALSE;
 }
 

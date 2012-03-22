@@ -3,7 +3,9 @@
 
 #include <glib.h>
 
-gboolean wmud_db_init(Gerror ** error);
+#include "wmud_types.h"
+
+gboolean wmud_db_init(GError **err);
 gboolean wmud_load_players(GError **err);
 gboolean wmud_save_player(wmudPlayer *player, GError **err);
 
