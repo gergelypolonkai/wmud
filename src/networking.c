@@ -38,8 +38,8 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 	g_free(client);
 }
 
-gboolean
-client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data)
+static gboolean
+wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data)
 {
 	GError *err = NULL;
 
@@ -161,7 +161,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	clients = g_slist_prepend(clients, client_data);
 
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
-	g_source_set_callback(client_source, (GSourceFunc)client_callback, client_data, NULL);
+	g_source_set_callback(client_source, (GSourceFunc)wmud_client_callback, client_data, NULL);
 	g_source_attach(client_source, accept_data->context);
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "New connection.");
 	wmud_client_send(client_data, "By what name shall we call you? ");
