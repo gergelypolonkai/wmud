@@ -26,15 +26,11 @@ void wmud_client_interpret_newplayer_mailconfirm(wmudClient *client_data);
 void
 wmud_client_close(wmudClient *client, gboolean send_goodbye)
 {
-	GError *err = NULL;
 	if (send_goodbye)
-	{
 		wmud_client_send(client, "\r\nHave a nice real-world day!\r\n\r\n");
-	}
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Connection closed.");
-	/* TODO: Error checking */
-	g_socket_close(client->socket, &err);
+	g_socket_close(client->socket, NULL);
 	clients = g_slist_remove(clients, client);
 	wmud_player_free(&(client->player));
 	if (client->buffer)
