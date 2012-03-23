@@ -1,7 +1,11 @@
-#include <glib.h>
-#include <gio/gio.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+
+#include <glib.h>
+#include <gio/gio.h>
+#ifdef HAVE_CRYPT_H
+#include <crypt.h>
 #endif
 
 #include "wmud_types.h"
@@ -9,6 +13,7 @@
 #include "networking.h"
 #include "interpreter.h"
 #include "db.h"
+#include "players.h"
 
 struct {
 	char *file;
@@ -44,6 +49,68 @@ rl_sec_elapsed(gpointer user_data)
 	{
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "Heartbeat");
 	}
+
+	return TRUE;
+}
+
+gchar *
+wmud_random_string(gint len)
+{
+	gchar *ret = g_malloc0(len + 1);
+	gint i;
+
+	for (i = 0; i < len; i++)
+	{
+		gchar c = 0;
+		/* Include only printable characters, but exclude $ because of
+		 * salt generation */
+		while (!g_ascii_isprint(c) || (c == '$'))
+			c = random_number(1, 127);
+
+		ret[i] = c;
+	}
+
+	return ret;
+}
+
+void
+wmud_maintenance_check_new_players(wmudPlayer *player, gpointer user_data)
+{
+	if (player->cpassword == NULL)
+	{
+		gchar *pw,
+		      *salt,
+		      *cpw;
+		GString *full_salt;
+
+		pw = wmud_random_string(8);
+		salt = wmud_random_string(8);
+		full_salt = g_string_new("$1$");
+		g_string_append(full_salt, salt);
+		cpw = g_strdup(crypt(pw, full_salt->str));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Player %s has no"
+				" password set", player->player_name);
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "New password will be %s", pw);
+		player->cpassword = cpw;
+		/* TODO: Send e-mail about the new password. Upon completion,
+		 * set it in the database */
+
+		g_free(pw);
+		g_free(salt);
+		g_string_free(full_salt, TRUE);
+	}
+}
+
+gboolean
+wmud_maintenance(gpointer user_data)
+{
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Starting maintenance...");
+	/* Run through the player list, and generate a random password for each
+	 * newly registered player */
+	g_slist_foreach(players, (GFunc)wmud_maintenance_check_new_players, NULL);
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Finished maintenance...");
 
 	return TRUE;
 }
@@ -164,6 +231,14 @@ game_thread_func(GMainLoop *game_loop)
 	return NULL;
 }
 
+gpointer
+maint_thread_func(GMainLoop *maint_loop)
+{
+	g_main_loop_run(maint_loop);
+
+	return NULL;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -171,7 +246,10 @@ main(int argc, char **argv)
 	GSource *timeout_source;
 	guint timeout_id;
 	GError *err = NULL;
-	GThread *game_thread;
+	GThread *game_thread,
+		*maint_thread;
+	GMainContext *maint_context;
+	GMainLoop *maint_loop;
 
 	/* Initialize the thread and type system */
 	g_thread_init(NULL);
@@ -187,11 +265,21 @@ main(int argc, char **argv)
 	game_context = g_main_context_new();
 	game_loop = g_main_loop_new(game_context, FALSE);
 
+	/* Create the maintenance context and main loop */
+	maint_context = g_main_context_new();
+	maint_loop = g_main_loop_new(maint_context, FALSE);
+
 	/* Create the timeout source which keeps track of elapsed real-world
 	 * time */
 	timeout_source = g_timeout_source_new(1000);
 	g_source_set_callback(timeout_source, rl_sec_elapsed, NULL, NULL);
 	timeout_id = g_source_attach(timeout_source, game_context);
+	g_source_unref(timeout_source);
+
+	/* Create the timeout source which will do the maintenance tasks */
+	timeout_source = g_timeout_source_new_seconds(3);
+	g_source_set_callback(timeout_source, wmud_maintenance, NULL, NULL);
+	timeout_id = g_source_attach(timeout_source, maint_context);
 	g_source_unref(timeout_source);
 
 	/* TODO: Create signal handlers! */
@@ -249,6 +337,9 @@ main(int argc, char **argv)
 
 	g_clear_error(&err);
 	game_thread = g_thread_create((GThreadFunc)game_thread_func, game_loop, TRUE, &err);
+
+	g_clear_error(&err);
+	maint_thread = g_thread_create((GThreadFunc)maint_thread_func, maint_loop, FALSE, &err);
 
 	/* Initialize other threads here */
 

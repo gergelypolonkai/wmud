@@ -7,6 +7,14 @@ AM_INIT_AUTOMAKE([wMUD], [0.1.0])
 AC_PROG_CC
 PKG_PROG_PKG_CONFIG
 
+AC_CHECK_HEADERS([crypt.h])
+AC_SEARCH_LIBS([crypt], [crypt])
+AC_CHECK_FUNC([crypt], ac_have_crypt=yes, ac_have_crypt=no)
+if test "$ac_have_crypt" != "yes"; then
+	echo "The crypt() function call can not be found."
+	exit 1
+fi
+
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [Enable debugging support (default: disabled)]), [enable_debug=yes; CFLAGS="$CFLAGS -g -Wall"], [enable_debug=no])
 AM_CONDITIONAL([ENABLE_DEBUG], [test "$enable_debug" = "yes"])
 if test "$enable_debug" = "yes"; then
