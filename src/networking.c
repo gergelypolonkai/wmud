@@ -35,6 +35,7 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 	wmud_player_free(&(client->player));
 	if (client->buffer)
 		g_string_free(client->buffer, TRUE);
+	g_source_destroy(client->socket_source);
 	g_free(client);
 }
 
@@ -161,6 +162,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	clients = g_slist_prepend(clients, client_data);
 
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
+	client_data->socket_source = client_source;
 	g_source_set_callback(client_source, (GSourceFunc)wmud_client_callback, client_data, NULL);
 	g_source_attach(client_source, accept_data->context);
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "New connection.");

@@ -28,6 +28,7 @@ typedef struct _wmudPlayer {
 
 typedef struct _wmudClient {
 	GSocket *socket;
+	GSource *socket_source;
 	GString *buffer;
 	wmudClientState state;
 	gboolean authenticated;
