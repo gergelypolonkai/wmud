@@ -35,6 +35,9 @@ wmud_player_auth(wmudClient *client)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Player entered %s as password", client->buffer->str);
 
+	if (g_strcmp0(crypt(client->buffer->str, client->player->cpassword), client->player->cpassword) == 0)
+		return TRUE;
+
 	return FALSE;
 }
 

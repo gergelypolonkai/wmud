@@ -316,6 +316,7 @@ wmud_client_start_login(wmudClient *client)
 		else
 		{
 			client->state = WMUD_CLIENT_STATE_PASSWAIT;
+			client->player = player;
 			wmud_client_send(client, "Please provide us your password: %c%c%c", TELNET_IAC, TELNET_WONT, TELNET_ECHO);
 		}
 	}
