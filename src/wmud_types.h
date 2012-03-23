@@ -24,7 +24,6 @@ typedef struct _wmudPlayer {
 	gchar *player_name;   /* Player login name */
 	gchar *cpassword;     /* Crypted password */
 	gchar *email;         /* E-mail address */
-	gboolean registering; /* Player is currently registering */
 } wmudPlayer;
 
 typedef struct _wmudClient {

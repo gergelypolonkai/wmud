@@ -56,7 +56,6 @@ wmud_db_players_load(GError **err)
 			player->player_name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
 			player->cpassword = g_strdup((gchar *)sqlite3_column_text(sth, 2));
 			player->email = g_strdup((gchar *)sqlite3_column_text(sth, 3));
-			player->registering = (player->cpassword == NULL);
 
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded player _%s_", player->player_name);
 
