@@ -34,6 +34,7 @@ typedef struct _wmudClient {
 	gboolean authenticated;
 	wmudPlayer *player;
 	gboolean bademail;
+	gint login_try_count;
 } wmudClient;
 
 enum {

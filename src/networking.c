@@ -60,6 +60,7 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 		{
 			g_free(buf);
 			wmud_client_close(client_data, FALSE);
+
 			return FALSE;
 		}
 
@@ -96,7 +97,32 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 						break;
 					case WMUD_CLIENT_STATE_PASSWAIT:
 						if (*(client_data->buffer->str))
-							wmud_player_auth(client_data);
+						{
+							if (wmud_player_auth(client_data))
+							{
+								wmud_client_send(client_data, "%c%c%cLogin successful.\r\n", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
+								/* TODO: Send fail count if non-zero */
+								client_data->state = WMUD_CLIENT_STATE_MENU;
+							}
+							else
+							{
+								wmud_client_send(client_data, "%c%c%cThis password doesn't seem to be valid. Let's try it again...\r\nBy what name would you like to be called? ", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
+								client_data->state = WMUD_CLIENT_STATE_FRESH;
+								client_data->login_try_count++;
+								if (client_data->login_try_count > 3)
+								{
+									wmud_client_send(client_data, "You are trying these bad passwords for too many times. Please stop that!\r\n");
+									wmud_client_close(client_data, TRUE);
+									/* TODO: Increase IP fail count, and ban IP if it's too high */
+								}
+								/* TODO: Increase and save player fail count */
+								client_data->player = NULL;
+							}
+						}
+						else
+						{
+							wmud_client_send(client_data, "Empty passwords are not valid.\r\nTry again: ");
+						}
 						break;
 					case WMUD_CLIENT_STATE_MENU:
 						//wmud_client_interpret_menu_command(client_data);
@@ -383,7 +409,10 @@ wmud_client_interpret_newplayer_mailconfirm(wmudClient *client)
 	if (g_ascii_strcasecmp(client->player->email, client->buffer->str) == 0)
 	{
 		if (wmud_db_save_player(client->player, &err))
+		{
 			wmud_client_send(client, "Good. We will generate the password for this player name, and send it to you\r\nvia e-mail. Please come back to us, if you get that code, so you can log\r\nin.\r\n");
+			players = g_slist_prepend(players, wmud_player_dup(client->player));
+		}
 		else
 		{
 			g_critical("wmud_db_save_player() error: %s", err->message);
