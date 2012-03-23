@@ -118,18 +118,28 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 						{
 							if (wmud_player_auth(client_data))
 							{
-								wmud_client_send(client_data, "%c%c%cLogin successful.\r\n", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
+								wmud_client_send(client_data, "%c%c%cLogin"
+										" successful.\r\n", TELNET_IAC,
+										TELNET_WILL, TELNET_ECHO);
+								client_data->authenticated = TRUE;
 								/* TODO: Send fail count if non-zero */
 								client_data->state = WMUD_CLIENT_STATE_MENU;
 							}
 							else
 							{
-								wmud_client_send(client_data, "%c%c%cThis password doesn't seem to be valid. Let's try it again...\r\nBy what name would you like to be called? ", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
+								wmud_client_send(client_data, "%c%c%cThis"
+										" password doesn't seem to be valid."
+										" Let's try it again...\r\nBy what"
+										" name would you like to be called? ",
+										TELNET_IAC, TELNET_WILL, TELNET_ECHO);
 								client_data->state = WMUD_CLIENT_STATE_FRESH;
 								client_data->login_try_count++;
-								if (client_data->login_try_count > 3)
+								if (client_data->login_try_count == 3)
 								{
-									wmud_client_send(client_data, "You are trying these bad passwords for too many times. Please stop that!\r\n");
+									wmud_client_send(client_data, "You are"
+											" trying these bad passwords for"
+											" too many times. Please stop"
+											" that!\r\n");
 									wmud_client_close(client_data, TRUE);
 									/* TODO: Increase IP fail count, and ban IP if it's too high */
 								}
@@ -139,7 +149,8 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 						}
 						else
 						{
-							wmud_client_send(client_data, "Empty passwords are not valid.\r\nTry again: ");
+							wmud_client_send(client_data, "\r\nEmpty passwords are"
+									" not valid.\r\nTry again: ");
 						}
 						break;
 					case WMUD_CLIENT_STATE_MENU:
