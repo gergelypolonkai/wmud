@@ -28,8 +28,21 @@
 #include "networking.h"
 #include "players.h"
 
+/**
+ * @players: GSList of all loaded players. Stores #wmudPlayer structures.
+ */
 GSList *players = NULL;
 
+/**
+ * wmud_player_auth:
+ * @client: The client to be authenticated. The authentication password comes
+ *          from the client's buffer.
+ *
+ * Tries to authenticate a client based on the associated player structure, and
+ * the password stored in the client's buffer.
+ *
+ * Return value: %TRUE if the password is valid, %FALSE otherwise.
+ */
 gboolean
 wmud_player_auth(wmudClient *client)
 {
@@ -47,6 +60,15 @@ find_player_by_name(wmudPlayer *player, gchar *player_name)
 	return g_ascii_strcasecmp(player->player_name, player_name);
 }
 
+/**
+ * wmud_player_exists:
+ * @player_name: The login name of the player to check
+ *
+ * Check if the player with the given name already exists.
+ *
+ * Return value: the wmudPlayer structure for the given player name, or %NULL
+ *               if it can not be found.
+ */
 wmudPlayer *
 wmud_player_exists(gchar *player_name)
 {
@@ -59,6 +81,14 @@ wmud_player_exists(gchar *player_name)
 
 }
 
+/**
+ * wmud_player_dup:
+ * @player: the player structure to duplicate
+ *
+ * Duplicates a #wmudPlayer structure.
+ *
+ * Return value: the new, duplicated player structure. It must be freed with wmud_player_free().
+ */
 wmudPlayer *
 wmud_player_dup(wmudPlayer *player)
 {
@@ -76,6 +106,13 @@ wmud_player_dup(wmudPlayer *player)
 	return new_player;
 }
 
+/**
+ * wmud_player_free:
+ * @player: A pointer to the player structure to be freed
+ *
+ * Frees a #wmudPlayer structure with all its fields, and sets the structure
+ * variable to %NULL.
+ */
 void
 wmud_player_free(wmudPlayer **player)
 {
