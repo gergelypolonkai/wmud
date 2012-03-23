@@ -5,6 +5,11 @@
 
 #include "wmud_types.h"
 
+#define TELNET_IAC '\xff'
+#define TELNET_WONT '\xfc'
+#define TELNET_WILL '\xfb'
+#define TELNET_ECHO '\x01'
+
 extern GSList *clients;
 
 gboolean wmud_networking_init(guint port_number, GError **err);

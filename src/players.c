@@ -16,7 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <glib.h>
+#ifdef HAVE_CRYPT_H
+#include <crypt.h>
+#endif
 
 #include "networking.h"
 #include "players.h"
@@ -26,6 +33,8 @@ GSList *players = NULL;
 gboolean
 wmud_player_auth(wmudClient *client)
 {
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Player entered %s as password", client->buffer->str);
+
 	return FALSE;
 }
 
