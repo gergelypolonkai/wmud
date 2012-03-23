@@ -59,6 +59,23 @@ wmud_player_exists(gchar *player_name)
 
 }
 
+wmudPlayer *
+wmud_player_dup(wmudPlayer *player)
+{
+	wmudPlayer *new_player;
+
+	if (!player)
+		return NULL;
+
+	new_player = g_new0(wmudPlayer, 1);
+	new_player->id = player->id;
+	new_player->player_name = g_strdup(player->player_name);
+	new_player->cpassword = g_strdup(player->cpassword);
+	new_player->email = g_strdup(player->email);
+
+	return new_player;
+}
+
 void
 wmud_player_free(wmudPlayer **player)
 {

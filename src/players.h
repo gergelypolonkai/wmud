@@ -28,5 +28,6 @@ extern GSList *players;
 gboolean wmud_player_auth(wmudClient *client);
 wmudPlayer *wmud_player_exists(gchar *player_name);
 void wmud_player_free(wmudPlayer **player);
+wmudPlayer *wmud_player_dup(wmudPlayer *player);
 
 #endif /* __WMUD_PLAYERS_H__ */
