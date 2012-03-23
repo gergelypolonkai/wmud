@@ -1,7 +1,7 @@
-/*
- * players.c
- *
+/* wMUD - Yet another MUD codebase by W00d5t0ck
  * Copyright (C) 2012 - Gergely POLONKAI
+ *
+ * players.c: player structure related functions
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
