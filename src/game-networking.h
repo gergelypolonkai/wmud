@@ -21,7 +21,7 @@
 
 #include <glib.h>
 
-#include "wmud_types.h"
+#include "wmud-types.h"
 
 /**
  * TELNET_IAC:

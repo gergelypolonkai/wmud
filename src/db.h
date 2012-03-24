@@ -21,7 +21,7 @@
 
 #include <glib.h>
 
-#include "wmud_types.h"
+#include "wmud-types.h"
 
 gboolean wmud_db_init(GError **err);
 gboolean wmud_db_players_load(GError **err);

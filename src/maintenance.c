@@ -25,7 +25,7 @@
 #include <crypt.h>
 #endif
 
-#include "wmud_types.h"
+#include "wmud-types.h"
 #include "maintenance.h"
 #include "main.h"
 #include "players.h"

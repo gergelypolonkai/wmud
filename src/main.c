@@ -26,7 +26,7 @@
 #include <crypt.h>
 #endif
 
-#include "wmud_types.h"
+#include "wmud-types.h"
 #include "main.h"
 #include "game-networking.h"
 #include "interpreter.h"
