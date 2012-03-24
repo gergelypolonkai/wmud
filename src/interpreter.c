@@ -24,6 +24,13 @@
 #include "networking.h"
 #include "main.h"
 
+/**
+ * SECTION:interpreter
+ * @short_description: Game command interpreter
+ *
+ * Functions to interpret and execute in-game commands
+ */
+
 WMUD_COMMAND(quit);
 
 static wmudCommand command_list[] = {

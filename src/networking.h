@@ -23,9 +23,29 @@
 
 #include "wmud_types.h"
 
+/**
+ * TELNET_IAC:
+ *
+ * Telnet IAC code
+ */
 #define TELNET_IAC '\xff'
+/**
+ * TELNET_WONT:
+ *
+ * Telnet WON'T code
+ */
 #define TELNET_WONT '\xfc'
+/**
+ * TELNET_WILL:
+ *
+ * Telnet WILL code
+ */
 #define TELNET_WILL '\xfb'
+/**
+ * TELNET_ECHO:
+ *
+ * Telnet ECHO code
+ */
 #define TELNET_ECHO '\x01'
 
 extern GSList *clients;

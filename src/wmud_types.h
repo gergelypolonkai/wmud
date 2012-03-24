@@ -23,6 +23,13 @@
 #include <gio/gio.h>
 
 /**
+ * SECTION:types
+ * @short_description: wMUD Data Types
+ * @title: wMUD's Data Types
+ *
+ */
+
+/**
  * wmudClientState:
  * @WMUD_CLIENT_STATE_FRESH: Client is newly connected. Waiting for a login
  *     player name
@@ -64,7 +71,7 @@ typedef enum {
  *     maintenance loop
  * @email: E-mail address of the player
  *
- * The <structname>wmudPlayer<structname> structure contains all information of
+ * The <structname>wmudPlayer</structname> structure contains all information of
  * a player.
  */
 typedef struct _wmudPlayer {
@@ -85,6 +92,8 @@ typedef struct _wmudPlayer {
  *     registration, so it should be always checked if the player is a saved
  *     database user
  * @bademail: indicates that the entered e-mail address is invalid
+ * @socket_source: the #GSource associated with the client socket
+ * @login_try_count: the failed login count of the client
  *
  * <structname>wmudClient</structname> contains all properties of a connected
  * game client.

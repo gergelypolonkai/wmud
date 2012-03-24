@@ -1,6 +1,7 @@
 AC_INIT([wMUD], [0.1.0])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_SRCDIR([configure.ac])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([wMUD], [0.1.0])
 
@@ -21,6 +22,12 @@ if test "$enable_debug" = "yes"; then
 	AC_DEFINE([DEBUG], [1], [Define to compile with debugging support])
 fi
 
+m4_ifdef([GTK_DOC_CHECK], [
+GTK_DOC_CHECK([1.14], [--flavour no-tmpl])
+],[
+AM_CONDITIONAL([ENABLE_GTK_DOC], false)
+])
+
 AC_ARG_ENABLE([memcached], AS_HELP_STRING([--disable-memcached], [Disable Memcached support (default: enabled)]), [], [enable_memcached=yes])
 AM_CONDITIONAL([ENABLE_MEMCACHED], [test "$enable_memcached" = "yes"])
 if test "$enable_memcached" = "yes"; then
@@ -36,4 +43,4 @@ PKG_CHECK_MODULES([GLIB], glib-2.0)
 PKG_CHECK_MODULES([GTHREAD], gthread-2.0)
 PKG_CHECK_MODULES([SQLITE3], sqlite3)
 
-AC_OUTPUT(Makefile src/Makefile)
+AC_OUTPUT(Makefile src/Makefile docs/reference/wmud/Makefile)

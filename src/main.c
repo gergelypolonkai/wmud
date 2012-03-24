@@ -35,6 +35,13 @@
 #include "maintenance.h"
 
 /**
+ * SECTION:utils
+ * @short_description: Utilities and uncategorized functions
+ * @title: Utility and uncategorized functions
+ *
+ */
+
+/**
  * debug_context_loc:
  *
  * This variable holds the location of the last context marker
@@ -45,27 +52,60 @@ struct {
 } debug_context_loc = {NULL, 0};
 
 /**
- * @game_context: the game thread's main context
- * @elapsed_seconds: the number of seconds elapsed since game boot. May be
- *                   inaccurate, as it simply gets updated by a timeout
- *                   function which should run every second
- * @elapsed_cycle: yes, I'm optimistic. This counter is increased if, for some
- *                 reason, #elapsed_seconds reaches the maximum value
- * @main_rand: the main random generator
- * @WMUD_CONFIG_ERROR: the GQuark for the config error GError
- * @WMUD_DB_ERROR: the GQuark for the database error GError
- * @port: the port number to listen on
- * @database_file: the filename of the world database
- * @admin_email: e-mail address of the MUD's administrator
+ * game_context:
+ *
+ * the game thread's main context
  */
 GMainContext *game_context;
+/**
+ * elapsed_seconds:
+ *
+ * the number of seconds elapsed since game boot. May be inaccurate, as it
+ * simply gets updated by a timeout function which should run every second
+ */
 guint32 elapsed_seconds = 0;
+/**
+ * elapsed_cycle:
+ *
+ * yes, I'm optimistic. This counter is increased if, for some reason,
+ * #elapsed_seconds reaches the maximum value
+ */
 guint32 elapsed_cycle = 0;
+/**
+ * main_rand:
+ *
+ * the main random generator
+ */
 GRand *main_rand = NULL;
+/**
+ * WMUD_CONFIG_ERROR:
+ *
+ * the GQuark for the config error GError
+ */
 GQuark WMUD_CONFIG_ERROR = 0;
+/**
+ * WMUD_DB_ERROR:
+ *
+ * the GQuark for the database error GError
+ */
 GQuark WMUD_DB_ERROR = 0;
+/**
+ * port:
+ *
+ * the port number to listen on
+ */
 guint port = 0;
+/**
+ * database_file:
+ *
+ * the filename of the world database
+ */
 gchar *database_file = NULL;
+/**
+ * admin_email:
+ *
+ * e-mail address of the MUD's administrator
+ */
 gchar *admin_email = NULL;
 
 /**

@@ -29,7 +29,16 @@
 #include "players.h"
 
 /**
- * @players: GSList of all loaded players. Stores #wmudPlayer structures.
+ * SECTION:player
+ * @short_description: Player database handling
+ *
+ * Functions to handle player database records
+ */
+
+/**
+ * players:
+ *
+ * GSList of all loaded players. Stores #wmudPlayer structures.
  */
 GSList *players = NULL;
 

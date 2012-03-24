@@ -1,0 +1,14 @@
+*.stamp
+*.args
+*.hierarchy
+*.interfaces
+*.prerequisites
+*.signals
+*-decl-list.txt
+*-decl.txt
+*-overrides.txt
+*-undeclared.txt
+*-undocumented.txt
+*-unused.txt
+html
+xml

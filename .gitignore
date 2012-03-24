@@ -17,3 +17,5 @@ stamp-h1
 *.db
 *.anjuta
 tags
+gtk-doc.make
+m4

@@ -31,6 +31,13 @@
 #include "players.h"
 #include "db.h"
 
+/**
+ * SECTION:networking
+ * @short_description: Game related networking code
+ *
+ * Functions to handle game connections
+ */
+
 struct AcceptData {
 	GMainContext *context;
 	GSocketListener *listener;

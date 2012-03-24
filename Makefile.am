@@ -1,1 +1,2 @@
-SUBDIRS = src
+SUBDIRS = src docs/reference/wmud
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc

@@ -23,11 +23,18 @@
 #include "db.h"
 #include "players.h"
 
+/**
+ * SECTION:db
+ * @short_description: Database handling
+ * @title: Database handling routines
+ *
+ */
+
 sqlite3 *dbh = NULL;
 
 /**
  * wmud_db_init:
- * @error: a GError to put error messages in it
+ * @err: a GError to put error messages in it
  *
  * Initializes the wMUD database system. Checks and opens database files.
  */
@@ -51,7 +58,7 @@ wmud_db_init(GError **err)
 
 /**
  * wmud_db_players_load:
- * @error: a GError to put error messages in it
+ * @err: a GError to put error messages in it
  *
  * Loads all player records from the database
  */
@@ -110,7 +117,7 @@ wmud_db_players_load(GError **err)
 /**
  * wmud_db_save_player:
  * @player: the player record to save
- * @error: a GError to put error messages in it
+ * @err: a GError to put error messages in it
  *
  * Saves a player record to the database backend.
  *
