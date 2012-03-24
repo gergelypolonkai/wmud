@@ -19,5 +19,7 @@ extern gchar *admin_email;
  */
 #define random_number(min, max) g_rand_int_range(main_rand, (min), (max) + 1)
 
+gchar *wmud_random_string(gint len);
+
 #endif /* __WMUD_MAIN_H__ */
 

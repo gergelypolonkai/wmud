@@ -32,6 +32,7 @@
 #include "interpreter.h"
 #include "db.h"
 #include "players.h"
+#include "maintenance.h"
 
 /**
  * debug_context_loc:
@@ -116,62 +117,6 @@ wmud_random_string(gint len)
 	}
 
 	return ret;
-}
-
-/**
- * wmud_maintenance_check_new_players:
- * @player: #wmudPLayer structure of the player record to check
- * @user_data: not used
- *
- * Callback called from within the maintenance loop. Checks if the player has
- * an unset password, and generate one for them, if so.
- */
-void
-wmud_maintenance_check_new_players(wmudPlayer *player, gpointer user_data)
-{
-	if (player->cpassword == NULL)
-	{
-		gchar *pw,
-		      *salt,
-		      *cpw;
-		GString *full_salt;
-
-		pw = wmud_random_string(8);
-		salt = wmud_random_string(8);
-		full_salt = g_string_new("$1$");
-		g_string_append(full_salt, salt);
-		cpw = g_strdup(crypt(pw, full_salt->str));
-
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Player %s has no"
-				" password set", player->player_name);
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "New password will be %s", pw);
-		player->cpassword = cpw;
-		/* TODO: Send e-mail about the new password. Upon completion,
-		 * set it in the database */
-
-		g_free(pw);
-		g_free(salt);
-		g_string_free(full_salt, TRUE);
-	}
-}
-
-/**
- * wmud_maintenance:
- * @user_data: not used
- *
- * Timeout source function for maintenance tasks
- */
-gboolean
-wmud_maintenance(gpointer user_data)
-{
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Starting maintenance...");
-	/* Run through the player list, and generate a random password for each
-	 * newly registered player */
-	g_slist_foreach(players, (GFunc)wmud_maintenance_check_new_players, NULL);
-
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Finished maintenance...");
-
-	return TRUE;
 }
 
 #ifdef DEBUG
@@ -324,22 +269,6 @@ game_thread_func(GMainLoop *game_loop)
 }
 
 /**
- * maint_thread_func:
- * @main_loop: the main loop to be associated with the maintenance thread
- *
- * The maintenance thread's main function.
- *
- * Return value: This function always returns %NULL.
- */
-gpointer
-maint_thread_func(GMainLoop *maint_loop)
-{
-	g_main_loop_run(maint_loop);
-
-	return NULL;
-}
-
-/**
  * main:
  * @argc: The number of arguments on the command line
  * @argv: The command line arguments themselves
@@ -351,12 +280,8 @@ main(int argc, char **argv)
 {
 	GMainLoop *game_loop;
 	GSource *timeout_source;
-	guint timeout_id;
 	GError *err = NULL;
-	GThread *game_thread,
-		*maint_thread;
-	GMainContext *maint_context;
-	GMainLoop *maint_loop;
+	GThread *game_thread;
 
 	/* Initialize the thread and type system */
 	g_thread_init(NULL);
@@ -372,21 +297,11 @@ main(int argc, char **argv)
 	game_context = g_main_context_new();
 	game_loop = g_main_loop_new(game_context, FALSE);
 
-	/* Create the maintenance context and main loop */
-	maint_context = g_main_context_new();
-	maint_loop = g_main_loop_new(maint_context, FALSE);
-
 	/* Create the timeout source which keeps track of elapsed real-world
 	 * time */
 	timeout_source = g_timeout_source_new(1000);
 	g_source_set_callback(timeout_source, rl_sec_elapsed, NULL, NULL);
-	timeout_id = g_source_attach(timeout_source, game_context);
-	g_source_unref(timeout_source);
-
-	/* Create the timeout source which will do the maintenance tasks */
-	timeout_source = g_timeout_source_new_seconds(3);
-	g_source_set_callback(timeout_source, wmud_maintenance, NULL, NULL);
-	timeout_id = g_source_attach(timeout_source, maint_context);
+	g_source_attach(timeout_source, game_context);
 	g_source_unref(timeout_source);
 
 	/* TODO: Create signal handlers! */
@@ -445,8 +360,7 @@ main(int argc, char **argv)
 	g_clear_error(&err);
 	game_thread = g_thread_create((GThreadFunc)game_thread_func, game_loop, TRUE, &err);
 
-	g_clear_error(&err);
-	maint_thread = g_thread_create((GThreadFunc)maint_thread_func, maint_loop, FALSE, &err);
+	wmud_maintenance_init();
 
 	/* Initialize other threads here */
 
