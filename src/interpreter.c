@@ -33,12 +33,25 @@ static wmudCommand command_list[] = {
 	{ NULL, NULL },
 };
 
+/**
+ * destroy_string:
+ * @string: a GString to destroy
+ *
+ * Callback function to destroy a list of GStrings
+ */
 static void
 destroy_string(GString *string)
 {
 	g_string_free(string, TRUE);
 }
 
+/**
+ * wmud_interpret_game_command:
+ * @client: the wmudClient whose command should be processed
+ *
+ * Processes a wmudClient's buffer, and executes the game command if there is
+ * one
+ */
 void
 wmud_interpret_game_command(wmudClient *client)
 {
@@ -176,7 +189,12 @@ wmud_interpret_game_command(wmudClient *client)
 	g_slist_free(matches);
 }
 
-WMUD_COMMAND(gcmd_quit)
+/**
+ * gcmd_quit:
+ * 
+ * The QUIT game command's handler
+ */
+WMUD_COMMAND(quit)
 {
 	wmud_client_send(client, "Are you sure you want to get back to that freaky other reality? [y/N] ");
 	client->state = WMUD_CLIENT_STATE_QUITWAIT;

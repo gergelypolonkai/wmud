@@ -25,6 +25,12 @@
 
 sqlite3 *dbh = NULL;
 
+/**
+ * wmud_db_init:
+ * @error: a GError to put error messages in it
+ *
+ * Initializes the wMUD database system. Checks and opens database files.
+ */
 gboolean
 wmud_db_init(GError **err)
 {
@@ -43,6 +49,12 @@ wmud_db_init(GError **err)
 	return TRUE;
 }
 
+/**
+ * wmud_db_players_load:
+ * @error: a GError to put error messages in it
+ *
+ * Loads all player records from the database
+ */
 gboolean
 wmud_db_players_load(GError **err)
 {
@@ -95,6 +107,16 @@ wmud_db_players_load(GError **err)
 	return FALSE;
 }
 
+/**
+ * wmud_db_save_player:
+ * @player: the player record to save
+ * @error: a GError to put error messages in it
+ *
+ * Saves a player record to the database backend.
+ *
+ * Return value: %TRUE on success. Upon failure, %FALSE is returned, and err is
+ *               set accordingly.
+ */
 gboolean
 wmud_db_save_player(wmudPlayer *player, GError **err)
 {

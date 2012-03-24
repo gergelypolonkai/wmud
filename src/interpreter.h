@@ -21,9 +21,25 @@
 
 #include "networking.h"
 
+/**
+ * wmudCommandFunc:
+ * @client: the client from whom the command arrived
+ * @command: the command itself
+ * @token_list: the command arguments
+ *
+ * Command handler function type
+ */
 typedef void (*wmudCommandFunc)(wmudClient *client, gchar *command, GSList *token_list);
 #define WMUD_COMMAND(name) void name(wmudClient *client, gchar *command, GSList *token_list)
 
+/**
+ * wmudCommand:
+ * @command: the command itself. Should be in uppercase, but doesn't actually
+ *           matter
+ * @commandFunc: the command handler function for this command
+ *
+ * This structure holds the different properties of the in-game commands.
+ */
 typedef struct _wmudCommand {
 	gchar *command;
 	wmudCommandFunc commandFunc;

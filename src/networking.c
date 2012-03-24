@@ -41,6 +41,15 @@ GSList *clients;
 void wmud_client_interpret_newplayer_email(wmudClient *client);
 void wmud_client_interpret_newplayer_mailconfirm(wmudClient *client_data);
 
+/**
+ * wmud_client_close:
+ * @client: the client whose connection should be dropped
+ * @send_goodbye: if set to %TRUE, we will send a nice good-bye message to the
+ *                client before dropping the connection
+ *
+ * Closes a client connection. If send_goodbye is set to %TRUE, a good-bye
+ * message will be sent to the client.
+ */
 void
 wmud_client_close(wmudClient *client, gboolean send_goodbye)
 {
@@ -57,6 +66,14 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 	g_free(client);
 }
 
+/**
+ * wmud_client_callback:
+ * @client: the socket of the client on which the data arrived
+ * @condition: the condition available on the client socket
+ * @client: the wmudClient structure of the client
+ *
+ * Processes incoming client data, and client hangup
+ */
 static gboolean
 wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data)
 {
@@ -195,9 +212,16 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 	return TRUE;
 }
 
-/* game_source_callback()
+/**
+ * game_source_callback:
+ * @socket: the listener socket on which the new connection arrived
+ * @condition: not used
+ * @accept_data: the AcceptData structure of the game listener
  *
- * This function is called whenever a new connection is available on the game socket
+ * Callback function to be called when a new connection is available on the
+ * game listener socket.
+ *
+ * Return value: this function always returns %TRUE
  */
 gboolean
 game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData *accept_data)
@@ -226,6 +250,16 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	return TRUE;
 }
 
+/**
+ * wmud_networking_init:
+ * @port_number: the port number on which the game listener should listen
+ * @err: the GError in which possible errors will be reported
+ *
+ * Initializes the game network listener
+ *
+ * Return value: Returns %TRUE on success. Upon failure, %FALSE is return, and
+ *               err is set accordingly (if not NULL)
+ */
 gboolean
 wmud_networking_init(guint port_number, GError **err)
 {
@@ -338,6 +372,14 @@ wmud_networking_init(guint port_number, GError **err)
 	return TRUE;
 }
 
+/**
+ * wmud_client_send:
+ * @client: the client to which the message will be sent
+ * @fmt: the printf() style format string of the message
+ * @...: optional parameters to the format string
+ *
+ * Sends a formatted message to a game client
+ */
 void
 wmud_client_send(wmudClient *client, const gchar *fmt, ...)
 {
@@ -353,6 +395,13 @@ wmud_client_send(wmudClient *client, const gchar *fmt, ...)
 	g_string_free(buf, TRUE);
 }
 
+/**
+ * wmud_client_start_login:
+ * @client: the client from which the login name came from
+ *
+ * This function is currently called when the freshly connected client sends a
+ * non-empty string (a player name).
+ */
 void
 wmud_client_start_login(wmudClient *client)
 {
@@ -382,6 +431,13 @@ wmud_client_start_login(wmudClient *client)
 	}
 }
 
+/**
+ * wmud_client_interpret_newplayer_answer:
+ * @client: the client from which the answer came from
+ *
+ * Interprets a yes/no answer from the client to the question if they are new
+ * to the game.
+ */
 void
 wmud_client_interpret_newplayer_answer(wmudClient *client)
 {
@@ -402,6 +458,12 @@ wmud_client_interpret_newplayer_answer(wmudClient *client)
 	}
 }
 
+/**
+ * wmud_client_interpret_newplayer_email:
+ * @client: the client from which the e-mail address arrived from
+ *
+ * Checks for the validity of the new player's e-mail address
+ */
 void
 wmud_client_interpret_newplayer_email(wmudClient *client)
 {
@@ -430,6 +492,13 @@ wmud_client_interpret_newplayer_email(wmudClient *client)
 	}
 }
 
+/**
+ * wmud_client_interpret_newplayer_mailconfirm:
+ * @client: the client from which the confirmation e-mail arrived
+ *
+ * Check if the confirmed e-mail address is the same as the previously entered
+ * one.
+ */
 void
 wmud_client_interpret_newplayer_mailconfirm(wmudClient *client)
 {

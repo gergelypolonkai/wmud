@@ -33,11 +33,30 @@
 #include "db.h"
 #include "players.h"
 
+/**
+ * debug_context_loc:
+ *
+ * This variable holds the location of the last context marker
+ */
 struct {
 	char *file;
 	int line;
 } debug_context_loc = {NULL, 0};
 
+/**
+ * @game_context: the game thread's main context
+ * @elapsed_seconds: the number of seconds elapsed since game boot. May be
+ *                   inaccurate, as it simply gets updated by a timeout
+ *                   function which should run every second
+ * @elapsed_cycle: yes, I'm optimistic. This counter is increased if, for some
+ *                 reason, #elapsed_seconds reaches the maximum value
+ * @main_rand: the main random generator
+ * @WMUD_CONFIG_ERROR: the GQuark for the config error GError
+ * @WMUD_DB_ERROR: the GQuark for the database error GError
+ * @port: the port number to listen on
+ * @database_file: the filename of the world database
+ * @admin_email: e-mail address of the MUD's administrator
+ */
 GMainContext *game_context;
 guint32 elapsed_seconds = 0;
 guint32 elapsed_cycle = 0;
@@ -48,10 +67,12 @@ guint port = 0;
 gchar *database_file = NULL;
 gchar *admin_email = NULL;
 
-/* rl_sec_elapsed()
+/**
+ * rl_sec_elapsed:
+ * @user_data: non-used pointer to callback's user data
  *
- * This function keeps track of elapsed real-world time. It is inaccurate by
- * design, but it doesn't actually matter.
+ * Keeps track of elapsed real-world time. It is inaccurate by design, but it
+ * doesn't actually matter.
  */
 gboolean
 rl_sec_elapsed(gpointer user_data)
@@ -71,6 +92,12 @@ rl_sec_elapsed(gpointer user_data)
 	return TRUE;
 }
 
+/**
+ * wmud_random_string:
+ * @len: the desired length of the generated random string
+ *
+ * Generates a random string of %len characters.
+ */
 gchar *
 wmud_random_string(gint len)
 {
@@ -91,6 +118,14 @@ wmud_random_string(gint len)
 	return ret;
 }
 
+/**
+ * wmud_maintenance_check_new_players:
+ * @player: #wmudPLayer structure of the player record to check
+ * @user_data: not used
+ *
+ * Callback called from within the maintenance loop. Checks if the player has
+ * an unset password, and generate one for them, if so.
+ */
 void
 wmud_maintenance_check_new_players(wmudPlayer *player, gpointer user_data)
 {
@@ -120,6 +155,12 @@ wmud_maintenance_check_new_players(wmudPlayer *player, gpointer user_data)
 	}
 }
 
+/**
+ * wmud_maintenance:
+ * @user_data: not used
+ *
+ * Timeout source function for maintenance tasks
+ */
 gboolean
 wmud_maintenance(gpointer user_data)
 {
@@ -135,11 +176,16 @@ wmud_maintenance(gpointer user_data)
 
 #ifdef DEBUG
 void
-/* debug_context()
+/**
+ * debug_context:
+ * @file: the source file name, where the context marker was found
+ * @line: the line number where the context marker was found
  *
  * This function keeps track of the code flow in some way. It can help with
  * debugging, as during a SIGSEGV or such signal this will print out the last
  * place of DebugContext in the code.
+ *
+ * THIS FUNCTION SHOULD NEVER BE CALLED DIRECTLY!
  */
 debug_context(char *file, int line)
 {
@@ -149,11 +195,22 @@ debug_context(char *file, int line)
 	debug_context_loc.file = g_strdup(file);
 	debug_context_loc.line = line;
 }
+/**
+ * DebugContext:
+ *
+ * Marks the current line of the source file with a context marker. Deadly
+ * signals should print the place of the last marker.
+ */
 #define DebugContext debug_context(__FILE__, __LINE__)
 #else
 #define DebugContext
 #endif
 
+/**
+ * wmud_type_init:
+ *
+ * Initializes the wMUD types.
+ */
 void
 wmud_type_init(void)
 {
@@ -161,6 +218,15 @@ wmud_type_init(void)
 	WMUD_DB_ERROR = g_quark_from_string("wmud_db_error");
 }
 
+/**
+ * wmud_config_init:
+ * @err: The GError in which the config handling status should be returned
+ *
+ * Parses the default configuration file, and sets different variables
+ * according to it.
+ *
+ * Return value: %TRUE if parsing was successful. %FALSE otherwise.
+ */
 gboolean
 wmud_config_init(GError **err)
 {
@@ -240,6 +306,14 @@ wmud_config_init(GError **err)
 	return TRUE;
 }
 
+/**
+ * game_thread_func:
+ * @game_loop: the main loop to be associated with the game thread
+ *
+ * The game thread's main function.
+ *
+ * Return value: This function always returns %NULL.
+ */
 gpointer
 game_thread_func(GMainLoop *game_loop)
 {
@@ -249,6 +323,14 @@ game_thread_func(GMainLoop *game_loop)
 	return NULL;
 }
 
+/**
+ * maint_thread_func:
+ * @main_loop: the main loop to be associated with the maintenance thread
+ *
+ * The maintenance thread's main function.
+ *
+ * Return value: This function always returns %NULL.
+ */
 gpointer
 maint_thread_func(GMainLoop *maint_loop)
 {
@@ -257,6 +339,13 @@ maint_thread_func(GMainLoop *maint_loop)
 	return NULL;
 }
 
+/**
+ * main:
+ * @argc: The number of arguments on the command line
+ * @argv: The command line arguments themselves
+ *
+ * The Main Function (TM)
+ */
 int
 main(int argc, char **argv)
 {
