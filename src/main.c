@@ -28,7 +28,7 @@
 
 #include "wmud_types.h"
 #include "main.h"
-#include "networking.h"
+#include "game-networking.h"
 #include "interpreter.h"
 #include "db.h"
 #include "players.h"

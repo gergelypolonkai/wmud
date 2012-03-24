@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "interpreter.h"
-#include "networking.h"
+#include "game-networking.h"
 #include "main.h"
 
 /**

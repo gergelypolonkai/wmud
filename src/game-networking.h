@@ -1,7 +1,7 @@
 /* wMUD - Yet another MUD codebase by W00d5t0ck
  * Copyright (C) 2012 - Gergely POLONKAI
  *
- * networking.h: basic networking function headers, variables and defines
+ * game-networking.h: basic networking function headers, variables and defines
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

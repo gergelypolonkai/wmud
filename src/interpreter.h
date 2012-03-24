@@ -19,7 +19,7 @@
 #ifndef __WMUD_INTERPRETER_H__
 # define __WMUD_INTERPRETER_H__
 
-#include "networking.h"
+#include "game-networking.h"
 
 /**
  * wmudCommandFunc:

@@ -1,7 +1,7 @@
 /* wMUD - Yet another MUD codebase by W00d5t0ck
  * Copyright (C) 2012 - Gergely POLONKAI
  *
- * networking.c: basic networking functions
+ * game-networking.c: basic networking functions
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include "main.h"
-#include "networking.h"
+#include "game-networking.h"
 #include "interpreter.h"
 #include "players.h"
 #include "db.h"

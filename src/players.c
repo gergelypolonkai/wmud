@@ -25,7 +25,7 @@
 #include <crypt.h>
 #endif
 
-#include "networking.h"
+#include "game-networking.h"
 #include "players.h"
 
 /**
