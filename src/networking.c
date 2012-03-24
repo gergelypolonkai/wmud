@@ -39,7 +39,7 @@ struct AcceptData {
 GSList *clients;
 
 void wmud_client_interpret_newplayer_email(wmudClient *client);
-void wmud_client_interpret_newplayer_mailconfirm(wmudClient *client_data);
+void wmud_client_interpret_newplayer_mailconfirm(wmudClient *client);
 
 /**
  * wmud_client_close:
@@ -75,13 +75,13 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
  * Processes incoming client data, and client hangup
  */
 static gboolean
-wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client_data)
+wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient *client)
 {
 	GError *err = NULL;
 
 	if (condition & G_IO_HUP)
 	{
-		wmud_client_close(client_data, FALSE);
+		wmud_client_close(client, FALSE);
 		return FALSE;
 	}
 	else if ((condition & G_IO_IN) || (condition & G_IO_PRI))
@@ -91,10 +91,10 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 		gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
 
 		/* TODO: Error checking */
-		if ((len = g_socket_receive(client, buf, MAX_RECV_LEN, NULL, &err)) == 0)
+		if ((len = g_socket_receive(client_socket, buf, MAX_RECV_LEN, NULL, &err)) == 0)
 		{
 			g_free(buf);
-			wmud_client_close(client_data, FALSE);
+			wmud_client_close(client, FALSE);
 
 			return FALSE;
 		}
@@ -109,87 +109,87 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 			{
 				if ((r < n) && r)
 				{
-					if (client_data->buffer->len > 0)
-						g_string_append_len(client_data->buffer, buf2, (r - buf2));
+					if (client->buffer->len > 0)
+						g_string_append_len(client->buffer, buf2, (r - buf2));
 					else
-						g_string_overwrite_len(client_data->buffer, 0, buf2, (r - buf2));
+						g_string_overwrite_len(client->buffer, 0, buf2, (r - buf2));
 					buf2 = r;
 				}
 				else if (n)
 				{
-					if (client_data->buffer->len > 0)
-						g_string_append_len(client_data->buffer, buf2, (n - buf2));
+					if (client->buffer->len > 0)
+						g_string_append_len(client->buffer, buf2, (n - buf2));
 					else
-						g_string_overwrite_len(client_data->buffer, 0, buf2, (n - buf2));
+						g_string_overwrite_len(client->buffer, 0, buf2, (n - buf2));
 					buf2 = n;
 				}
 
-				switch (client_data->state)
+				switch (client->state)
 				{
 					case WMUD_CLIENT_STATE_FRESH:
-						if (*(client_data->buffer->str))
-							wmud_client_start_login(client_data);
+						if (*(client->buffer->str))
+							wmud_client_start_login(client);
 						break;
 					case WMUD_CLIENT_STATE_PASSWAIT:
-						if (*(client_data->buffer->str))
+						if (*(client->buffer->str))
 						{
-							if (wmud_player_auth(client_data))
+							if (wmud_player_auth(client))
 							{
-								wmud_client_send(client_data, "%c%c%cLogin"
+								wmud_client_send(client, "%c%c%cLogin"
 										" successful.\r\n", TELNET_IAC,
 										TELNET_WILL, TELNET_ECHO);
-								client_data->authenticated = TRUE;
+								client->authenticated = TRUE;
 								/* TODO: Send fail count if non-zero */
-								client_data->state = WMUD_CLIENT_STATE_MENU;
+								client->state = WMUD_CLIENT_STATE_MENU;
 							}
 							else
 							{
-								wmud_client_send(client_data, "%c%c%cThis"
+								wmud_client_send(client, "%c%c%cThis"
 										" password doesn't seem to be valid."
 										" Let's try it again...\r\nBy what"
 										" name would you like to be called? ",
 										TELNET_IAC, TELNET_WILL, TELNET_ECHO);
-								client_data->state = WMUD_CLIENT_STATE_FRESH;
-								client_data->login_try_count++;
-								if (client_data->login_try_count == 3)
+								client->state = WMUD_CLIENT_STATE_FRESH;
+								client->login_try_count++;
+								if (client->login_try_count == 3)
 								{
-									wmud_client_send(client_data, "You are"
+									wmud_client_send(client, "You are"
 											" trying these bad passwords for"
 											" too many times. Please stop"
 											" that!\r\n");
-									wmud_client_close(client_data, TRUE);
+									wmud_client_close(client, TRUE);
 									/* TODO: Increase IP fail count, and ban IP if it's too high */
 								}
 								/* TODO: Increase and save player fail count */
-								client_data->player = NULL;
+								client->player = NULL;
 							}
 						}
 						else
 						{
-							wmud_client_send(client_data, "\r\nEmpty passwords are"
+							wmud_client_send(client, "\r\nEmpty passwords are"
 									" not valid.\r\nTry again: ");
 						}
 						break;
 					case WMUD_CLIENT_STATE_MENU:
-						//wmud_client_interpret_menu_command(client_data);
+						//wmud_client_interpret_menu_command(client);
 						break;
 					case WMUD_CLIENT_STATE_INGAME:
-						wmud_interpret_game_command(client_data);
+						wmud_interpret_game_command(client);
 						break;
 					case WMUD_CLIENT_STATE_QUITWAIT:
-						//wmud_interpret_quit_answer(client_data);
+						//wmud_interpret_quit_answer(client);
 						break;
 					case WMUD_CLIENT_STATE_NEWCHAR:
-						wmud_client_interpret_newplayer_answer(client_data);
+						wmud_client_interpret_newplayer_answer(client);
 						break;
 					case WMUD_CLIENT_STATE_REGISTERING:
-						wmud_client_interpret_newplayer_email(client_data);
+						wmud_client_interpret_newplayer_email(client);
 						break;
 					case WMUD_CLIENT_STATE_REGEMAIL_CONFIRM:
-						wmud_client_interpret_newplayer_mailconfirm(client_data);
+						wmud_client_interpret_newplayer_mailconfirm(client);
 						break;
 				}
-				g_string_erase(client_data->buffer, 0, -1);
+				g_string_erase(client->buffer, 0, -1);
 
 				for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
 				if (!*buf2)
@@ -197,10 +197,10 @@ wmud_client_callback(GSocket *client, GIOCondition condition, wmudClient *client
 			}
 			else
 			{
-				if (client_data->buffer->len > 0)
-					g_string_append(client_data->buffer, buf2);
+				if (client->buffer->len > 0)
+					g_string_append(client->buffer, buf2);
 				else
-					g_string_overwrite(client_data->buffer, 0, buf2);
+					g_string_overwrite(client->buffer, 0, buf2);
 
 				break;
 			}
@@ -229,23 +229,23 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	GSocket *client_socket;
 	GSource *client_source;
 	GError *err = NULL;
-	wmudClient *client_data;
+	wmudClient *client;
 
 	/* TODO: Error checking */
 	client_socket = g_socket_listener_accept_socket(accept_data->listener, NULL, NULL, &err);
 
-	client_data = g_new0(wmudClient, 1);
-	client_data->socket = client_socket;
-	client_data->buffer = g_string_new("");
-	client_data->state = WMUD_CLIENT_STATE_FRESH;
-	clients = g_slist_prepend(clients, client_data);
+	client = g_new0(wmudClient, 1);
+	client->socket = client_socket;
+	client->buffer = g_string_new("");
+	client->state = WMUD_CLIENT_STATE_FRESH;
+	clients = g_slist_prepend(clients, client);
 
 	client_source = g_socket_create_source(client_socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
-	client_data->socket_source = client_source;
-	g_source_set_callback(client_source, (GSourceFunc)wmud_client_callback, client_data, NULL);
+	client->socket_source = client_source;
+	g_source_set_callback(client_source, (GSourceFunc)wmud_client_callback, client, NULL);
 	g_source_attach(client_source, accept_data->context);
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "New connection.");
-	wmud_client_send(client_data, "By what name shall we call you? ");
+	wmud_client_send(client, "By what name shall we call you? ");
 
 	return TRUE;
 }
