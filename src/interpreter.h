@@ -30,7 +30,13 @@
  * Command handler function type
  */
 typedef void (*wmudCommandFunc)(wmudClient *client, gchar *command, GSList *token_list);
-#define WMUD_COMMAND(name) void name(wmudClient *client, gchar *command, GSList *token_list)
+/**
+ * WMUD_COMMAND:
+ * @name: the name of the command. Should be in lowercase
+ *
+ * Shorthand to create the function header for command handlers
+ */
+#define WMUD_COMMAND(name) void gcmd_ ## name(wmudClient *client, gchar *command, GSList *token_list)
 
 /**
  * wmudCommand:

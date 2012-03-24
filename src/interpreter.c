@@ -24,9 +24,7 @@
 #include "networking.h"
 #include "main.h"
 
-#define IS_SPACE(c) (g_ascii_isspace((c)) || (!(c)))
-
-WMUD_COMMAND(gcmd_quit);
+WMUD_COMMAND(quit);
 
 static wmudCommand command_list[] = {
 	{ "quit", gcmd_quit },
@@ -87,7 +85,7 @@ wmud_interpret_game_command(wmudClient *client)
 					start++;
 					break;
 				}
-				else if (!IS_SPACE(*start))
+				else if (g_ascii_isspace(*start) || (!*start))
 				{
 					break;
 				}
