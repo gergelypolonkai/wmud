@@ -50,7 +50,7 @@
 
 extern GSList *clients;
 
-gboolean wmud_networking_init(guint port_number, GError **err);
+gboolean wmud_networking_init(guint port_number, GMainContext *game_context, GError **err);
 void wmud_client_send(wmudClient *client, const gchar *fmt, ...);
 void wmud_client_start_login(wmudClient *client);
 void wmud_client_interpret_newplayer_answer(wmudClient *client);

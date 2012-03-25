@@ -268,7 +268,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
  *               err is set accordingly (if not NULL)
  */
 gboolean
-wmud_networking_init(guint port_number, GError **err)
+wmud_networking_init(guint port_number, GMainContext *game_context, GError **err)
 {
 	struct AcceptData *accept_data;
 	GSocketListener *game_listener;
