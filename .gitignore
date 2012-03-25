@@ -19,3 +19,4 @@ stamp-h1
 tags
 gtk-doc.make
 m4
+*.bak
