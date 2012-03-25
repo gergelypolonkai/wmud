@@ -4,17 +4,27 @@ wMUD TODO file
 This file is continuously migrated into the Zim wiki (later it will become
 media or dokuwiki).
 
+Legend
+------
+
+[  ] planned
+[f ] feature request added to flyspray
+[ i] implementation began
+[XX] finished
+
 Data storage and code flow
 --------------------------
 
-* Store EVERYTHING in an SQLite3 database
+[ i] Store EVERYTHING in an SQLite3 database
 
-* At least two threads. One of them should continuously write everything back
-  to the database, while the other one should serve the connections. Maybe the
-  out-of-game chat should be outsourced to a separate thread, either.
+[ i] Separate threads for separate jobs. Game thread for accepting players,
+       maintenance thread to continuously maintain the database, chat threads for
+       different chat protocols, world builder thread for online world building.
 
-* All descriptions should be written in a markup language to support bold,
-  underline, colours, and such
+[  ] All descriptions should be written in a markup language to support bold,
+       underline, colours, and such
+
+[f ] Loadable modules for commands, races, classes, etc.
 
 Game world
 ----------
