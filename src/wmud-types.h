@@ -110,26 +110,6 @@ typedef struct _wmudClient {
 } wmudClient;
 
 /**
- * wmudConfigError:
- * @WMUD_CONFIG_ERROR_NOGLOBAL: Indicates that the config file read doesn't
- *     contain a [global] section
- * @WMUD_CONFIG_ERROR_BADPORT: Indicates that the config file contains and
- *     invalid port number
- * @WMUD_CONFIG_ERROR_NOWORLD: Indicates that the config file doesn't contain a
- *     world database file
- * @WMUD_CONFIG_ERROR_NOEMAIL: Indicates that the config file doesn't contain
- *     an administrator e-mail address
- *
- * Error codes returned by configuration file parsing functions.
- */
-typedef enum {
-	WMUD_CONFIG_ERROR_NOGLOBAL,
-	WMUD_CONFIG_ERROR_BADPORT,
-	WMUD_CONFIG_ERROR_NOWORLD,
-	WMUD_CONFIG_ERROR_NOEMAIL
-} wmudConfigError;
-
-/**
  * wmudDbError:
  * @WMUD_DB_ERROR_CANTOPEN: Database file cannot be opened
  * @WMUD_DB_ERROR_NOINIT: Database system was not initialized

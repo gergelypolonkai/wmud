@@ -6,9 +6,6 @@
 extern GMainContext *game_context;
 extern guint32 elapsed_seconds;
 extern GRand *main_rand;
-extern gchar *database_file;
-extern GQuark WMUD_DB_ERROR;
-extern gchar *admin_email;
 
 /**
  * random_number:

@@ -30,6 +30,7 @@
 #include "interpreter.h"
 #include "players.h"
 #include "db.h"
+#include "configuration.h"
 
 /**
  * SECTION:game-networking
@@ -247,7 +248,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 						}
 						else
 						{
-							wmud_client_send(client, "\r\nSorry, but this e-mail address doesn't seem to be valid to me.\r\n\r\nIf you think this is a valid address, simply press enter to quit, and send an e-mail to %s from that address, so we can fix our e-mail validation code.\r\n\r\nIf you just mistyped your address, type it now: ", admin_email);
+							wmud_client_send(client, "\r\nSorry, but this e-mail address doesn't seem to be valid to me.\r\n\r\nIf you think this is a valid address, simply press enter to quit, and send an e-mail to %s from that address, so we can fix our e-mail validation code.\r\n\r\nIf you just mistyped your address, type it now: ", active_config->admin_email);
 							if (*(client->buffer->str))
 								client->bademail = TRUE;
 						}

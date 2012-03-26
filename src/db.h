@@ -23,6 +23,8 @@
 
 #include "wmud-types.h"
 
+extern GQuark WMUD_DB_ERROR;
+
 gboolean wmud_db_init(GError **err);
 gboolean wmud_db_players_load(GError **err);
 gboolean wmud_db_save_player(wmudPlayer *player, GError **err);

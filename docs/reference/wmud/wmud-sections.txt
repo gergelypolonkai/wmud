@@ -12,6 +12,16 @@ wmud_random_string
 
 <SECTION>
 <TITLE></TITLE>
+<FILE>configuration</FILE>
+WMUD_CONFIG_ERROR
+wmudConfigError
+ConfigData
+active_config
+wmud_config_init
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
 <FILE>maintenance-thread</FILE>
 wmud_maintenance_init
 </SECTION>
@@ -27,6 +37,8 @@ game_context
 wmud_game_init
 </SECTION>
 
+<SECTION>
+<TITLE></TITLE>
 <FILE>game-networking</FILE>
 TELNET_IAC
 TELNET_WILL
