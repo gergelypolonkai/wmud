@@ -148,6 +148,9 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 								client->authenticated = TRUE;
 								/* TODO: Send fail count if non-zero */
 								client->state = WMUD_CLIENT_STATE_MENU;
+								/* TODO: send MOTD */
+								/* TODO: send menu items */
+								/* TODO: send menu prologue */
 							}
 							else
 							{
