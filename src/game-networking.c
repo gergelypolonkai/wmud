@@ -85,6 +85,8 @@ static gboolean
 wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient *client)
 {
 	GError *err = NULL;
+	/* TODO: Error checking */
+	GRegex *email_regex = g_regex_new("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", G_REGEX_CASELESS, 0, NULL);
 
 	if (condition & G_IO_HUP)
 	{
@@ -135,7 +137,32 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 				{
 					case WMUD_CLIENT_STATE_FRESH:
 						if (*(client->buffer->str))
-							wmud_client_start_login(client);
+						{
+							wmudPlayer *player;
+
+							if ((player = wmud_player_exists(client->buffer->str)) != NULL)
+							{
+								g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Trying to login with playername '%s'\n", client->buffer->str);
+								if (player->cpassword == NULL)
+								{
+									wmud_client_send(client, "Your registration is not finished yet.\r\n");
+									wmud_client_close(client, TRUE);
+								}
+								else
+								{
+									client->state = WMUD_CLIENT_STATE_PASSWAIT;
+									client->player = player;
+									wmud_client_send(client, "Please provide us your password: %c%c%c", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
+								}
+							}
+							else
+							{
+								client->player = g_new0(wmudPlayer, 1);
+								client->player->player_name = g_strdup(client->buffer->str);
+								client->state = WMUD_CLIENT_STATE_NEWCHAR;
+								wmud_client_send(client, "Is %s new to this game? [Y/N] ", client->buffer->str);
+							}
+						}
 						break;
 					case WMUD_CLIENT_STATE_PASSWAIT:
 						if (*(client->buffer->str))
@@ -144,7 +171,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 							{
 								wmud_client_send(client, "%c%c%cLogin"
 										" successful.\r\n", TELNET_IAC,
-										TELNET_WILL, TELNET_ECHO);
+										TELNET_WONT, TELNET_ECHO);
 								client->authenticated = TRUE;
 								/* TODO: Send fail count if non-zero */
 								client->state = WMUD_CLIENT_STATE_MENU;
@@ -155,7 +182,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 										" password doesn't seem to be valid."
 										" Let's try it again...\r\nBy what"
 										" name would you like to be called? ",
-										TELNET_IAC, TELNET_WILL, TELNET_ECHO);
+										TELNET_IAC, TELNET_WONT, TELNET_ECHO);
 								client->state = WMUD_CLIENT_STATE_FRESH;
 								client->login_try_count++;
 								if (client->login_try_count == 3)
@@ -167,7 +194,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 									wmud_client_close(client, TRUE);
 									/* TODO: Increase IP fail count, and ban IP if it's too high */
 								}
-								/* TODO: Increase and save player fail count */
+								/* TODO: Increase and save login fail count */
 								client->player = NULL;
 							}
 						}
@@ -187,13 +214,68 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 						//wmud_interpret_quit_answer(client);
 						break;
 					case WMUD_CLIENT_STATE_NEWCHAR:
-						wmud_client_interpret_newplayer_answer(client);
+						if (g_ascii_strcasecmp(client->buffer->str, "n") == 0)
+						{
+							wmud_client_send(client, "What is your player-name, then? ");
+							client->state = WMUD_CLIENT_STATE_FRESH;
+						}
+						else if (g_ascii_strcasecmp(client->buffer->str, "y") == 0)
+						{
+							g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Creating new player\n");
+							wmud_client_send(client, "Welcome to this MUD!\r\nPlease enter your e-mail address: ");
+							client->state = WMUD_CLIENT_STATE_REGISTERING;
+						}
+						else
+						{
+							wmud_client_send(client, "Sorry, but for this question I only understand 'Y' or 'N'.\r\nIs %s a new player here? [Y/N] ", client->player->player_name);
+						}
 						break;
 					case WMUD_CLIENT_STATE_REGISTERING:
-						wmud_client_interpret_newplayer_email(client);
+						if (!*(client->buffer->str))
+						{
+							if (client->bademail)
+							{
+								wmud_client_close(client, TRUE);
+							}
+						}
+
+						if (g_regex_match(email_regex, client->buffer->str, 0, NULL))
+						{
+							client->player->email = g_strdup(client->buffer->str);
+							client->state = WMUD_CLIENT_STATE_REGEMAIL_CONFIRM;
+							wmud_client_send(client, "It seems to be a valid address to me, but could you write it again? ");
+						}
+						else
+						{
+							wmud_client_send(client, "\r\nSorry, but this e-mail address doesn't seem to be valid to me.\r\n\r\nIf you think this is a valid address, simply press enter to quit, and send an e-mail to %s from that address, so we can fix our e-mail validation code.\r\n\r\nIf you just mistyped your address, type it now: ", admin_email);
+							if (*(client->buffer->str))
+								client->bademail = TRUE;
+						}
 						break;
 					case WMUD_CLIENT_STATE_REGEMAIL_CONFIRM:
-						wmud_client_interpret_newplayer_mailconfirm(client);
+						if (g_ascii_strcasecmp(client->player->email, client->buffer->str) == 0)
+						{
+							g_clear_error(&err);
+							if (wmud_db_save_player(client->player, &err))
+							{
+								wmud_client_send(client, "Good. We will generate the password for this player name, and send it to you\r\nvia e-mail. Please come back to us, if you get that code, so you can log\r\nin.\r\n");
+								players = g_slist_prepend(players, wmud_player_dup(client->player));
+							}
+							else
+							{
+								g_critical("wmud_db_save_player() error: %s", err->message);
+								wmud_client_send(client, "There was an error during the database update. Please try again later!\r\n");
+							}
+							wmud_client_close(client, TRUE);
+						}
+						else
+						{
+							g_free(client->player->email);
+							client->player->email = NULL;
+
+							wmud_client_send(client, "This is not the same as you entered before.\r\nLet's just try it again: ");
+							client->state = WMUD_CLIENT_STATE_REGISTERING;
+						}
 						break;
 				}
 				g_string_erase(client->buffer, 0, -1);
@@ -400,138 +482,5 @@ wmud_client_send(wmudClient *client, const gchar *fmt, ...)
 	/* TODO: error checking */
 	g_socket_send(client->socket, buf->str, buf->len, NULL, NULL);
 	g_string_free(buf, TRUE);
-}
-
-/**
- * wmud_client_start_login:
- * @client: the client from which the login name came from
- *
- * This function is currently called when the freshly connected client sends a
- * non-empty string (a player name).
- */
-void
-wmud_client_start_login(wmudClient *client)
-{
-	wmudPlayer *player;
-
-	if ((player = wmud_player_exists(client->buffer->str)) != NULL)
-	{
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Trying to login with playername '%s'\n", client->buffer->str);
-		if (player->cpassword == NULL)
-		{
-			wmud_client_send(client, "Your registration is not finished yet.\r\n");
-			wmud_client_close(client, TRUE);
-		}
-		else
-		{
-			client->state = WMUD_CLIENT_STATE_PASSWAIT;
-			client->player = player;
-			wmud_client_send(client, "Please provide us your password: %c%c%c", TELNET_IAC, TELNET_WONT, TELNET_ECHO);
-		}
-	}
-	else
-	{
-		client->player = g_new0(wmudPlayer, 1);
-		client->player->player_name = g_strdup(client->buffer->str);
-		client->state = WMUD_CLIENT_STATE_NEWCHAR;
-		wmud_client_send(client, "Is %s new to this game? [Y/N] ", client->buffer->str);
-	}
-}
-
-/**
- * wmud_client_interpret_newplayer_answer:
- * @client: the client from which the answer came from
- *
- * Interprets a yes/no answer from the client to the question if they are new
- * to the game.
- */
-void
-wmud_client_interpret_newplayer_answer(wmudClient *client)
-{
-	if (g_ascii_strcasecmp(client->buffer->str, "n") == 0)
-	{
-		wmud_client_send(client, "What is your player-name, then? ");
-		client->state = WMUD_CLIENT_STATE_FRESH;
-	}
-	else if (g_ascii_strcasecmp(client->buffer->str, "y") == 0)
-	{
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Creating new player\n");
-		wmud_client_send(client, "Welcome to this MUD!\r\nPlease enter your e-mail address: ");
-		client->state = WMUD_CLIENT_STATE_REGISTERING;
-	}
-	else
-	{
-		wmud_client_send(client, "Sorry, but for this question I only understand 'Y' or 'N'.\r\nIs %s a new player here? [Y/N] ", client->player->player_name);
-	}
-}
-
-/**
- * wmud_client_interpret_newplayer_email:
- * @client: the client from which the e-mail address arrived from
- *
- * Checks for the validity of the new player's e-mail address
- */
-void
-wmud_client_interpret_newplayer_email(wmudClient *client)
-{
-	/* TODO: Error checking */
-	GRegex *email_regex = g_regex_new("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", G_REGEX_CASELESS, 0, NULL);
-
-	if (!*(client->buffer->str))
-	{
-		if (client->bademail)
-		{
-			wmud_client_close(client, TRUE);
-		}
-	}
-
-	if (g_regex_match(email_regex, client->buffer->str, 0, NULL))
-	{
-		client->player->email = g_strdup(client->buffer->str);
-		client->state = WMUD_CLIENT_STATE_REGEMAIL_CONFIRM;
-		wmud_client_send(client, "It seems to be a valid address to me, but could you write it again? ");
-	}
-	else
-	{
-		wmud_client_send(client, "\r\nSorry, but this e-mail address doesn't seem to be valid to me.\r\n\r\nIf you think this is a valid address, simply press enter to quit, and send an e-mail to %s from that address, so we can fix our e-mail validation code.\r\n\r\nIf you just mistyped your address, type it now: ", admin_email);
-		if (*(client->buffer->str))
-			client->bademail = TRUE;
-	}
-}
-
-/**
- * wmud_client_interpret_newplayer_mailconfirm:
- * @client: the client from which the confirmation e-mail arrived
- *
- * Check if the confirmed e-mail address is the same as the previously entered
- * one.
- */
-void
-wmud_client_interpret_newplayer_mailconfirm(wmudClient *client)
-{
-	GError *err = NULL;
-
-	if (g_ascii_strcasecmp(client->player->email, client->buffer->str) == 0)
-	{
-		if (wmud_db_save_player(client->player, &err))
-		{
-			wmud_client_send(client, "Good. We will generate the password for this player name, and send it to you\r\nvia e-mail. Please come back to us, if you get that code, so you can log\r\nin.\r\n");
-			players = g_slist_prepend(players, wmud_player_dup(client->player));
-		}
-		else
-		{
-			g_critical("wmud_db_save_player() error: %s", err->message);
-			wmud_client_send(client, "There was an error during the database update. Please try again later!\r\n");
-		}
-		wmud_client_close(client, TRUE);
-	}
-	else
-	{
-		g_free(client->player->email);
-		client->player->email = NULL;
-
-		wmud_client_send(client, "This is not the same as you entered before.\r\nLet's just try it again: ");
-		client->state = WMUD_CLIENT_STATE_REGISTERING;
-	}
 }
 
