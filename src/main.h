@@ -5,7 +5,6 @@
 
 extern GMainContext *game_context;
 extern guint32 elapsed_seconds;
-extern GRand *main_rand;
 
 /**
  * random_number:
@@ -14,7 +13,7 @@ extern GRand *main_rand;
  *
  * Generates a random number between min and max
  */
-#define random_number(min, max) g_rand_int_range(main_rand, (min), (max) + 1)
+#define random_number(min, max) g_random_int_range((min), (max) + 1)
 
 gchar *wmud_random_string(gint len);
 

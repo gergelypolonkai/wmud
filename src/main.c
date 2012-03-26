@@ -54,11 +54,6 @@ struct {
 } debug_context_loc = {NULL, 0};
 
 /**
- * main_rand:
- *
- * the main random generator
- */
-GRand *main_rand = NULL;
  * wmud_random_string:
  * @len: the desired length of the generated random string
  *
@@ -148,10 +143,6 @@ main(int argc, char **argv)
 	wmud_type_init();
 
 	/* TODO: Command line parsing */
-
-	/* Initialize random number generator */
-	main_rand = g_rand_new();
-
 	/* TODO: Create signal handlers! */
 
 	if (!wmud_config_init(&active_config, &err))
