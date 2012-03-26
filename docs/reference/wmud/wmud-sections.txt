@@ -12,6 +12,21 @@ wmud_random_string
 
 <SECTION>
 <TITLE></TITLE>
+<FILE>maintenance-thread</FILE>
+wmud_maintenance_init
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
+<FILE>game-thread</FILE>
+wmudClientState
+wmudClient
+elapsed_seconds
+elapsed_cycle
+game_context
+wmud_game_init
+</SECTION>
+
 <FILE>game-networking</FILE>
 TELNET_IAC
 TELNET_WILL
@@ -32,7 +47,7 @@ wmud_interpret_game_command
 </SECTION>
 
 <SECTION>
-<TITLE>Database handling</TITLE>
+<TITLE></TITLE>
 <FILE>db</FILE>
 WMUD_DB_ERROR
 wmudDbError
@@ -42,12 +57,13 @@ wmud_db_save_player
 </SECTION>
 
 <SECTION>
-<TITLE>Player handling</TITLE>
+<TITLE></TITLE>
 <FILE>player</FILE>
+wmudPlayer
 players
 wmud_player_dup
 wmud_player_free
-wmud_player_exists
 wmud_player_auth
+wmud_player_exists
 </SECTION>
 
