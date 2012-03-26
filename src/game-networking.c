@@ -32,7 +32,7 @@
 #include "db.h"
 
 /**
- * SECTION:networking
+ * SECTION:game-networking
  * @short_description: Game related networking code
  *
  * Functions to handle game connections
@@ -342,6 +342,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 /**
  * wmud_networking_init:
  * @port_number: the port number on which the game listener should listen
+ * @game_context: the #GMainContext of the game thread
  * @err: the GError in which possible errors will be reported
  *
  * Initializes the game network listener

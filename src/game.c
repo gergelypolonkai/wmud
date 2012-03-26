@@ -1,7 +1,42 @@
+/* wMUD - Yet another MUD codebase by W00d5t0ck
+ * Copyright (C) 2012 - Gergely POLONKAI
+ *
+ * game.c: Game Thread related functions
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <glib.h>
 
 #include "main.h"
 #include "game.h"
+
+/**
+ * SECTION:game-thread
+ * @short_description: Game related functions
+ * @title: The Game Thread
+ *
+ * The game thread is supposed to serve game client connections. Also,
+ * maintaining the loaded game world is the objective ot this thread.
+ *
+ * This thread has to serve all the game clients after a connection is
+ * estabilished. Player login, menu interaction and play are both the tasks of
+ * this thread.
+ *
+ * The other main objective is to maintain the loaded world. Moving and
+ * resetting the mobs, cleaning up areas and many other things belong here.
+ */
 
 /**
  * elapsed_seconds:
@@ -10,6 +45,7 @@
  * simply gets updated by a timeout function which should run every second
  */
 guint32 elapsed_seconds = 0;
+
 /**
  * elapsed_cycle:
  *
@@ -17,6 +53,7 @@ guint32 elapsed_seconds = 0;
  * #elapsed_seconds reaches the maximum value
  */
 guint32 elapsed_cycle = 0;
+
 /**
  *
  * rl_sec_elapsed:

@@ -31,6 +31,13 @@
 #include "players.h"
 
 /**
+ * SECTION:maintenance-thread
+ * @short_description: Runtime maintenance functions
+ * @title: Runtime maintenance functions
+ *
+ */
+
+/**
  * wmud_maintenance_check_new_players:
  * @player: #wmudPLayer structure of the player record to check
  * @user_data: not used

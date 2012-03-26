@@ -1,21 +1,18 @@
 <SECTION>
-<TITLE>Data types</TITLE>
+<TITLE>wMUD's Data Types</TITLE>
 <FILE>types</FILE>
-wmudClientState
-wmudClient
-wmudPlayer
 </SECTION>
 
 <SECTION>
-<TITLE>Utilities and uncategorized functions</TITLE>
+<TITLE></TITLE>
 <FILE>utils</FILE>
 random_number
 wmud_random_string
 </SECTION>
 
 <SECTION>
-<TITLE>Networking</TITLE>
-<FILE>networking</FILE>
+<TITLE></TITLE>
+<FILE>game-networking</FILE>
 TELNET_IAC
 TELNET_WILL
 TELNET_WONT
@@ -26,7 +23,7 @@ wmud_client_send
 </SECTION>
 
 <SECTION>
-<TITLE>Command interpreter</TITLE>
+<TITLE></TITLE>
 <FILE>interpreter</FILE>
 wmudCommandFunc
 wmudCommand
