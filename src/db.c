@@ -16,12 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <glib.h>
 #include <sqlite3.h>
 
 #include "main.h"
 #include "db.h"
 #include "players.h"
+#include "configuration.h"
 
 /**
  * SECTION:db
@@ -30,7 +32,13 @@
  *
  */
 
-sqlite3 *dbh = NULL;
+/**
+ * WMUD_DB_ERROR:
+ *
+ * the GQuark for the database error GError
+ */
+GQuark WMUD_DB_ERROR = 0;
+static sqlite3 *dbh = NULL;
 
 /**
  * wmud_db_init:
@@ -44,7 +52,7 @@ wmud_db_init(GError **err)
 	GString *db_file = g_string_new(WMUD_STATEDIR);
 	int sqlite_code;
 
-	g_string_append_printf(db_file, "/%s", database_file);
+	g_string_append_printf(db_file, "/%s", active_config->database_file);
 
 	if ((sqlite_code = sqlite3_open(db_file->str, &dbh)) != SQLITE_OK)
 	{
@@ -168,5 +176,41 @@ wmud_db_save_player(wmudPlayer *player, GError **err)
 
 	g_clear_error(err);
 	return TRUE;
+}
+
+gboolean
+wmud_db_load_planes(GSList **planes, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_planets(GSList **planets, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_directions(GSList **directions, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_areas(GSList **areas, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_rooms(GSList **rooms, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_exits(GSList **exits, GError **err)
+{
+	return FALSE;
 }
 

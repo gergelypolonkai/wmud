@@ -5,10 +5,6 @@
 
 extern GMainContext *game_context;
 extern guint32 elapsed_seconds;
-extern GRand *main_rand;
-extern gchar *database_file;
-extern GQuark WMUD_DB_ERROR;
-extern gchar *admin_email;
 
 /**
  * random_number:
@@ -17,7 +13,7 @@ extern gchar *admin_email;
  *
  * Generates a random number between min and max
  */
-#define random_number(min, max) g_rand_int_range(main_rand, (min), (max) + 1)
+#define random_number(min, max) g_random_int_range((min), (max) + 1)
 
 gchar *wmud_random_string(gint len);
 

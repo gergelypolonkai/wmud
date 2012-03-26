@@ -1,21 +1,45 @@
 <SECTION>
-<TITLE>Data types</TITLE>
+<TITLE>wMUD's Data Types</TITLE>
 <FILE>types</FILE>
-wmudClientState
-wmudClient
-wmudPlayer
 </SECTION>
 
 <SECTION>
-<TITLE>Utilities and uncategorized functions</TITLE>
+<TITLE></TITLE>
 <FILE>utils</FILE>
 random_number
 wmud_random_string
 </SECTION>
 
 <SECTION>
-<TITLE>Networking</TITLE>
-<FILE>networking</FILE>
+<TITLE></TITLE>
+<FILE>configuration</FILE>
+WMUD_CONFIG_ERROR
+wmudConfigError
+ConfigData
+active_config
+wmud_config_init
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
+<FILE>maintenance-thread</FILE>
+wmud_maintenance_init
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
+<FILE>game-thread</FILE>
+wmudClientState
+wmudClient
+elapsed_seconds
+elapsed_cycle
+game_context
+wmud_game_init
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
+<FILE>game-networking</FILE>
 TELNET_IAC
 TELNET_WILL
 TELNET_WONT
@@ -26,7 +50,7 @@ wmud_client_send
 </SECTION>
 
 <SECTION>
-<TITLE>Command interpreter</TITLE>
+<TITLE></TITLE>
 <FILE>interpreter</FILE>
 wmudCommandFunc
 wmudCommand
@@ -35,7 +59,7 @@ wmud_interpret_game_command
 </SECTION>
 
 <SECTION>
-<TITLE>Database handling</TITLE>
+<TITLE></TITLE>
 <FILE>db</FILE>
 WMUD_DB_ERROR
 wmudDbError
@@ -45,12 +69,17 @@ wmud_db_save_player
 </SECTION>
 
 <SECTION>
-<TITLE>Player handling</TITLE>
+<TITLE></TITLE>
 <FILE>player</FILE>
+wmudPlayer
 players
 wmud_player_dup
 wmud_player_free
-wmud_player_exists
 wmud_player_auth
+wmud_player_exists
 </SECTION>
 
+<SECTION>
+<TITLE></TITLE>
+<FILE>world</FILE>
+</SECTION>

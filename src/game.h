@@ -1,7 +1,7 @@
 /* wMUD - Yet another MUD codebase by W00d5t0ck
  * Copyright (C) 2012 - Gergely POLONKAI
  *
- * db.h: database handling routine prototypes
+ * game.h: Game Thread related functions
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __WMUD_DB_H__
-#define __WMUD_DB_H__
+#ifndef __WMUD_GAME_H__
+#define __WMUD_GAME_H__
 
-#include <glib.h>
+gboolean wmud_game_init(GThread **game_thread, GMainContext **game_context);
 
-#include "wmud-types.h"
-
-extern GQuark WMUD_DB_ERROR;
-
-gboolean wmud_db_init(GError **err);
-gboolean wmud_db_players_load(GError **err);
-gboolean wmud_db_save_player(wmudPlayer *player, GError **err);
-gboolean wmud_db_load_planes(GSList **planes, GError **err);
-gboolean wmud_db_load_planets(GSList **planets, GError **err);
-gboolean wmud_db_load_directions(GSList **directions, GError **err);
-gboolean wmud_db_load_areas(GSList **areas, GError **err);
-gboolean wmud_db_load_rooms(GSList **rooms, GError **err);
-gboolean wmud_db_load_exits(GSList **exits, GError **err);
-
-#endif /* __WMUD__DB_H__ */
+#endif /* __WMUD_GAME_H__ */
 
