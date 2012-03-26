@@ -40,7 +40,7 @@
  * @WMUD_CLIENT_STATE_INGAME: Character login was successful, player is now
  *     in-game
  * @WMUD_CLIENT_STATE_QUITWAIT: Player entered the in-game QUIT command, and we
- *     are now waiting for an answer if they reallz want to quit
+ *     are now waiting for an answer if they really want to quit
  *     Will be removed soon, this should work totally different (TODO)
  * @WMUD_CLIENT_STATE_NEWCHAR: Player name entered on the login screen was
  *     invalid. Waiting for answer if this is a new player
@@ -66,7 +66,7 @@ typedef enum {
  * wmudPlayer:
  * @id: Player's database ID
  * @player_name: Player's login name
- * @cpassword: crzpt()ed password of the player. This is NULL for newly
+ * @cpassword: crypt()ed password of the player. This is NULL for newly
  *     registered players, who have no password generated for them by the
  *     maintenance loop
  * @email: E-mail address of the player
