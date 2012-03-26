@@ -178,3 +178,39 @@ wmud_db_save_player(wmudPlayer *player, GError **err)
 	return TRUE;
 }
 
+gboolean
+wmud_db_load_planes(GSList **planes, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_planets(GSList **planets, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_directions(GSList **directions, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_areas(GSList **areas, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_rooms(GSList **rooms, GError **err)
+{
+	return FALSE;
+}
+
+gboolean
+wmud_db_load_exits(GSList **exits, GError **err)
+{
+	return FALSE;
+}
+

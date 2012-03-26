@@ -79,3 +79,7 @@ wmud_player_auth
 wmud_player_exists
 </SECTION>
 
+<SECTION>
+<TITLE></TITLE>
+<FILE>world</FILE>
+</SECTION>
