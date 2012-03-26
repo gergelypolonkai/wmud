@@ -1,0 +1,36 @@
+General
+=======
+
+wMUD is a MUD code base. It is written from scratch, using GLib and CURL.
+Although it is just another MUD code base, I tried to add unique features, and
+also tried to make it as flexible as possible.
+
+wMUD stores everything in an SQLite3 database, and everything really means
+everything. The whole world is dynamic, and most of it can be defined without
+touching the code itself. Possible directions, areas, rooms, items, mobs,
+races, classes and all important apects of the world are in the database
+backend, and as such, can be reloaded runtime without stopping the MUD.
+
+wMUD is modular. Except the basic commands, everything is loaded via dynamic
+modules (well, on systems which support it). This again helps flexibility, as
+commands, spells, and many more can be loaded or unloaded runtime. This, of
+cource can sometimes cause funny things in game play (characters disappearing
+because of unloaded race), but everything can be explained with a good story.
+Or, if you are not creative enough, you can simply disable this functionality.
+
+wMUD is a threaded application using GLib's GThread functionality. All tasks
+are done by separate threads, so the game can run as smoothly as possible. The
+game world is ran by one thread. Database updating is done by a separate
+maintenance thread. This may cause some lags in the database update process,
+but whenever it causes trouble, wizards can force the maintenance thread to
+start immediately. The Out-of-Game chat functions also run in different
+threads.
+
+Development
+===========
+
+wMUD's development, so as other MUD codebases', is no easy task. Although each
+thread is coded in separate files (except the game thread), threading makes it
+even difficult. I try to make this task as easy as possible with comments and
+an API reference, but this is also a hard goal to accomplish. If you really
+want to mess with things, the file HACKING is just the place for you.
