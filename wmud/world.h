@@ -19,6 +19,19 @@
 #ifndef __WMUD_WORLD_H__
 #define __WMUD_WORLD_H__
 
+#include <glib.h>
+
+typedef struct _wmudPlane {
+	guint id;
+	gchar *name;
+} wmudPlane;
+
+typedef struct _wmudDirection {
+	guint id;
+	gchar *short_name;
+	gchar *name;
+} wmudDirection;
+
 gboolean wmud_world_check_planes(GSList *planes, GError **err);
 gboolean wmud_world_check_planets(GSList *planets, GError **err);
 gboolean wmud_world_check_areas(GSList *areas, GError **err);

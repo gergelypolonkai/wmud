@@ -121,6 +121,7 @@ wmud_type_init(void)
 {
 	WMUD_CONFIG_ERROR = g_quark_from_string("wmud_config_error");
 	WMUD_DB_ERROR = g_quark_from_string("wmud_db_error");
+	WMUD_INTERPRETER_ERROR = g_quark_from_string("wmud_interpreter_error");
 }
 
 /**
@@ -176,6 +177,7 @@ main(int argc, char **argv)
 
 	g_clear_error(&err);
 	wmud_db_load_players(&err);
+	wmud_world_load(&err);
 
 	/* Initialization ends here */
 

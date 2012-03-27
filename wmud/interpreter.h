@@ -51,6 +51,13 @@ typedef struct _wmudCommand {
 	wmudCommandFunc commandFunc;
 } wmudCommand;
 
+GQuark WMUD_INTERPRETER_ERROR;
+
+typedef enum {
+	WMUD_INTERPRETER_ERROR_DUPCMD
+} wmudInterpreterError;
+
+gboolean wmud_interpreter_check_directions(GSList *directions, GError **err);
 void wmud_interpret_game_command(wmudClient *client);
 
 #endif /* __WMUD_INTERPRETER_H__ */

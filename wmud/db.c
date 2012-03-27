@@ -20,6 +20,7 @@
 #include <glib.h>
 #include <sqlite3.h>
 
+#include "world.h"
 #include "main.h"
 #include "db.h"
 #include "players.h"
@@ -182,7 +183,52 @@ wmud_db_save_player(wmudPlayer *player, GError **err)
 gboolean
 wmud_db_load_planes(GSList **planes, GError **err)
 {
-	return FALSE;
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planes", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planes(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudPlane *plane = g_new0(wmudPlane, 1);
+			plane->id = sqlite3_column_int(sth, 0);
+			plane->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded plane _%s_", plane->name);
+
+			*planes = g_slist_prepend(*planes, plane);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_planes(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
 }
 
 gboolean
@@ -194,7 +240,52 @@ wmud_db_load_planets(GSList **planets, GError **err)
 gboolean
 wmud_db_load_directions(GSList **directions, GError **err)
 {
-	return FALSE;
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, short_name, name FROM directions", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_directions(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudDirection *dir = g_new0(wmudDirection, 1);
+			dir->id = sqlite3_column_int(sth, 0);
+			dir->short_name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
+			dir->name = g_strdup((gchar *)sqlite3_column_text(sth, 2));
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded direction _%s_", dir->name);
+
+			*directions = g_slist_prepend(*directions, dir);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
 }
 
 gboolean

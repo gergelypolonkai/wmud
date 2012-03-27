@@ -21,6 +21,7 @@
 
 #include "world.h"
 #include "db.h"
+#include "interpreter.h"
 
 /**
  * SECTION:world
@@ -77,7 +78,6 @@ wmud_world_assoc_exits_rooms(GSList *exits, GSList *rooms, GError **err)
 	return FALSE;
 }
 
-
 /**
  * wmud_world_load:
  * @err: a #GError to put error messages into
@@ -98,7 +98,12 @@ wmud_world_load(GError **err)
 	/* Load directions from the database */
 	wmud_db_load_directions(&directions, &in_err);
 
+	/* Check if the loaded directions conform to the rules */
+	g_clear_error(&in_err);
+	wmud_interpreter_check_directions(directions, &in_err);
+
 	/* Load planes from the database */
+	g_clear_error(&in_err);
 	wmud_db_load_planes(&planes, &in_err);
 
 	/* Check if the loaded planes conform to the rules */

@@ -23,6 +23,7 @@
 #include "interpreter.h"
 #include "game-networking.h"
 #include "main.h"
+#include "world.h"
 
 /**
  * SECTION:interpreter
@@ -35,7 +36,7 @@ WMUD_COMMAND(quit);
 
 static wmudCommand command_list[] = {
 	{ "quit", gcmd_quit },
-	{ NULL, NULL },
+	{ NULL,   NULL },
 };
 
 /**
@@ -48,6 +49,52 @@ static void
 destroy_string(GString *string)
 {
 	g_string_free(string, TRUE);
+}
+
+static void
+check_direction_command(wmudDirection *dir, gboolean *found)
+{
+	wmudCommand *cmd;
+
+	for (cmd = command_list; cmd->command; cmd++)
+	{
+		if (g_ascii_strcasecmp(dir->short_name, cmd->command) == 0)
+		{
+			*found = TRUE;
+			return;
+		}
+
+		if (g_ascii_strcasecmp(dir->name, cmd->command) == 0)
+		{
+			*found = TRUE;
+			return;
+		}
+	}
+}
+
+/**
+ * wmud_interpreter_check_directions:
+ * @directions: a #GSList of directions
+ * @err: A #GError to store possible errors on failure
+ *
+ * Checks if the given directions are already registered commands.
+ *
+ * Return value: If the directions are acceptable at the time of the check, the function returns %TRUE. Otherwise %FALSE is returned, and 
+ */
+gboolean
+wmud_interpreter_check_directions(GSList *directions, GError **err)
+{
+	gboolean command_found = FALSE;
+
+	g_slist_foreach(directions, (GFunc)check_direction_command, &command_found);
+
+	if (command_found)
+	{
+		g_set_error(err, WMUD_INTERPRETER_ERROR, WMUD_INTERPRETER_ERROR_DUPCMD, "Direction commands are not unique. Please check the database!");
+		g_debug("Directions command are not unique. Please check the database!");
+	}
+
+	return command_found;
 }
 
 /**
