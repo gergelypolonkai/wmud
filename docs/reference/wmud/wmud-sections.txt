@@ -64,7 +64,7 @@ wmud_interpret_game_command
 WMUD_DB_ERROR
 wmudDbError
 wmud_db_init
-wmud_db_players_load
+wmud_db_load_players
 wmud_db_save_player
 </SECTION>
 

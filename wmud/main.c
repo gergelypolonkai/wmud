@@ -175,7 +175,7 @@ main(int argc, char **argv)
 	}
 
 	g_clear_error(&err);
-	wmud_db_players_load(&err);
+	wmud_db_load_players(&err);
 
 	/* Initialization ends here */
 

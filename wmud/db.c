@@ -65,13 +65,13 @@ wmud_db_init(GError **err)
 }
 
 /**
- * wmud_db_players_load:
+ * wmud_db_load_players:
  * @err: a GError to put error messages in it
  *
  * Loads all player records from the database
  */
 gboolean
-wmud_db_players_load(GError **err)
+wmud_db_load_players(GError **err)
 {
 	sqlite3_stmt *sth = NULL;
 	int sqlite_code;
@@ -86,7 +86,7 @@ wmud_db_players_load(GError **err)
 
 	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, login, password, email FROM players", -1, &sth, NULL)) != SQLITE_OK)
 	{
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_players_load(): %s", sqlite3_errmsg(dbh));
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
@@ -112,7 +112,8 @@ wmud_db_players_load(GError **err)
 		}
 		else
 		{
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_players_load(): %s", sqlite3_errmsg(dbh));
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
 			return FALSE;
 		}
 	}

@@ -26,7 +26,7 @@
 extern GQuark WMUD_DB_ERROR;
 
 gboolean wmud_db_init(GError **err);
-gboolean wmud_db_players_load(GError **err);
+gboolean wmud_db_load_players(GError **err);
 gboolean wmud_db_save_player(wmudPlayer *player, GError **err);
 gboolean wmud_db_load_planes(GSList **planes, GError **err);
 gboolean wmud_db_load_planets(GSList **planets, GError **err);
