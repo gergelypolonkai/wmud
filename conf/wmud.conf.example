@@ -1,4 +1,43 @@
 [global]
+# The world database file. This file holds everything needed to create the
+# in-game world and let players login.
 world file = iminiru.db
+
+# The game thread will listen on this port.
 port = 4000
+
+# The e-mail address of the MUD's administrator
 admin email = polesz@w00d5t0ck.info
+
+# If set to true and only one race is defined in the database, registering
+# players will automatically "choose" that, and they will not get any
+# notification about this. Useful if your MUD is actually raceless.
+hide single race = true
+
+# If set to true and only one class is defined in the database, registering
+# players will automatically "choose" that, and they will not get any
+# notification about this. Useful if your MUD is actually classless.
+hide single class = true
+
+# If non-zero, characters can occupy houses not visited by their owner in the
+# last <number> in-game days with the HOUSE OCCUPY command (of course only if
+# they can get inside).
+house occupy time = 100
+
+# The minimum number of deities a player must choose during character
+# generation.
+minimum deities = 2
+
+# If set to true, clans can decide war on other clans (the number of other
+# clans depends on the clan's level)
+clan wars = true
+
+# The maximum size of a player group. You should not set this too high.
+maximum group size = 5
+
+# If set to true, abilities are trainable
+trainable abilities = true
+
+# If set to true, characters can choose to die, and reborn in a new body if
+# they are old enough (80% of the racial maximum age)
+reborn = true
