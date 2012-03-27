@@ -86,7 +86,7 @@ wmud_config_init(ConfigData **config_data, GError **err)
 	if (!config_data)
 		return FALSE;
 
-	if (!*config_data)
+	if (*config_data)
 	{
 		g_clear_error(err);
 		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_REUSE, "Configuration pointer reuse. Please file a bug report!");
