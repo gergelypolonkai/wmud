@@ -25,6 +25,20 @@
 
 extern GQuark WMUD_DB_ERROR;
 
+/**
+ * wmudDbError:
+ * @WMUD_DB_ERROR_CANTOPEN: Database file cannot be opened
+ * @WMUD_DB_ERROR_NOINIT: Database system was not initialized
+ * @WMUD_DB_ERROR_BADQUERY: Invalid database query
+ *
+ * Error codes returned by database handling functions.
+ */
+typedef enum {
+	WMUD_DB_ERROR_CANTOPEN,
+	WMUD_DB_ERROR_NOINIT,
+	WMUD_DB_ERROR_BADQUERY
+} wmudDbError;
+
 gboolean wmud_db_init(GError **err);
 gboolean wmud_db_load_players(GError **err);
 gboolean wmud_db_save_player(wmudPlayer *player, GError **err);
