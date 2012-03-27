@@ -117,6 +117,9 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 
 			if (r || n)
 			{
+				gint i,
+				     sloc = -1;
+
 				if ((r < n) && r)
 				{
 					if (client->buffer->len > 0)
@@ -132,6 +135,30 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 					else
 						g_string_overwrite_len(client->buffer, 0, buf2, (n - buf2));
 					buf2 = n;
+				}
+
+				/* Remove telnet codes from the string */
+				for (i = 0; i < client->buffer->len; i++)
+				{
+					guchar c = (client->buffer->str)[i];
+
+					if ((c >= 240) || (c == 1))
+					{
+						if (sloc == -1)
+							sloc = i;
+					}
+					else
+					{
+						if (sloc != -1)
+						{
+							g_string_erase(client->buffer, sloc, i - sloc);
+							sloc = -1;
+						}
+					}
+				}
+				if (sloc != -1)
+				{
+					g_string_erase(client->buffer, sloc, -1);
 				}
 
 				switch (client->state)
@@ -170,7 +197,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 						{
 							if (wmud_player_auth(client))
 							{
-								wmud_client_send(client, "%c%c%cLogin"
+								wmud_client_send(client, "%c%c%c\r\nLogin"
 										" successful.\r\n", TELNET_IAC,
 										TELNET_WONT, TELNET_ECHO);
 								client->authenticated = TRUE;

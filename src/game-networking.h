@@ -42,6 +42,18 @@
  */
 #define TELNET_WILL '\xfb'
 /**
+ * TELNET_DO:
+ *
+ * Telnet DO code
+ */
+#define TELNET_DO '\xfd'
+/**
+ * TELNET_DONT:
+ *
+ * Telnet DONT code
+ */
+#define TELNET_DONT '\xfe'
+/**
  * TELNET_ECHO:
  *
  * Telnet ECHO code
