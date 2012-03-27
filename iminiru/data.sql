@@ -15,9 +15,9 @@ INSERT INTO planes (id, name) VALUES (3, 'Zothar');
 
 INSERT INTO planets (id, name) VALUES (1, 'Erodar');
 
-INSERT INTO planet_planes (1, 1);
-INSERT INTO planet_planes (1, 2);
-INSERT INTO planet_planes (1, 3);
+INSERT INTO planet_planes (planet_id, plane_id) VALUES (1, 1);
+INSERT INTO planet_planes (planet_id, plane_id) VALUES (1, 2);
+INSERT INTO planet_planes (planet_id, plane_id) VALUES (1, 3);
 
 INSERT INTO areas (id, name) VALUES (1, 'Tutorial Area');
 
