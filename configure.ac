@@ -43,4 +43,4 @@ PKG_CHECK_MODULES([GLIB], glib-2.0)
 PKG_CHECK_MODULES([GTHREAD], gthread-2.0)
 PKG_CHECK_MODULES([SQLITE3], sqlite3)
 
-AC_OUTPUT(Makefile wmud/Makefile docs/reference/wmud/Makefile)
+AC_OUTPUT(Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)

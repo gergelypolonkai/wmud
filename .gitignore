@@ -20,3 +20,5 @@ tags
 gtk-doc.make
 m4
 *.bak
+create-world.sh
+drop-world.sh
