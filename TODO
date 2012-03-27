@@ -15,316 +15,354 @@ Legend
 Data storage and code flow
 --------------------------
 
-[ i] Store EVERYTHING in an SQLite3 database
+[ i] * Store EVERYTHING in an SQLite3 database
 
-[ i] Separate threads for separate jobs. Game thread for accepting players,
-       maintenance thread to continuously maintain the database, chat threads for
-       different chat protocols, world builder thread for online world building.
+[ i] * Separate threads for separate jobs. Game thread for accepting players,
+	 maintenance thread to continuously maintain the database, chat threads
+	 for different chat protocols, world builder thread for online world
+         building.
 
-[  ] All descriptions should be written in a markup language to support bold,
-       underline, colours, and such
+[  ] * All descriptions should be written in a markup language to support bold,
+         underline, colours, and such
 
-[f ] Loadable modules for commands, races, classes, etc.
+[f ] * Loadable modules for commands, races, classes, etc.
 
 Game world
 ----------
 
-* Movement
-  - 10 directions (N, E, S, W, NE, NW, SE, SW, U, D)
-  - Also, some rooms may have other exits, like portals, which can be ENTER'ed.
-  - Doors can be locked or hidden
+[  ] * Movement
+[ i]   - 10 directions (N, E, S, W, NE, NW, SE, SW, U, D)
+[  ]   - Also, some rooms may have other exits, like portals, which can be
+           ENTER'ed.
+[  ]   - Doors can be locked or hidden
+[  ]   - <mob> arrives from <direction>
 
-* Planets/Planes
-  - Rooms are connected to Planets
-  - Planets are connected to Planes
-  - Rooms may have different descriptions depending on the Plane the Character
-    is active on
+[ i] * Planets/Planes
+[ i]   - Rooms are connected to Planets
+[ i]   - Planets are connected to Planes
+[  ]  - Rooms may have different descriptions depending on the Plane the
+          Character is active on
 
-* Player grouping (AKA Party)
+[  ] * Player grouping (AKA Party or formations)
+[  ]   - Group leader (can promote others, demoting themselves)
+[  ]   - Maximum group size
+[  ]   - Following is not grouping
 
-* People start in a well-defined start location (randomly selected during
-    character generation)
-  - All Races have at least one possible start locations
-  - The whole world should have one fallback start location (Tree of Memories?)
+[  ] * People start in a well-defined start location (randomly selected during
+         character generation)
+[  ]   - All Races have at least one possible start locations
+[  ]   - The whole world should have one fallback start location (Tree of
+           Memories?)
 
-* Housing system should automatically expand towns (this will be fun to write).
-    Maybe a better alternative is to check for free housing and if the amount
-    goes too low, manually create some new one.
-  - Housing should be decorated with different objects.
-  - Houses get untidy over time, so they need to be cleaned
-  - House maids
+[  ] * Housing system should automatically expand towns (this will be fun to
+	 write).  Maybe a better alternative is to check for free housing and
+         if the amount goes too low, manually create some new one.
+[  ]   - Housing can be decorated with different objects ('decoration' item
+           flag; can not exceed a maximum number, depending on house size).
+[  ]   - Houses get untidy over time, so they need to be cleaned
+[  ]   - House maids (for cleaning, and maybe basic cooking)
+[  ]   - Houses have a fix price
+[  ]   - Locks
+[  ]     . Locks of houses not visited occasionally get more and more rusty,
+	     making it easier to break into them. Burglars can take whatever
+             they want!
+[  ]     . Locks decompose after a given time, making the house door openable
+             and the house accessible to anyone
+[  ]     . Fixing the lock requires Mechanics after a given amount of condition
+             loss, otherwise a small amount of oil helps
+[  ]     . Unowned houses' locks are maintained regularly
+[  ]     . Houses must be bought, players can't just occupy an abandoned one
+	     (or can they? Funny decision to make, maybe it will be
+	     configurable instead). Abandoned houses instead get occupied by
+             town guards, and are sold again after a given time.
 
-* Inn and Tavern system
-  - Characters can set their hometown in an Inn; however, Inns have only a
-      limited amount of rooms. Inn rooms cost some amount of gold per day,
-      which is pre-paid. If the rent is over, the character's start location is
-      set to one of the racial defaults. If the character is online when the
-      rent is over, they should get a warning message about this. If the player
-      gets an own house, their home location should be automatically set to it
-  - Tavern system
-    . Tables and chairs
-    . Tables are private chat rooms with a maximum number of members
-    . Each tavern has a fixed amount of tables and chairs
-    . Chairs can be moved from one table to another
-    . Tables have a maximum number of chairs (which may vary depending on the
-        table's size)
+[  ] * Inn and Tavern system
+[  ]   - Characters can set their hometown in an Inn; however, Inns have only a
+           limited amount of rooms. Inn rooms cost some amount of gold per day,
+	   which is pre-paid. If the rent is over, the character's start
+	   location is set to one of the racial defaults. If the character is
+	   online when the rent is over, they should get a warning message
+	   about this. If the player gets an own house, their home location
+           should be automatically set to it
+[  ]   - Tavern system
+[  ]     . Tables and chairs
+[  ]     . Tables are private chat rooms with a maximum number of members
+[  ]     . Each tavern has a fixed amount of tables and chairs
+[  ]     . Chairs can be moved from one table to another
+[  ]     . Tables have a maximum number of chairs (which may vary depending on
+             the table's size)
 
-* Item disposal methods
-  - Drop
-      Dropped items don't generate points, nor money. They also get the dropped
-      flag, so they loose some (most) of their property bonuses unless their
-      original owner picks them up
-  - Donation
-      Donated items automatically appear in the nearest donation room (or
-      random, maybe). Donations are recorded, and the characters who donate in
-      larger amounts and/or more valuable items may get rewards
-  - Sacrifice
-      Sacrificed items become energy, which the Gods retun as Sacrifice Points.
-  - Salvage
-      Most items can be salvaged to get some raw materials back
-  - Auction
-      Items can be auctioned at the Market Squares
+[  ] * Item disposal methods
+[  ]   - Drop (DROP <item>)
+	   Dropped items don't generate points, nor money. They also get the
+	   dropped flag, so they loose some (most) of their property bonuses
+           unless their original owner picks them up
+[  ]   - Donation (DONATE <item>)
+	   Donated items automatically appear in the nearest donation room (or
+	   random, maybe). Donations are recorded, and the characters who
+	   donate in larger amounts and/or more valuable items may get rewards
+	   for public service. Items dropped in donation centers also count as
+           donated
+[  ]   - Sacrifice (SACRIFICE <item> [to] <god>)
+	   Sacrificed items become energy, which the Gods retun as Sacrifice
+           Points
+[  ]   - Salvage (SALVAGE <item>)
+	   Most items can be salvaged to get some raw materials back. Of
+	   course, it is way less than the original amount required to craft
+           the item. Salvaging may require tools.
+[  ]   - Auction (AUCTION <item>)
+           Items can be auctioned at the Market Squares
 
-* Item creation (AKA combining or Professions)
-  - Trainers, who know only specific recipes
-  - Recipe scrolls (e.g to be dropped by mobs and such)
-  - Corpse skinning (only specific corpses)
-  - Corpse butching (only specific corpses)
-  - Fishing
-  - Mining
-  - Foraging
-  - Blacksmithing
-  - Alchemy
+[  ] * Item creation (AKA combining or Professions)
+[  ]   - Trainers, who know only specific recipes
+[  ]   - Recipe scrolls (e.g to be dropped by mobs and such)
+[  ]   - Corpse skinning (only specific corpses)
+[  ]   - Corpse butching (only specific corpses)
+[  ]   - Fishing
+[  ]   - Mining
+[  ]   - Foraging
+[  ]   - Blacksmithing
+[  ]   - Alchemy
 
-* Companions
-  - Combat/Pack animals
-  - Mounts (may also act as combat/pack animals)
-  - Charming
-  - Servants, pages
+[  ] * Companions
+[  ]   - Combat/Pack animals
+[  ]   - Mounts (may also act as combat/pack animals)
+[  ]   - Charming
+[  ]   - Servants, pages
 
-* Gods
-  - Gods may be chosen upon character creation (for wMUD, a character MUST have
-    at least two Gods)
-  - Sacrifices
-  - Prayers
+[  ] * Gods
+[  ]   - Gods may be chosen upon character creation (for wMUD, a character MUST
+         have at least two Gods in Iminiru. Amount should be configurable)
+[  ]   - Sacrifices
+[  ]   - Prayers
 
-* Reputation system
+[  ] * Reputation system
 
-* Player Clans
-  o Clan bank
-  o Clan wars (Players from a Guild may PK players from another Guild if the
-      two Guilds are in war with each other)
+[  ] * Player Clans
+[  ]   - Clan bank
+[  ]   - Clan wars (Players from a Guild may PK players from another Guild if
+           the two Guilds are in war with each other)
 
-* Item types
-  - Armour/Clothing
-    . Shields
-  - Weapon
-    . Ballista
-    . Bashing
-    . Bow
-    . Crossbow
-    . Club
-    . Knuckle
-    . Lash
-    . Net
-    . Piercing
-    . Slashing
-    . Whip
-  - Potion
-  - Poison (appliable to weapons)
-  - Food/Water/Alcohol/Sugar
-  - Light
-    . Maybe these objects (or some of them) should be seen in the dark
-  - Spell reagent
-  - Material
-  - Artifacts
-  - Containers
-    . Bags
+[  ] * Item types
+[  ]   - Armour/Clothing
+[  ]      . Shields
+[  ]   - Weapon
+[  ]     . Ballista
+[  ]     . Bashing
+[  ]     . Bow
+[  ]     . Crossbow
+[  ]     . Club
+[  ]     . Knuckle
+[  ]     . Lash
+[  ]     . Net
+[  ]     . Piercing
+[  ]     . Slashing
+[  ]     . Whip
+[  ]   - Potion
+[  ]   - Poison (appliable to weapons)
+[  ]   - Food/Water/Alcohol/Sugar
+[  ]   - Light
+[  ]   - Spell reagent
+[  ]   - Material
+[  ]   - Artifacts
+[  ]   - Containers
+[  ]     . Bags
+[  ]     . Chests
 
-* Death system, Rebirth
+[  ] * Death system, Rebirth
 
-* War Machines
+[  ] * War Machines
 
-* Shops
-  - Most shops should open/close depending on the in-game time
+[  ] * Shops
+[  ]   - Most shops should open/close depending on the in-game time
 
-* Skills/Spells/Talents granted by the Gods
-  - Fear
+[  ] * Skills/Spells/Talents granted by the Gods
+[  ]   - Fear
 
-* Magic Profession
+[  ] * Magic Profession
 
-* Fighting Professions with practicing
-  - Disarm
-  - Dual Wield
-  - Stun
+[  ] * Fighting Professions with practicing
+[  ]   - Disarm
+[  ]   - Dual Wield
+[  ]   - Stun
 
-* The whole system should be built with class support, although wMUD will
-  technically have only one "Adventurer" class. Also, multiclassing should be
-  possible
+[  ] * The whole system should be built with class support, although wMUD will
+	 technically have only one "Adventurer" class. Also, multiclassing
+         should be possible
 
-* Character aging, with racial maximum age. When a character is too old, they
-  can retire (e.g they will become story tellers or such), or die and rebirth.
-  Reborn characters have a bonus to their maximum age. Upon rebirth they create
-  a totally new character, with all their old data remaining in the database.
-  Reborn characters have the possibility to regain all their old powers after a
-  few years
+[  ] * Character aging, with racial maximum age. When a character is too old,
+	 they can retire (e.g they will become story tellers or such), or die
+	 and rebirth.  Reborn characters have a bonus to their maximum age.
+	 Upon rebirth they create a totally new character, with all their old
+	 data remaining in the database. Reborn characters have the possibility
+         to regain all their old powers after a few years
 
-* Quests
-  o Quests given by NPCs
-  o Player creatable quests
-  o Character bounty, which can be placed by other characters for a fee (should
-      be enabled per world), or NPCs.
+[  ] * Quests
+[  ]   - Quests given by NPCs
+[  ]   - Player creatable quests
+[  ]   - Character bounty, which can be placed by other characters for a fee
+           (should be enabled per world), or NPCs.
 
-* In-game chat (whisper, say, shout, emotes, group/party, guild). Guild chat
-    should be accessible without entering the game (from the Circle-like main
-    menu), or even via IRC or something like that
+[  ] * In-game chat (whisper, say, shout, emotes, group/party, guild). Guild
+	 chat should be accessible without entering the game (from the
+	 Circle-like main menu), or even via IRC or something like that
 
-* Speedwalking?
+[  ] * Speedwalking?
 
-* Arenas
+[  ] * Arenas
 
-* Mercy mob flag: mobs will stop attacking if their enemy is unable to fight
-    any more
+[  ] * Mercy mob flag: mobs will stop attacking if their enemy is unable to
+         fight any more
 
-* Mobs should be able to wear/wield items, have an inventory, have Skills,
-    Spells and Talents
+[  ] * Mobs should be able to wear/wield items, have an inventory, have Skills,
+         Spells and Talents
 
-* Sneaking, thieving, robbery
-  - A mob may steal stuff from you, you may detect it, and maybe able to catch
-      it and get your stuff back. However, killing them in a city may result in
-      punishment by the guards.
-  - Player killing/thieving should be enabled/disabled per world
+[  ] * Sneaking, thieving, robbery
+[  ]   - A mob may steal stuff from you, you may detect it, and maybe able to
+	   catch it and get your stuff back. However, killing them in a city
+           may result in punishment by the guards.
+[  ]   - Player killing/thieving should be enabled/disabled per world
 
-* Gossips
-  - Bragging NPCs: if a character gets killed by a specific NPCs, those NPCs
-      will humiliate that character for a while
+[  ] * Gossips
+[  ]   - Bragging NPCs: if a character gets killed by a specific NPCs, those
+           NPCs will humiliate that character for a while
 
-* Weapon USE: wielded weapons may do something (like cast spells or such) if a
-    specific attribute is set. The item spell should recharge over time, or
-    recharge upon a specific condition
+[  ] * Weapon USE: wielded weapons may do something (like cast spells or such)
+	 if a specific attribute is set. The item spell should recharge over
+         time, or recharge upon a specific condition
 
-* Money (with the possibility to create several money types, like different
-    currencies for different Races or Countries)
+[  ] * Money (with the possibility to create several money types, like
+         different currencies for different Races or Countries)
+[  ]   - Money has weight
 
-* Banks
-  - Money deposit (with interest in some banks)
-  - Storage, for a fee
-  - Loans
+[  ] * Banks
+[  ]   - Money deposit (with interest in some banks)
+[  ]   - Storage, for a fee
+[  ]   - Loans
 
-* All looted items should be used in some way or another. Sacrifice is a common
-    way, but some items may be milled (e.g bones and herbs) or disassembled
-    (e.g Mechanics objects or armour), others may be used as raw materials.
-    Extracted body parts (e.g blood or meat) should decompose over time, even
-    in an inventory, unless put in a special container
+[  ] * All looted items should be used in some way or another. Sacrifice is a
+	 common way, but some items may be milled (e.g bones and herbs) or
+	 disassembled (e.g Mechanics objects or armour), others may be used as
+	 raw materials. Extracted body parts (e.g blood or meat) should
+	 decompose over time, even in an inventory, unless put in a special
+         container
 
-* Object affects and attribute modifiers, like an earring which make the
-    character deaf. These affects may be hidden, and even delayed (e.g the
-    character puts on the earring that gives a high amount of charisma, but
-    after wearing it for a specific time, they will become deaf, and they will
-    have no idea what caused it. The same object can also be cursed, so it
-    cannot be removed except by some professional magicians
+[  ] * Object affects and attribute modifiers, like an earring which make the
+	 character deaf. These affects may be hidden, and even delayed (e.g the
+	 character puts on the earring that gives a high amount of charisma,
+	 but after wearing it for a specific time, they will become deaf, and
+	 they will have no idea what caused it. The same object can also be
+	 cursed, so it cannot be removed except by some professional magicians
 
-* Item modifiers, like sharpening stones
+[  ] * Item modifiers, like sharpening stones
 
-* Item durability. Items must have a Profession and a Profession Level
-    associated to them to show who can repair it
+[  ] * Item durability. Items must have a Profession and a Profession Level
+         associated to them to show who can repair it
 
-* <mob> arrives from <direction>
+[  ] * Mob glowing (e.g they will be unable to sneak)
 
-* Mob glowing (e.g they will be unable to sneak)
+[  ] * Polls
 
-* Polls
+[  ] * Configurable prompt
 
-* Configurable prompt
+[  ] * Marriage?
 
-* Marriage?
+[  ] * Character titles, which can be rewards for quests, or be bought for a
+         high amount of money
 
-* Character titles, which can be rewards for quests, or be bought for a high
-    amount of money
+[  ] * Spirit world
+[  ]   - Some rooms (at least one) should be marked as Spirit World. Upon
+	   death, characters get the DEAD flag, and get to this room. They must
+	   find their way to remove the DEAD flag, and/or find a way back to
+           the real world.
 
-* Spirit world
-  - Some rooms (at least one) should be marked as Spirit World. Upon death,
-      characters get the DEAD flag, and get to this room. They must find their
-      way to remove the DEAD flag, and/or find a way back to the real world.
+[  ] * Blood may remain on the floor during a fight (even without a kill)
 
-* Blood may remain on the floor during a fight (even without a kill)
+[  ] * Special rooms
+[  ]   - Death trap rooms
+[  ]   - Regeneration rooms
+[  ]   - Teleportation objects (portal machines) and rooms (elevators)
 
-* Special rooms
-  o Death trap rooms
-  o Regeneration rooms
-  o Teleportation objects (portal machines) and rooms (elevators)
+[  ] * Languages
 
-* Languages
+[  ] * Books
 
-* Books
+[  ] * Rivers should have some kind of a current. If you get into a river (even
+         on a boat, or by swimming), it will move you automatically somewhere
 
-* Rivers should have some kind of a current. If you get into a river (even on a
-    boat, or by swimming), it will move you automatically somewhere
+[  ] * Gambling (may be illegal in some towns ;) )
 
-* Gambling (may be illegal in some towns ;) )
+[  ] * Guides that can be payed for. E.g in a big city, a guide can lead you to
+         the Inn, or something like that for a small fee.
 
-* Guides that can be payed for. E.g in a big city, a guide can lead you to the
-    Inn, or something like that for a small fee.
+[  ] * Automatically hiding/appearing exits (e.g to create mazes or to hide
+         stuff)
 
-* Automatically hiding/appearing exits (e.g to create mazes or to hide stuff)
+[  ] * Mailing
 
-* Mailing
+[  ] * Abilities
+[  ]   - Rolled upon character creation
+[  ]   - May be trained (ability training may be enabled/disabled system wide)
+[  ]   - There should be a racial maximum
+[  ]   - May be modified by affections and worn items
+[  ]   - May increase/decrease with age
 
-* Abilities
-  - Rolled upon character creation
-  - May be trained (ability training may be enabled/disabled system wide)
-  - There should be a racial maximum
-  - May be modified by affections and worn items
-  - May increase/decrease with age
-
-* Tattoes, scars, piercings, etc.
+[  ] * Tattoes, scars, piercings, etc.
 
 Commands
 --------
 
-* Commands already defined in Zim Wiki:
-  - DROP
-  - GET
-  - PRACISE/PRACTICE
-  - PRAY
-  - RECALL should take back the character to their house, or the Inn room they
-    have rented. Specific rooms may have a flag so there must be no recall from
-    them (this should also mean that upon logout/login, the character will get
-    back to this room)
-  - SURVEY
-  - TALE
+[  ] * Commands already defined in Zim Wiki:
+[  ]   - DROP
+[  ]   - GET
+[  ]   - PRACISE/PRACTICE
+[  ]   - PRAY
+[  ]   - RECALL
+	   Take back the character to their house, or the Inn room they have
+	   rented. Specific rooms may have a flag so there must be no recall
+	   from them (this should also mean that upon logout/login, the
+           character will get back to this room)
+[  ]   - SURVEY
+[  ]   - TALE
 
-* Commands that should be present
-  - AFFECTS to show all the spells that affects the character (spell name,
-    apply count, duration, applier name)
-  - SCORE to show the player's statistics
-  - INVENTORY to show the character's inventory
-  - EQUIPMENT to show the equipped items
-  - AUTOEXIT to toggle exit display on LOOK
-  - LOOK
-  - EXITS
-  - EXAMINE should be an alias to LOOK, except it should work only on objects
-  - CONSIDER
-  - SET
-    . AUTOLOOT    [OFF]
-    . AUTOSKIN    [OFF]
-    . AUTODRAIN   [OFF]
-    . AUTOSPLIT   [OFF]
-    . COLOR       [ON ]
-    . AUTOLOOK    [ON ]
-    . WIMPY       [OFF]
-    . AUTOCONSUME [OFF] (To automatically consume food and drink when
-                         hungry/thirsty)
-    . GROUPINV    [ON ]
-    . PAGELENGTH  [30 ]
-  - BURY/DIG
-  - EQUIP/WIELD
-  - IGNORE/UNIGNORE
-  - WHO/WHOIS
-  - QUIT should exit the game
-  - LOGOUT should go back to intro menu
-  - USE may use objects in hand (map, weapons with spells, etc.), or in room
-    (buttons, levers, etc.)
+[  ] * Commands that should be present
+[  ]   - AFFECTS
+	   Shows all the spells that affects the character (spell name, apply
+           count, duration, applier name)
+[  ]   - SCORE
+           Shows the player's statistics
+[  ]   - INVENTORY
+           Shows the character's inventory
+[  ]   - EQUIPMENT
+           Shows the equipped items
+[  ]   - LOOK
+[  ]   - EXITS
+[  ]   - EXAMINE should be an alias to LOOK, except it should work only on objects
+[  ]   - CONSIDER
+[  ]   - SET
+[  ]     . AUTOLOOT    [OFF]
+[  ]     . AUTOSKIN    [OFF]
+[  ]     . AUTODRAIN   [OFF]
+[  ]     . AUTOSPLIT   [OFF]
+[  ]     . AUTOEXIT    [ON ]
+[  ]     . COLOR       [ON ]
+[  ]     . AUTOLOOK    [ON ]
+[  ]     . WIMPY       [OFF]
+[  ]     . AUTOCONSUME [OFF]
+	     (To automatically consume food and drink when hungry/thirsty)
+[  ]     . GROUPINV    [ON ]
+[  ]     . PAGELENGTH  [30 ]
+[  ]   - BURY/DIG
+[  ]   - EQUIP/WIELD
+[  ]   - IGNORE/UNIGNORE
+[  ]   - WHO/WHOIS
+[  ]   - QUIT
+           Exits the game
+[  ]   - LOGOUT
+           Goes back to the intro menu
+[  ]   - USE
+	   Use objects in hand (map, weapons with spells, etc.), or in room
+           (buttons, levers, etc.)
 
 Materia Magica command list
 ---------------------------
