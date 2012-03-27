@@ -1,3 +1,6 @@
+-- Okay, so you update this file. But if you create a table, don't forget to
+-- update drop.sql, either!
+
 CREATE TABLE directions (
 	id integer NOT NULL PRIMARY KEY,
 	short_name varchar(2) NOT NULL UNIQUE,

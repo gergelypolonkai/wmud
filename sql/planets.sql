@@ -1,3 +1,6 @@
+-- Okay, so you update this file. But if you create a table, don't forget to
+-- update drop.sql, either!
+
 CREATE TABLE planets (
 	id integer NOT NULL PRIMARY KEY,
 	name varchar(40) NOT NULL UNIQUE
