@@ -90,7 +90,7 @@ Game world
 [  ]     . Tables and chairs
 [  ]     . Tables are private chat rooms with a maximum number of members
 [  ]     . Each tavern has a fixed amount of tables and chairs
-[  ]     . Chairs can be moved from one table to another
+[  ]     . Chairs can be moved from one table to another if not occupied
 [  ]     . Tables have a maximum number of chairs (which may vary depending on
              the table's size)
 
@@ -117,24 +117,30 @@ Game world
 
 [  ] * Item creation (AKA combining or Professions)
 [  ]   - Trainers, who know only specific recipes
-[  ]   - Recipe scrolls (e.g to be dropped by mobs and such)
-[  ]   - Corpse skinning (only specific corpses)
-[  ]   - Corpse butching (only specific corpses)
-[  ]   - Fishing
-[  ]   - Mining
-[  ]   - Foraging
-[  ]   - Blacksmithing
-[  ]   - Alchemy
+[  ]   - Recipe scrolls (e.g to be dropped by mobs and such) (item flag
+	  'recipe'; custom fields must be added for Profession ID and recipe
+          ID)
+[  ]   - Corpse skinning (only corpses of mobs with the 'skinnable' flag)
+[  ]   - Corpse butching (only corpses of mobs with the 'butchable' flag)
+[  ]   - Fishing (only in rooms with the 'fishing' flag)
+[  ]   - Mining (only if the room has an item with the 'minable' flag)
+[  ]   - Foraging (only if the room has an item with the 'foragable' flag)
+[  ]   - Blacksmithing (only if the room has an item with the 'anvil' flag, and
+           the character has an item with the 'blacksmith-hammer' flag)
+[  ]   - Alchemy (some recipes may require an item in the room with the
+           'alchemytools' flag)
 
 [  ] * Companions
 [  ]   - Combat/Pack animals
+[  [   - May be rented
+[  ]   - They should also advance in age
 [  ]   - Mounts (may also act as combat/pack animals)
 [  ]   - Charming
 [  ]   - Servants, pages
 
 [  ] * Gods
-[  ]   - Gods may be chosen upon character creation (for wMUD, a character MUST
-         have at least two Gods in Iminiru. Amount is configurable)
+[  ]   - Gods may be chosen upon character creation. Amount is configurable.
+           (for Iminiru, a character MUST have at least two Gods) 
 [  ]   - Sacrifices
 [  ]   - Prayers
 
@@ -188,16 +194,16 @@ Game world
 [  ]   - Dual Wield
 [  ]   - Stun
 
-[  ] * The whole system should be built with class support, although wMUD will
-	 technically have only one "Adventurer" class. Also, multiclassing
+[  ] * The whole system should be built with class support, although Iminiru
+	 will technically have only one "Adventurer" class. Also, multiclassing
          should be possible
 
 [  ] * Character aging, with racial maximum age. When a character is too old,
 	 they can retire (e.g they will become story tellers or such), or die
-	 and rebirth.  Reborn characters have a bonus to their maximum age.
-	 Upon rebirth they create a totally new character, with all their old
-	 data remaining in the database. Reborn characters have the possibility
-         to regain all their old powers after a few years
+	 and reborn.  Reborn characters have a bonus to their maximum age. Upon
+	 rebirth they create a totally new character, with all their old data
+	 remaining in the database. Reborn characters have the possibility to
+         regain all their old powers after a few years
 
 [  ] * Quests
 [  ]   - Quests given by NPCs
@@ -226,7 +232,7 @@ Game world
 [  ]   - Player killing/thieving should be enabled/disabled per world
 
 [  ] * Gossips
-[  ]   - Bragging NPCs: if a character gets killed by a specific NPCs, those
+[  ]   - Bragging NPCs: if a character gets killed by specific NPCs, those
            NPCs will humiliate that character for a while
 
 [  ] * Weapon USE: wielded weapons may do something (like cast spells or such)
@@ -310,6 +316,8 @@ Game world
 [  ]   - May increase/decrease with age
 
 [  ] * Tattoes, scars, piercings, etc.
+
+[  ] * Lights that shine on each other and on the world
 
 Commands
 --------
