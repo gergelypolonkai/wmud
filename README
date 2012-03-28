@@ -1,9 +1,12 @@
-General
-=======
+What is wMUD?
+=============
 
 wMUD is a MUD code base. It is written from scratch, using GLib and CURL.
 Although it is just another MUD code base, I tried to add unique features, and
 also tried to make it as flexible as possible.
+
+What are the key features?
+==========================
 
 wMUD stores everything in an SQLite3 database, and everything really means
 everything. The whole world is dynamic, and most of it can be defined without
@@ -26,11 +29,26 @@ but whenever it causes trouble, wizards can force the maintenance thread to
 start immediately. The Out-of-Game chat functions also run in different
 threads.
 
-Development
-===========
+Why writing a new codebase?
+===========================
+
+The MUD codebases out there (well, the ones that are freely available) are a
+bit outdated. Yes, I know that in the world of MMORPG games even MUD is
+outdated, but who cares?
+
+The other part of the story is that I needed challenge. Writing such a software
+while creating a world to run in it is a huge job. However, creating a world in
+a codebase that does not really support the features I need requires a lot of
+coding. I realized it early during the world building with CircleMUD, so I've
+decided to create a new codebase even if I have to recode everything from
+scratch. As GLib, SQLite3 and CURL are at my hands, even if I'm just trying to
+get to know them, it was not that hard.
+
+How can I help in development, or add my own stuff?
+===================================================
 
 wMUD's development, so as other MUD codebases', is no easy task. Although each
-thread is coded in separate files (except the game thread), threading makes it
+thread is coded in a separate file (except the game thread), threading makes it
 even difficult. I try to make this task as easy as possible with comments and
 an API reference, but this is also a hard goal to accomplish. If you really
 want to mess with things, the file HACKING is just the place for you.
