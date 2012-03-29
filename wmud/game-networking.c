@@ -201,7 +201,10 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 										" successful.\r\n", TELNET_IAC,
 										TELNET_WONT, TELNET_ECHO);
 								client->authenticated = TRUE;
-								/* TODO: Send fail count if non-zero */
+								if (client->player->fail_count > 0)
+								{
+									wmud_client_send("There %s %d failed login attempt%s with your account since your last visit\r\n", (client->player->fail_count == 1) ? "was" : "were", client->player->fail_count, (client->player->fail_count > 1) ? "s" : "");
+								}
 								client->state = WMUD_CLIENT_STATE_MENU;
 								/* TODO: send MOTD */
 								/* TODO: send menu items */
@@ -215,6 +218,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 										" name would you like to be called? ",
 										TELNET_IAC, TELNET_WONT, TELNET_ECHO);
 								client->state = WMUD_CLIENT_STATE_FRESH;
+								client->player->fail_count++;
 								client->login_try_count++;
 								if (client->login_try_count == 3)
 								{
