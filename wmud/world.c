@@ -35,6 +35,11 @@ struct findData {
 	guint found;
 	gchar *last;
 };
+struct dirCheckData {
+	GSList *directions;
+	GSList *rooms;
+	gboolean sane;
+};
 
 GQuark WMUD_WORLD_ERROR = 0;
 
@@ -167,6 +172,28 @@ wmud_world_check_areas(GSList *areas, GError **err)
 	return (find_data.found < 2);
 }
 
+static gint
+check_room_exit_room(wmudRoom *room, wmudExit *room_exit)
+{
+	return ((room->id == room_exit->source_room_id) || (room->id == room_exit->destination_room_id)) ? 0 : 1;
+}
+
+static gint
+check_room_exit_dir(wmudDirection *dir, wmudExit *room_exit)
+{
+	return (dir->id == room_exit->direction_id) ? 0 : 1;
+}
+
+static void
+exit_sanity_check(wmudExit *room_exit, struct dirCheckData *dir_check_data)
+{
+	if (
+		!g_slist_find_custom(dir_check_data->rooms, room_exit, (GCompareFunc)check_room_exit_room)
+		|| !g_slist_find_custom(dir_check_data->directions, room_exit, (GCompareFunc)check_room_exit_dir)
+	)
+		dir_check_data->sane = FALSE;
+}
+
 /**
  * wmud_world_check_exits:
  * @exits: a #GSList of wmudExit structs
@@ -182,7 +209,13 @@ wmud_world_check_areas(GSList *areas, GError **err)
 gboolean
 wmud_world_check_exits(GSList *exits, GSList *directions, GSList *rooms, GError **err)
 {
-	return FALSE;
+	struct dirCheckData dir_check_data = {directions, rooms, TRUE};
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Sanity checking on room exits");
+
+	g_slist_foreach(exits, (GFunc)exit_sanity_check, &dir_check_data);
+
+	return dir_check_data.sane;
 }
 
 static gint
@@ -418,6 +451,20 @@ wmud_world_free_rooms(GSList *rooms)
 	}
 }
 
+void
+wmud_world_free_exits(GSList *exits)
+{
+	if (exits)
+	{
+#if GLIB_CHECK_VERSION(2, 28, 0)
+		g_slist_free_full(exits, (GDestroyNotify)g_free);
+#else
+		g_slist_foreach(exits, (GFunc)g_free, NULL);
+		g_slist_free(rooms);
+#endif
+	}
+}
+
 /**
  * wmud_world_load:
  * @err: a #GError to put error messages into
@@ -601,9 +648,44 @@ wmud_world_load(GError **err)
 
 	/* Load room exits from the database and check them */
 	g_clear_error(&in_err);
-	wmud_db_load_exits(&exits, &in_err);
+	if (!wmud_db_load_exits(&exits, &in_err))
+	{
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load exits from database: %s", in_err->message);
+		wmud_world_free_exits(exits);
+		wmud_world_free_rooms(rooms);
+		wmud_world_free_areas(areas);
+		wmud_world_free_planets(planets);
+		wmud_world_free_planes(planes);
+		wmud_world_free_directions(directions);
+		g_clear_error(&in_err);
+
+		return FALSE;
+	}
+	if (!exits)
+	{
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No exits were found in the database!");
+		wmud_world_free_rooms(rooms);
+		wmud_world_free_areas(areas);
+		wmud_world_free_planets(planets);
+		wmud_world_free_planes(planes);
+		wmud_world_free_directions(directions);
+		g_clear_error(&in_err);
+
+		return FALSE;
+	}
 	g_clear_error(&in_err);
-	wmud_world_check_exits(exits, directions, rooms, &in_err);
+	if (!wmud_world_check_exits(exits, directions, rooms, &in_err))
+	{
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Exit list pre-flight check error: %s", in_err->message);
+		wmud_world_free_rooms(rooms);
+		wmud_world_free_areas(areas);
+		wmud_world_free_planets(planets);
+		wmud_world_free_planes(planes);
+		wmud_world_free_directions(directions);
+		g_clear_error(&in_err);
+
+		return FALSE;
+	}
 
 	/* World loading finished. Now let's tie the parts together... */
 
