@@ -137,9 +137,11 @@ wmud_interpreter_check_directions(GSList *directions, GError **err)
 	{
 		g_set_error(err, WMUD_INTERPRETER_ERROR, WMUD_INTERPRETER_ERROR_DUPCMD, "Direction commands defined in the database are not unique!");
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Direction commands defined in the databsae are not unique.");
+
+		return FALSE;
 	}
 
-	return (!command_found && (find_data.found == 1));
+	return !command_found;
 }
 
 /**
