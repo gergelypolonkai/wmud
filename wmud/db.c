@@ -150,28 +150,28 @@ wmud_db_save_player(wmudPlayer *player, GError **err)
 
 	if ((sqlite_code = sqlite3_prepare_v2(dbh, "INSERT INTO players (id, login, password, email) VALUES (NULL, ?, NULL, ?)", -1, &sth, NULL)) != SQLITE_OK)
 	{
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_player_save(): %s", sqlite3_errmsg(dbh));
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
 	if ((sqlite_code = sqlite3_bind_text(sth, 1, player->player_name, -1, SQLITE_STATIC)) != SQLITE_OK)
 	{
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_player_save(): %s", sqlite3_errmsg(dbh));
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
 	if ((sqlite_code = sqlite3_bind_text(sth, 2, player->email, -1, SQLITE_STATIC)) != SQLITE_OK)
 	{
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_player_save(): %s", sqlite3_errmsg(dbh));
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
 	if ((sqlite_code = sqlite3_step(sth)) != SQLITE_DONE)
 	{
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Statement cannot be executed in wmud_db_player_save(): %s", sqlite3_errmsg(dbh));
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Statement cannot be executed in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
@@ -325,7 +325,7 @@ wmud_db_load_directions(GSList **directions, GError **err)
 		}
 		else
 		{
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_directions(): %s", sqlite3_errmsg(dbh));
 			return FALSE;
 		}
 	}
@@ -431,7 +431,7 @@ wmud_db_load_rooms(GSList **rooms, GError **err)
 		}
 		else
 		{
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_rooms(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
 			return FALSE;
 		}
