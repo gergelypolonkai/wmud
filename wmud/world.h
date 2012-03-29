@@ -34,9 +34,18 @@ typedef struct _wmudPlane {
 	gchar *name;
 } wmudPlane;
 
+/**
+ * wmudPlanet:
+ * @id: The database ID of the planet
+ * @name: The name of the planet
+ * @planes: A #GSList of planes this planet is connected to. The data of this
+ *          list should never be freed, only the #GSList itself with
+ *          g_slist_free()
+ */
 typedef struct _wmudPlanet {
 	guint id;
 	gchar *name;
+	GSList *planes;
 } wmudPlanet;
 
 typedef struct _wmudArea {
