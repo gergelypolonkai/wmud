@@ -91,7 +91,6 @@ static gboolean
 wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient *client)
 {
 	GError *err = NULL;
-	/* TODO: Error checking */
 	GRegex *email_regex = g_regex_new("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", G_REGEX_CASELESS, 0, NULL);
 
 	if (condition & G_IO_HUP)
@@ -105,7 +104,6 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 		gchar *buf2;
 		gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
 
-		/* TODO: Error checking */
 		if ((len = g_socket_receive(client_socket, buf, MAX_RECV_LEN, NULL, &err)) == 0)
 		{
 			g_free(buf);
@@ -361,7 +359,8 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	wmudClient *client;
 	GSocketAddress *remote_addr;
 
-	/* TODO: Error checking */
+	/* This function should never return an error. If so, it is a huge bug,
+	 * and will trigger a higher level error. */
 	client_socket = g_socket_listener_accept_socket(accept_data->listener, NULL, NULL, &err);
 
 	client = g_new0(wmudClient, 1);
@@ -434,7 +433,7 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GError **err
 	/* The following snippet is borrowed from GLib 2.30's gsocketlistener.c
 	 * code, to create the necessary sockets to listen on both IPv4 and
 	 * IPv6 address */
-	if ((game_socket6 = g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, &in_err)) != NULL)
+	if ((game_socket6 = g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL)
 	{
 		GInetAddress *inet_address;
 		GSocketAddress *address;
@@ -446,8 +445,8 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GError **err
 
 		g_socket_set_listen_backlog(game_socket6, 10);
 
-		result = g_socket_bind(game_socket6, address, TRUE, &in_err)
-			&& g_socket_listen(game_socket6, &in_err);
+		result = g_socket_bind(game_socket6, address, TRUE, NULL)
+			&& g_socket_listen(game_socket6, NULL);
 
 		g_object_unref(address);
 
@@ -462,14 +461,13 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GError **err
 			need_ipv4_socket = FALSE;
 
 		game_net_source6 = g_socket_create_source(game_socket6, G_IO_IN, NULL);
-		/* TODO: error checking */
-		g_socket_listener_add_socket(game_listener, game_socket6, NULL, &in_err);
+		/* This function should never return error. If so, that would be a really big bug which will trigger a higher level problem for sure */
+		g_socket_listener_add_socket(game_listener, game_socket6, NULL, NULL);
 	}
-	/* TODO: else { error checking } */
 
 	if (need_ipv4_socket)
 	{
-		if ((game_socket4 = g_socket_new(G_SOCKET_FAMILY_IPV4, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, &in_err)) != NULL)
+		if ((game_socket4 = g_socket_new(G_SOCKET_FAMILY_IPV4, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL)
 		{
 			GInetAddress *inet_address;
 			GSocketAddress *address;
@@ -481,8 +479,8 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GError **err
 
 			g_socket_set_listen_backlog(game_socket4, 10);
 
-			result = g_socket_bind(game_socket4, address, TRUE, &in_err)
-				&& g_socket_listen(game_socket4, &in_err);
+			result = g_socket_bind(game_socket4, address, TRUE, NULL)
+				&& g_socket_listen(game_socket4, NULL);
 
 			g_object_unref(address);
 
@@ -497,10 +495,8 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GError **err
 			}
 
 			game_net_source4 = g_socket_create_source(game_socket4, G_IO_IN, NULL);
-			/* TODO: error checking */
-			g_socket_listener_add_socket(game_listener, game_socket4, NULL, &in_err);
+			g_socket_listener_add_socket(game_listener, game_socket4, NULL, NULL);
 		}
-		/* TODO: else { error checking } */
 	}
 	else
 	{
