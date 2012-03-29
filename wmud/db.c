@@ -186,6 +186,7 @@ wmud_db_load_planes(GSList **planes, GError **err)
 	sqlite3_stmt *sth = NULL;
 	int sqlite_code;
 
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planes");
 	if (dbh == NULL)
 	{
 		if (err)
@@ -234,7 +235,53 @@ wmud_db_load_planes(GSList **planes, GError **err)
 gboolean
 wmud_db_load_planets(GSList **planets, GError **err)
 {
-	return FALSE;
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planets");
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planets", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planets(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudPlanet *planet = g_new0(wmudPlanet, 1);
+			planet->id = sqlite3_column_int(sth, 0);
+			planet->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet _%s_", planet->name);
+
+			*planets = g_slist_prepend(*planets, planet);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_planets(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
 }
 
 gboolean
@@ -291,13 +338,108 @@ wmud_db_load_directions(GSList **directions, GError **err)
 gboolean
 wmud_db_load_areas(GSList **areas, GError **err)
 {
-	return FALSE;
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading areas");
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM areas", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudArea *area = g_new0(wmudArea, 1);
+			area->id = sqlite3_column_int(sth, 0);
+			area->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded area _%s_", area->name);
+
+			*areas = g_slist_prepend(*areas, area);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
 }
 
 gboolean
 wmud_db_load_rooms(GSList **rooms, GError **err)
 {
-	return FALSE;
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, area, name, distant_description, close_description FROM rooms", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_rooms(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudRoom *room = g_new0(wmudRoom, 1);
+			room->id = sqlite3_column_int(sth, 0);
+			room->area_id = sqlite3_column_int(sth, 1);
+			room->name = g_strdup((gchar *)sqlite3_column_text(sth, 2));
+			room->distant_description = g_strdup((gchar *)sqlite3_column_text(sth, 3));
+			room->close_description = g_strdup((gchar *)sqlite3_column_text(sth, 4));
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded room %d/_%s_", room->area_id, room->name);
+
+			*rooms = g_slist_prepend(*rooms, room);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
 }
 
 gboolean
