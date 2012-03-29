@@ -34,6 +34,12 @@
 
 WMUD_COMMAND(quit);
 
+struct findData {
+	GSList *list;
+	guint found;
+	gchar *last;
+};
+
 static wmudCommand command_list[] = {
 	{ "quit", gcmd_quit },
 	{ NULL,   NULL },
@@ -49,6 +55,36 @@ static void
 destroy_string(GString *string)
 {
 	g_string_free(string, TRUE);
+}
+
+static gint
+check_direction_dups2(wmudDirection *dir1, wmudDirection *dir2)
+{
+	gint check;
+
+	if ((check = g_ascii_strcasecmp(dir1->short_name, dir2->short_name)) != 0)
+		return check;
+
+	if ((check = g_ascii_strcasecmp(dir1->name, dir2->name)) != 0)
+		return check;
+
+	if ((check = g_ascii_strcasecmp(dir1->short_name, dir2->name)) != 0)
+		return check;
+
+	return g_ascii_strcasecmp(dir1->name, dir2->short_name);
+}
+
+static void
+check_direction_dups1(wmudDirection *dir, struct findData *find_data)
+{
+	if (find_data->last != dir->name)
+	{
+		find_data->found = (find_data->found > 1) ? find_data->found : 0;
+		find_data->last = dir->name;
+	}
+
+	if (g_slist_find_custom(find_data->list, dir, (GCompareFunc)check_direction_dups2))
+		find_data->found++;
 }
 
 static void
@@ -85,16 +121,25 @@ gboolean
 wmud_interpreter_check_directions(GSList *directions, GError **err)
 {
 	gboolean command_found = FALSE;
+	struct findData find_data = {directions, 0, NULL};
 
 	g_slist_foreach(directions, (GFunc)check_direction_command, &command_found);
 
 	if (command_found)
 	{
 		g_set_error(err, WMUD_INTERPRETER_ERROR, WMUD_INTERPRETER_ERROR_DUPCMD, "Direction commands are not unique. Please check the database!");
-		g_debug("Directions command are not unique. Please check the database!");
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Direction command are not unique. Please check the database!");
 	}
 
-	return command_found;
+	g_slist_foreach(directions, (GFunc)check_direction_dups1, &find_data);
+
+	if (find_data.found > 1)
+	{
+		g_set_error(err, WMUD_INTERPRETER_ERROR, WMUD_INTERPRETER_ERROR_DUPCMD, "Direction commands defined in the database are not unique!");
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Direction commands defined in the databsae are not unique.");
+	}
+
+	return (!command_found && (find_data.found == 1));
 }
 
 /**
