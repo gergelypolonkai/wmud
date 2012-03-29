@@ -30,52 +30,133 @@
  *
  */
 
+/**
+ * wmud_world_check_planes:
+ * @planes: a #GSList of wmudPlane structs
+ * @err: a #GError where this function can send back error messages
+ *
+ * Check for duplicate plane names in the @planes list.
+ *
+ * Return value: %TRUE if there are no duplicate names, %FALSE otherwise
+ */
 gboolean
 wmud_world_check_planes(GSList *planes, GError **err)
 {
 	return FALSE;
 }
 
+/**
+ * wmud_world_check_planets:
+ * @planets: a #GSList of wmudPlanet structs
+ * @err: a #GError where this function can send back error messages
+ *
+ * Check for duplicate planet names in the @planets list.
+ *
+ * Return value: %TRUE if there are no duplicate names, %FALSE otherwise
+ */
 gboolean
 wmud_world_check_planets(GSList *planets, GError **err)
 {
 	return FALSE;
 }
 
+/**
+ * wmud_world_check_areas:
+ * @areas: a #GSList of wmudArea structs
+ * @err: a #GError where this function can send back error messages
+ *
+ * Check for duplicate area names in the @areas list.
+ *
+ * Return value: %TRUE if there are no duplicate names, %FALSE otherwise
+ */
 gboolean
 wmud_world_check_areas(GSList *areas, GError **err)
 {
 	return FALSE;
 }
 
+/**
+ * wmud_world_check_exits:
+ * @exits: a #GSList of wmudExit structs
+ * @directions: a #GSList of wmudDirection structs
+ * @rooms: a #GSList of wmudRoom structs
+ * @err: a #GError where this function can send back error messages
+ *
+ * Check if both endpoints of exits point to a valid direction, and lead to an
+ * existing room.
+ *
+ * Return value: %TRUE if all the exits are valid, %FALSE otherwise
+ */
 gboolean
-wmud_world_check_exits(GSList *exits, GError **err)
+wmud_world_check_exits(GSList *exits, GSList *directions, GSList *rooms, GError **err)
 {
 	return FALSE;
 }
 
+/**
+ * wmud_world_assoc_planets_planes:
+ * @planets: a #GSList of wmudPlanets
+ * @planes: a #GSList of wmudPlanes
+ * @err: a #GError where this function can send back error messages
+ *
+ * Associates planets with planes by adding the required planes to the
+ * wmudPlanets' planes list.
+ *
+ * Return value: %FALSE if there are planets without planes, or if a planet has
+ * a plane database record that points to a nonexistant plane; %TRUE otherwise.
+ */
 gboolean
 wmud_world_assoc_planets_planes(GSList *planets, GSList *planes, GError **err)
 {
 	return FALSE;
 }
 
+/**
+ * wmud_world_assoc_rooms_areas:
+ * @rooms: a #GSList of wmudRooms
+ * @areas: a #GSList of wmudAreas
+ * @err: a #GError where this function can send back error messages
+ *
+ * Associates rooms with areas by adding the required areas to the wmudRooms'
+ * area list and the rooms to the wmudAreas' rooms list.
+ *
+ * Return value: %FALSE if there are any associations between a nonexistant
+ * area or a nonexistant room.
+ */
 gboolean
 wmud_world_assoc_rooms_areas(GSList *rooms, GSList *areas, GError **err)
 {
 	return FALSE;
 }
 
+/**
+ * wmud_world_assoc_rooms_planets:
+ * @rooms: a #GSList of wmudRooms
+ * @planets: a #GSList of wmudPlanets
+ * @err: a #GError where this function can send back error messages
+ *
+ * Associates rooms with planets, and through them with planes.
+ *
+ * Return value: %FALSE if a room has no planes associated with them, %TRUE
+ * otherwise.
+ */
 gboolean
 wmud_world_assoc_rooms_planets(GSList *rooms, GSList *planets, GError **err)
 {
 	return FALSE;
 }
 
-gboolean
+/**
+ * wmud_world_assoc_exits_rooms:
+ * @exits: a #GSList of wmudExits
+ * @rooms: a #GSList of wmudRooms
+ * @err: a #GError where this function can send back error messages
+ *
+ * Associate exits with rooms and vice versa.
+ */
+void
 wmud_world_assoc_exits_rooms(GSList *exits, GSList *rooms, GError **err)
 {
-	return FALSE;
 }
 
 /**

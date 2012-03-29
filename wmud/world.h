@@ -40,7 +40,7 @@ gboolean wmud_world_check_exits(GSList *exits, GError **err);
 gboolean wmud_world_assoc_planets_planes(GSList *planets, GSList *planes, GError **err);
 gboolean wmud_world_assoc_rooms_areas(GSList *rooms, GSList *areas, GError **err);
 gboolean wmud_world_assoc_rooms_planets(GSList *rooms, GSList *planets, GError **err);
-gboolean wmud_world_assoc_exits_rooms(GSList *exits, GSList *rooms, GError **err);
+void wmud_world_assoc_exits_rooms(GSList *exits, GSList *rooms, GError **err);
 
 #endif /* __WMUD_WORLD_H__ */
 
