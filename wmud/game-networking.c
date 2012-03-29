@@ -209,7 +209,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 								client->authenticated = TRUE;
 								if (client->player->fail_count > 0)
 								{
-									wmud_client_send("There %s %d failed login attempt%s with your account since your last visit\r\n", (client->player->fail_count == 1) ? "was" : "were", client->player->fail_count, (client->player->fail_count > 1) ? "s" : "");
+									wmud_client_send(client, "There %s %d failed login attempt%s with your account since your last visit\r\n", (client->player->fail_count == 1) ? "was" : "were", client->player->fail_count, (client->player->fail_count > 1) ? "s" : "");
 								}
 								client->state = WMUD_CLIENT_STATE_MENU;
 								/* TODO: send MOTD */
