@@ -35,6 +35,7 @@
 #include "maintenance.h"
 #include "game.h"
 #include "configuration.h"
+#include "world.h"
 
 /**
  * SECTION:utils
@@ -120,9 +121,10 @@ debug_context(char *file, int line)
 void
 wmud_type_init(void)
 {
-	WMUD_CONFIG_ERROR = g_quark_from_string("wmud_config_error");
-	WMUD_DB_ERROR = g_quark_from_string("wmud_db_error");
-	WMUD_INTERPRETER_ERROR = g_quark_from_string("wmud_interpreter_error");
+	WMUD_CONFIG_ERROR = g_quark_from_string("wmud-config-error");
+	WMUD_DB_ERROR = g_quark_from_string("wmud-db-error");
+	WMUD_INTERPRETER_ERROR = g_quark_from_string("wmud-interpreter-error");
+	WMUD_WORLD_ERROR = g_quark_from_string("wmud-world-error");
 }
 
 /**
@@ -178,7 +180,11 @@ main(int argc, char **argv)
 
 	g_clear_error(&err);
 	wmud_db_load_players(&err);
-	wmud_world_load(&err);
+	if (!wmud_world_load(&err))
+	{
+		/* TODO: Send some kind of an error? */
+		return 1;
+	}
 
 	/* Initialization ends here */
 

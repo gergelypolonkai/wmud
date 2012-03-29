@@ -21,10 +21,36 @@
 
 #include <glib.h>
 
+extern GQuark WMUD_WORLD_ERROR;
+typedef enum {
+	WMUD_WORLD_ERROR_DUPPLANE,
+	WMUD_WORLD_ERROR_DUPPLANET,
+	WMUD_WORLD_ERROR_DUPAREA,
+	WMUD_WORLD_ERROR_DUPROOM
+} wmudWorldError;
+
 typedef struct _wmudPlane {
 	guint id;
 	gchar *name;
 } wmudPlane;
+
+typedef struct _wmudPlanet {
+	guint id;
+	gchar *name;
+} wmudPlanet;
+
+typedef struct _wmudArea {
+	guint id;
+	gchar *name;
+} wmudArea;
+
+typedef struct _wmudRoom {
+	guint id;
+	guint area_id;
+	gchar *name;
+	gchar *distant_description;
+	gchar *close_description;
+} wmudRoom;
 
 typedef struct _wmudDirection {
 	guint id;
@@ -35,12 +61,15 @@ typedef struct _wmudDirection {
 gboolean wmud_world_check_planes(GSList *planes, GError **err);
 gboolean wmud_world_check_planets(GSList *planets, GError **err);
 gboolean wmud_world_check_areas(GSList *areas, GError **err);
-gboolean wmud_world_check_exits(GSList *exits, GError **err);
+gboolean wmud_world_check_rooms(GSList *rooms, GError **err);
+gboolean wmud_world_check_exits(GSList *exits, GSList *directions, GSList *rooms, GError **err);
 
 gboolean wmud_world_assoc_planets_planes(GSList *planets, GSList *planes, GError **err);
 gboolean wmud_world_assoc_rooms_areas(GSList *rooms, GSList *areas, GError **err);
 gboolean wmud_world_assoc_rooms_planets(GSList *rooms, GSList *planets, GError **err);
 void wmud_world_assoc_exits_rooms(GSList *exits, GSList *rooms, GError **err);
+
+gboolean wmud_world_load(GError **err);
 
 #endif /* __WMUD_WORLD_H__ */
 
