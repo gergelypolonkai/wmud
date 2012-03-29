@@ -38,7 +38,7 @@
  */
 
 /**
- * wmud_maintenance_check_new_players:
+ * wmud_maintenance_check_players:
  * @player: #wmudPLayer structure of the player record to check
  * @user_data: not used
  *
@@ -46,7 +46,7 @@
  * an unset password, and generate one for them, if so.
  */
 void
-wmud_maintenance_check_new_players(wmudPlayer *player, gpointer user_data)
+wmud_maintenance_check_players(wmudPlayer *player, gpointer user_data)
 {
 	if (player->cpassword == NULL)
 	{
@@ -86,7 +86,7 @@ wmud_maintenance(gpointer user_data)
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Starting maintenance...");
 	/* Run through the player list, and generate a random password for each
 	 * newly registered player */
-	g_slist_foreach(players, (GFunc)wmud_maintenance_check_new_players, NULL);
+	g_slist_foreach(players, (GFunc)wmud_maintenance_check_players, NULL);
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Finished maintenance...");
 
