@@ -36,7 +36,8 @@
  * SECTION:game-networking
  * @short_description: Game related networking code
  *
- * Functions to handle game connections
+ * Functions to handle game connections. Each connection has a #GSocket and a
+ * #GSource, associated with the game thread's #GMainContext.
  */
 
 struct AcceptData {
@@ -44,7 +45,11 @@ struct AcceptData {
 	GSocketListener *listener;
 };
 
-GSList *clients;
+/**
+ * clients:
+ * The full #GSList of the currently connected #wmudClient structs.
+ */
+GSList *clients = NULL;
 
 void wmud_client_interpret_newplayer_email(wmudClient *client);
 void wmud_client_interpret_newplayer_mailconfirm(wmudClient *client);
