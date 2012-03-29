@@ -31,6 +31,9 @@
  * @short_description: Database handling
  * @title: Database handling routines
  *
+ * This module handles all the database requests. It currently uses an SQLite3
+ * backend, but due to its nature, it could be easily rewritten to use a
+ * different (e.g MySQL or PostgreSQL) database.
  */
 
 /**
