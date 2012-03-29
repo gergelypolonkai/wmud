@@ -58,6 +58,12 @@ typedef struct _wmudDirection {
 	gchar *name;
 } wmudDirection;
 
+typedef struct _wmudExit {
+	guint source_room_id;
+	guint direction_id;
+	guint destination_room_id;
+} wmudExit;
+
 gboolean wmud_world_check_planes(GSList *planes, GError **err);
 gboolean wmud_world_check_planets(GSList *planets, GError **err);
 gboolean wmud_world_check_areas(GSList *areas, GError **err);

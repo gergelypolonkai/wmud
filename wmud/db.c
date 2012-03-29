@@ -448,6 +448,53 @@ wmud_db_load_rooms(GSList **rooms, GError **err)
 gboolean
 wmud_db_load_exits(GSList **exits, GError **err)
 {
-	return FALSE;
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT room_id, direction, other_side FROM room_exits", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudExit *room_exit = g_new0(wmudExit, 1);
+			room_exit->source_room_id = sqlite3_column_int(sth, 0);
+			room_exit->direction_id = sqlite3_column_int(sth, 1);
+			room_exit->destination_room_id = sqlite3_column_int(sth, 2);
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded exit %d =%d=> %d", room_exit->source_room_id, room_exit->direction_id, room_exit->destination_room_id);
+
+			*exits = g_slist_prepend(*exits, room_exit);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
 }
 
