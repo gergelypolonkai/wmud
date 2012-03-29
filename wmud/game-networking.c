@@ -170,7 +170,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 
 							if ((player = wmud_player_exists(client->buffer->str)) != NULL)
 							{
-								g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Trying to login with playername '%s'\n", client->buffer->str);
+								g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Trying to login with playername '%s'", client->buffer->str);
 								if (player->cpassword == NULL)
 								{
 									wmud_client_send(client, "Your registration is not finished yet.\r\n");
@@ -350,6 +350,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	GSource *client_source;
 	GError *err = NULL;
 	wmudClient *client;
+	GSocketAddress *remote_addr;
 
 	/* TODO: Error checking */
 	client_socket = g_socket_listener_accept_socket(accept_data->listener, NULL, NULL, &err);
@@ -364,7 +365,32 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	client->socket_source = client_source;
 	g_source_set_callback(client_source, (GSourceFunc)wmud_client_callback, client, NULL);
 	g_source_attach(client_source, accept_data->context);
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "New connection.");
+
+	g_clear_error(&err);
+	if ((remote_addr = g_socket_get_remote_address(client_socket, &err)) != NULL)
+	{
+		GInetAddress *addr;
+		gchar *ip_addr;
+
+		addr = g_inet_socket_address_get_address(G_INET_SOCKET_ADDRESS(remote_addr));
+		ip_addr = g_inet_address_to_string(addr);
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "New game connection from %s", ip_addr);
+		g_free(ip_addr);
+		g_object_unref(addr);
+		g_object_unref(remote_addr);
+	}
+	else
+	{
+		if (err)
+		{
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "New game connection. The remote address is unknown. This is a bug. Message from upper level: %s", err->message);
+		}
+		else
+		{
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "New game connection. The remote address is unknown. This is a bug.");
+		}
+	}
+	g_clear_error(&err);
 	wmud_client_send(client, "By what name shall we call you? ");
 
 	return TRUE;
