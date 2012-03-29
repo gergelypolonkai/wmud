@@ -69,8 +69,9 @@ wmud_random_string(gint len)
 	{
 		gchar c = 0;
 		/* Include only printable characters, but exclude $ because of
-		 * salt generation */
-		while (!g_ascii_isprint(c) || (c == '$'))
+		 * salt generation, and space to avoid misunderstanding in the
+		 * random generated passwords */
+		while (!g_ascii_isprint(c) || (c == '$') || (c == ' ') || (c == '\t'))
 			c = random_number(1, 127);
 
 		ret[i] = c;
