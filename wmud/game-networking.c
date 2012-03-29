@@ -86,6 +86,9 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
  * @client: the wmudClient structure of the client
  *
  * Processes incoming client data, and client hangup
+ *
+ * Return value: %FALSE if the connection is closed after this call, %TRUE
+ * otherwise
  */
 static gboolean
 wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient *client)
