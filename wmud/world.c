@@ -460,7 +460,7 @@ wmud_world_free_exits(GSList *exits)
 		g_slist_free_full(exits, (GDestroyNotify)g_free);
 #else
 		g_slist_foreach(exits, (GFunc)g_free, NULL);
-		g_slist_free(rooms);
+		g_slist_free(exits);
 #endif
 	}
 }
