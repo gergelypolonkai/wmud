@@ -41,7 +41,11 @@ struct dirCheckData {
 	gboolean sane;
 };
 
-GQuark WMUD_WORLD_ERROR = 0;
+GQuark
+wmud_world_error_quark()
+{
+	return g_quark_from_static_string("wmud-world-error");
+}
 
 static gint
 check_plane_dups2(wmudPlane *plane, gchar *name)

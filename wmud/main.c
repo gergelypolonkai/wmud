@@ -121,10 +121,6 @@ debug_context(char *file, int line)
 void
 wmud_type_init(void)
 {
-	WMUD_CONFIG_ERROR = g_quark_from_string("wmud-config-error");
-	WMUD_DB_ERROR = g_quark_from_string("wmud-db-error");
-	WMUD_INTERPRETER_ERROR = g_quark_from_string("wmud-interpreter-error");
-	WMUD_WORLD_ERROR = g_quark_from_string("wmud-world-error");
 }
 
 /**

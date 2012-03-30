@@ -21,7 +21,9 @@
 
 #include <glib.h>
 
-extern GQuark WMUD_WORLD_ERROR;
+#define WMUD_WORLD_ERROR wmud_world_error_quark()
+GQuark wmud_world_error_quark();
+
 typedef enum {
 	WMUD_WORLD_ERROR_DUPPLANE,
 	WMUD_WORLD_ERROR_DUPPLANET,

@@ -51,7 +51,8 @@ typedef struct _wmudCommand {
 	wmudCommandFunc commandFunc;
 } wmudCommand;
 
-GQuark WMUD_INTERPRETER_ERROR;
+#define WMUD_INTERPRETER_ERROR wmud_interpreter_error_quark()
+GQuark wmud_interpreter_error_quark();
 
 typedef enum {
 	WMUD_INTERPRETER_ERROR_DUPCMD

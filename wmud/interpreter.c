@@ -45,6 +45,12 @@ static wmudCommand command_list[] = {
 	{ NULL,   NULL },
 };
 
+GQuark
+wmud_interpreter_error_quark()
+{
+	return g_quark_from_static_string("wmud-interpreter-error");
+}
+
 /**
  * destroy_string:
  * @string: a GString to destroy

@@ -23,7 +23,8 @@
 
 #include "wmud-types.h"
 
-extern GQuark WMUD_DB_ERROR;
+#define WMUD_DB_ERROR wmud_db_error_quark()
+GQuark wmud_db_error_quark();
 
 /**
  * wmudDbError:

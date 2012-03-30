@@ -36,13 +36,13 @@
  * different (e.g MySQL or PostgreSQL) database.
  */
 
-/**
- * WMUD_DB_ERROR:
- *
- * the GQuark for the database error GError
- */
-GQuark WMUD_DB_ERROR = 0;
 static sqlite3 *dbh = NULL;
+
+GQuark
+wmud_db_error_quark()
+{
+	return g_quark_from_static_string("wmud-db-error");
+}
 
 /**
  * wmud_db_init:

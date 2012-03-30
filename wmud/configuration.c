@@ -34,17 +34,17 @@
  */
 
 /**
- * WMUD_CONFIG_ERROR:
- *
- * the GQuark for the config error GError
- */
-GQuark WMUD_CONFIG_ERROR = 0;
-/**
  * active_config:
  *
  * the currently active configuration directives
  */
 ConfigData *active_config = NULL;
+
+GQuark
+wmud_config_error_quark()
+{
+	return g_quark_from_static_string("wmud-config-error");
+}
 
 /**
  * wmud_configdata_free:

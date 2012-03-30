@@ -3,7 +3,9 @@
 
 #include <glib.h>
 
-extern GQuark WMUD_CONFIG_ERROR;
+#define WMUD_CONFIG_ERROR wmud_config_error_quark()
+GQuark wmud_config_error_quark();
+
 
 /**
  * wmudConfigError:
