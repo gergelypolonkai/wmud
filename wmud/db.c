@@ -498,3 +498,55 @@ wmud_db_load_exits(GSList **exits, GError **err)
 	return TRUE;
 }
 
+gboolean
+wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
+{
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT planet_id, plane_id FROM planet_planes", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planet_planes(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudPlanetPlaneAssoc *planet_plane = g_new0(wmudPlanetPlaneAssoc, 1);
+			planet_plane->planet_id = sqlite3_column_int(sth, 0);
+			planet_plane->plane_id = sqlite3_column_int(sth, 1);
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet-plane association %d <> %d", planet_plane->planet_id, planet_plane->plane_id);
+
+			*planet_planes = g_slist_prepend(*planet_planes, planet_plane);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
+}
+
