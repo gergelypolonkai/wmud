@@ -1,3 +1,19 @@
+--                                                                                        id    menuchar  need_active_char  placement  display_text                fnctn
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'w',      0,                 0,        'Enter the world',          'enter-world');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'p',      0,                 1,        'Change password',          'change-password');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'c',      0,                 2,        'Toggle colour',            'toggle-colour');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'd',      0,                 3,        'Read the documentation',   'documentation');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'a',      0,                 4,        'Change active character',  'caracter-select');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'n',      0,                 5,        'Create new character',     'character-create');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'r',      1,                 6,        'Delete active character',  'character-delete');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'i',      0,                 7,        'Enter the chat rooms',     'chat');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'm',      0,                 8,        'Check your player mail',   'player-mail');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 't',      0,                 9,        'Colour test',              'colour-test');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'e',      0,                10,        'Change e-mail address',    'change-email');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'g',      0,                11,        'Change real name',         'change-name');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, 'q',      0,                12,        'Return to the real world', 'quit');
+INSERT INTO menu (id, menuchar, need_active_char, placement, display_text, fnctn) VALUES (NULL, '?',      0,                13,        'Redisplay menu',           'redisplay-menu');
+
 INSERT INTO directions (id, short_name, name) VALUES (1, 'n', 'north');
 INSERT INTO directions (id, short_name, name) VALUES (2, 'nw', 'northwest');
 INSERT INTO directions (id, short_name, name) VALUES (3, 'w', 'west');
