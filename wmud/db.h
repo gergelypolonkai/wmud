@@ -50,6 +50,7 @@ gboolean wmud_db_load_areas(GSList **areas, GError **err);
 gboolean wmud_db_load_rooms(GSList **rooms, GError **err);
 gboolean wmud_db_load_exits(GSList **exits, GError **err);
 gboolean wmud_db_load_planet_planes(GSList **planet_planes, GError **err);
+gboolean wmud_db_load_menu(GSList **menu_items, GError **err);
 
 #endif /* __WMUD__DB_H__ */
 

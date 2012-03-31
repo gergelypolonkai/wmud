@@ -25,6 +25,7 @@
 #include "db.h"
 #include "players.h"
 #include "configuration.h"
+#include "menu.h"
 
 /**
  * SECTION:db
@@ -550,3 +551,59 @@ wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 	return TRUE;
 }
 
+gboolean
+wmud_db_load_menu(GSList **menu_items, GError **err)
+{
+	sqlite3_stmt *sth = NULL;
+	int sqlite_code;
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading menu items");
+	if (dbh == NULL)
+	{
+		if (err)
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+		return FALSE;
+	}
+
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu", -1, &sth, NULL)) != SQLITE_OK)
+	{
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_menu(): %s", sqlite3_errmsg(dbh));
+
+		return FALSE;
+	}
+
+	while (1)
+	{
+		sqlite_code = sqlite3_step(sth);
+		if (sqlite_code == SQLITE_ROW)
+		{
+			wmudMenu *menu_item = g_new0(wmudMenu, 1);
+			menu_item->id = sqlite3_column_int(sth, 0);
+			menu_item->menuchar = *(sqlite3_column_text(sth, 1));
+			menu_item->need_active_char = (sqlite3_column_int(sth, 2) != 0);
+			menu_item->placement = sqlite3_column_int(sth, 4);
+			menu_item->text = g_strdup((gchar *)sqlite3_column_text(sth, 5));
+			menu_item->func = g_strdup((gchar *)sqlite3_column_text(sth, 6));
+
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded menu item %s(%d)", menu_item->text, menu_item->id);
+
+			*menu_items = g_slist_prepend(*menu_items, menu_item);
+		}
+		else if (sqlite_code == SQLITE_DONE)
+		{
+			break;
+		}
+		else
+		{
+			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_menu_items(): %s", sqlite3_errmsg(dbh));
+			sqlite3_finalize(sth);
+			return FALSE;
+		}
+	}
+
+	sqlite3_finalize(sth);
+
+	return TRUE;
+	return FALSE;
+}

@@ -136,6 +136,7 @@ main(int argc, char **argv)
 	GError *err = NULL;
 	GThread *game_thread;
 	GMainContext *game_context;
+	GSList *game_menu;
 
 	/* Initialize the thread and type system */
 	g_thread_init(NULL);
@@ -182,9 +183,16 @@ main(int argc, char **argv)
 		return 1;
 	}
 
+	if (!wmud_menu_init(&game_menu))
+	{
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "An error occured during menu loading.");
+
+		return 1;
+	}
+
 	/* Initialization ends here */
 
-	wmud_game_init(&game_thread, &game_context);
+	wmud_game_init(&game_thread, &game_context, game_menu);
 
 	g_clear_error(&err);
 	if (!wmud_networking_init(active_config->port, game_context, &err))

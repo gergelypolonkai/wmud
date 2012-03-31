@@ -81,5 +81,10 @@ wmud_player_exists
 
 <SECTION>
 <TITLE></TITLE>
+<FILE>menu</FILE>
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
 <FILE>world</FILE>
 </SECTION>
