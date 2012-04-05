@@ -27,6 +27,10 @@ Data storage and code flow
 
 [f ] * Loadable modules for commands, races, classes, etc.
 
+[  ] * Forgot password option
+
+[  ] * Remind the player if they had changed their password too long ago
+
 Game world
 ----------
 
