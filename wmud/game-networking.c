@@ -31,6 +31,7 @@
 #include "players.h"
 #include "db.h"
 #include "configuration.h"
+#include "menu.h"
 
 /**
  * SECTION:game-networking
@@ -50,6 +51,12 @@ struct AcceptData {
  * The full #GSList of the currently connected #wmudClient structs.
  */
 GSList *clients = NULL;
+
+/**
+ * game_menu:
+ * The list of menu items to display after a successful login
+ */
+static GSList *game_menu = NULL;
 
 void wmud_client_interpret_newplayer_email(wmudClient *client);
 void wmud_client_interpret_newplayer_mailconfirm(wmudClient *client);
@@ -77,6 +84,12 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 		g_string_free(client->buffer, TRUE);
 	g_source_destroy(client->socket_source);
 	g_free(client);
+}
+
+void
+send_menu_item(wmudMenu *item, wmudClient *client)
+{
+	wmud_client_send(client, "Item\r\n");
 }
 
 /**
@@ -214,6 +227,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 								client->state = WMUD_CLIENT_STATE_MENU;
 								/* TODO: send MOTD */
 								/* TODO: send menu items */
+								//g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
 								/* TODO: send menu prologue */
 							}
 							else
@@ -419,7 +433,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
  *               err is set accordingly (if not NULL)
  */
 gboolean
-wmud_networking_init(guint port_number, GMainContext *game_context, GError **err)
+wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu_items, GError **err)
 {
 	struct AcceptData *accept_data;
 	GSocketListener *game_listener;
@@ -523,6 +537,8 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GError **err
 		g_source_set_callback(game_net_source4, (GSourceFunc)game_source_callback, (gpointer)accept_data, NULL);
 		g_source_attach(game_net_source4, game_context);
 	}
+
+	game_menu = menu_items;
 
 	return TRUE;
 }

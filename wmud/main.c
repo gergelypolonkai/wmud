@@ -190,12 +190,12 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-	/* Initialization ends here */
+	/* Non-thread initialization ends here */
 
-	wmud_game_init(&game_thread, &game_context, game_menu);
+	wmud_game_init(&game_thread, &game_context);
 
 	g_clear_error(&err);
-	if (!wmud_networking_init(active_config->port, game_context, &err))
+	if (!wmud_networking_init(active_config->port, game_context, game_menu, &err))
 	{
 		if (err)
 		{
