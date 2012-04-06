@@ -58,6 +58,8 @@ GSList *clients = NULL;
  */
 static GSList *game_menu = NULL;
 
+static GRegex *email_regex = NULL;
+
 void wmud_client_interpret_newplayer_email(wmudClient *client);
 void wmud_client_interpret_newplayer_mailconfirm(wmudClient *client);
 
@@ -107,7 +109,6 @@ static gboolean
 wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient *client)
 {
 	GError *err = NULL;
-	GRegex *email_regex = g_regex_new("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", G_REGEX_CASELESS, 0, NULL);
 
 	if (condition & G_IO_HUP)
 	{
@@ -540,6 +541,7 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 
 	game_menu = menu_items;
 
+	email_regex = g_regex_new("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", G_REGEX_CASELESS, 0, NULL);
 	return TRUE;
 }
 
