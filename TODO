@@ -27,28 +27,28 @@ Data storage and code flow
 
 [f ] * Loadable modules for commands, races, classes, etc.
 
-[  ] * Forgot password option
+[f ] * Forgot password option
 
-[  ] * Remind the player if they had changed their password too long ago
+[f ] * Remind the player if they had changed their password too long ago
 
 Game world
 ----------
 
 [  ] * Movement
-[ i]   - Directions are loaded from the database
+[ X]   - Directions are loaded from the database
 [  ]   - Rooms may have other exits, like portals, which can be ENTER'ed.
 [  ]   - Doors can be locked or hidden
 [  ]   - <mob> arrives from <direction>
 
-[ i] * Planets/Planes
-[ i]   - Rooms are connected to Planets
-[ i]   - Planets are connected to Planes
+[ X] * Planets/Planes
+[ X]   - Rooms are connected to Planets
+[ X]   - Planets are connected to Planes
 [  ]   - Rooms may have different descriptions depending on the Plane the
            Character is active on
 
-[  ] * Player grouping (AKA Party or formations)
-[  ]   - Group leader (can promote others, demoting themselves)
-[  ]   - Maximum group size
+[f ] * Player grouping (AKA Party or formations)
+[f ]   - Group leader (can promote others, demoting themselves)
+[f ]   - Maximum group size
 [  ]   - Following is not grouping
 
 [  ] * People start in a well-defined start location (randomly selected during
