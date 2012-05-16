@@ -76,6 +76,58 @@ wmud_menu_items_free(GSList **menu_items)
 	}
 }
 
+void
+menu_item_prepare(wmudMenu *item, gpointer data)
+{
+	gchar m1, m2;
+	gchar *a,
+	      *found = NULL;
+	GString *ds, *dsa;
+
+	g_debug("Preparing menu item %s", item->text);
+	m1 = g_ascii_tolower(item->menuchar);
+	m2 = g_ascii_toupper(item->menuchar);
+	for (a = item->text; *a; a++)
+		if ((*a == m1) || (*a == m2))
+		{
+			found = a;
+			break;
+		}
+
+	if (found)
+	{
+		gchar *tmp;
+
+		tmp = g_ascii_strdown(item->text, -1);
+		ds = g_string_new(tmp);
+		dsa = g_string_new(tmp);
+		g_free(tmp);
+
+		ds->str[found - item->text] = g_ascii_toupper(item->menuchar);
+		dsa->str[found - item->text] = g_ascii_toupper(item->menuchar);
+	}
+	else
+	{
+		found = item->text;
+		ds = g_string_new(item->text);
+		dsa = g_string_new(item->text);
+
+		g_string_prepend_c(ds, ' ');
+		g_string_prepend_c(ds, g_ascii_toupper(item->menuchar));
+		g_string_prepend_c(dsa, ' ');
+		g_string_prepend_c(dsa, g_ascii_toupper(item->menuchar));
+	}
+	
+	g_string_insert_c(ds, found - item->text, '(');
+	g_string_insert_c(ds, found - item->text + 2, ')');
+
+	g_string_insert(dsa, found - item->text, "\x1b[31;1m");
+	g_string_insert(dsa, found - item->text + 8, "\x1b[0m");
+	item->display_text = g_string_free(ds, FALSE);
+	item->display_text_ansi = g_string_free(dsa, FALSE);
+	g_debug("Prepared as %s %s", item->display_text, item->display_text_ansi);
+}
+
 gboolean
 wmud_menu_init(GSList **menu)
 {
@@ -105,7 +157,10 @@ wmud_menu_init(GSList **menu)
 		return FALSE;
 	}
 
+	/* TODO: free previous menu list, if *menu is not NULL */
 	*menu = menu_items;
+
+	g_slist_foreach(*menu, (GFunc)menu_item_prepare, NULL);
 
 	return TRUE;
 }

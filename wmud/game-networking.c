@@ -91,7 +91,8 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 void
 send_menu_item(wmudMenu *item, wmudClient *client)
 {
-	wmud_client_send(client, "Item\r\n");
+	/* TODO: Send ANSI menu item only to ANSI players! */
+	wmud_client_send(client, "%s\r\n", item->display_text_ansi);
 }
 
 /**
@@ -228,7 +229,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 								client->state = WMUD_CLIENT_STATE_MENU;
 								/* TODO: send MOTD */
 								/* TODO: send menu items */
-								//g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
+								g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
 								/* TODO: send menu prologue */
 							}
 							else
