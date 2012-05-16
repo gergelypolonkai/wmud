@@ -566,7 +566,7 @@ wmud_db_load_menu(GSList **menu_items, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu", -1, &sth, NULL)) != SQLITE_OK)
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu ORDER BY placement", -1, &sth, NULL)) != SQLITE_OK)
 	{
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_menu(): %s", sqlite3_errmsg(dbh));
 
@@ -582,11 +582,11 @@ wmud_db_load_menu(GSList **menu_items, GError **err)
 			menu_item->id = sqlite3_column_int(sth, 0);
 			menu_item->menuchar = *(sqlite3_column_text(sth, 1));
 			menu_item->need_active_char = (sqlite3_column_int(sth, 2) != 0);
-			menu_item->placement = sqlite3_column_int(sth, 4);
-			menu_item->text = g_strdup((gchar *)sqlite3_column_text(sth, 5));
-			menu_item->func = g_strdup((gchar *)sqlite3_column_text(sth, 6));
+			menu_item->placement = sqlite3_column_int(sth, 3);
+			menu_item->text = g_strdup((gchar *)sqlite3_column_text(sth, 4));
+			menu_item->func = g_strdup((gchar *)sqlite3_column_text(sth, 5));
 
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded menu item %s(%d)", menu_item->text, menu_item->id);
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded menu item %d: %s", menu_item->id, menu_item->text);
 
 			*menu_items = g_slist_prepend(*menu_items, menu_item);
 		}
