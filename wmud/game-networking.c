@@ -211,7 +211,8 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 							{
 								client->player = g_new0(wmudPlayer, 1);
 								client->player->player_name = g_strdup(client->buffer->str);
-								client->state = WMUD_CLIENT_STATE_NEWCHAR;
+								client->state = WMUD_CLIENT_STATE_YESNO;
+								client->yesNoCallback = wmud_client_newchar_answer;
 								wmud_client_send(client, "Is %s new to this game? [Y/N] ", client->buffer->str);
 							}
 						}
@@ -293,23 +294,6 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 						else
 						{
 							wmud_client_send(client, "Please enter a 'Y' or 'N' character: ");
-						}
-						break;
-					case WMUD_CLIENT_STATE_NEWCHAR:
-						if (g_ascii_strcasecmp(client->buffer->str, "n") == 0)
-						{
-							wmud_client_send(client, "What is your player-name, then? ");
-							client->state = WMUD_CLIENT_STATE_FRESH;
-						}
-						else if (g_ascii_strcasecmp(client->buffer->str, "y") == 0)
-						{
-							g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Creating new player\n");
-							wmud_client_send(client, "Welcome to this MUD!\r\nPlease enter your e-mail address: ");
-							client->state = WMUD_CLIENT_STATE_REGISTERING;
-						}
-						else
-						{
-							wmud_client_send(client, "Sorry, but for this question I only understand 'Y' or 'N'.\r\nIs %s a new player here? [Y/N] ", client->player->player_name);
 						}
 						break;
 					case WMUD_CLIENT_STATE_REGISTERING:
@@ -608,3 +592,20 @@ wmud_client_quitanswer(wmudClient *client, gboolean answer)
 		client->state = WMUD_CLIENT_STATE_MENU;
 	}
 }
+
+void
+wmud_client_newchar_answer(wmudClient *client, gboolean answer)
+{
+	if (answer)
+	{
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Creating new player\n");
+		wmud_client_send(client, "Welcome to this MUD!\r\nPlease enter your e-mail address: ");
+		client->state = WMUD_CLIENT_STATE_REGISTERING;
+	}
+	else
+	{
+		wmud_client_send(client, "What is your player-name, then? ");
+		client->state = WMUD_CLIENT_STATE_FRESH;
+	}
+}
+

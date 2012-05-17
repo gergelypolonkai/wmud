@@ -45,8 +45,6 @@
  *     that are called before and after the client enters a new state, this
  *     could be a three-state stuff, in which the player can enter e.g ? as
  *     the answer, so they would be presented with the question again.
- * @WMUD_CLIENT_STATE_NEWCHAR: Player name entered on the login screen was
- *     invalid. Waiting for answer if this is a new player
  * @WMUD_CLIENT_STATE_REGISTERING: Registering a new player. Waiting for the
  *     e-mail address to be given
  * @WMUD_CLIENT_STATE_REGEMAIL_CONFIRM: E-mail address entered séms valid,
@@ -60,7 +58,6 @@ typedef enum {
 	WMUD_CLIENT_STATE_MENU,
 	WMUD_CLIENT_STATE_INGAME,
 	WMUD_CLIENT_STATE_YESNO,
-	WMUD_CLIENT_STATE_NEWCHAR,
 	WMUD_CLIENT_STATE_REGISTERING,
 	WMUD_CLIENT_STATE_REGEMAIL_CONFIRM
 } wmudClientState;
