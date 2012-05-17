@@ -19,6 +19,7 @@
 #ifndef __WMUD_MENU_H__
 #define __WMUD_MENU_H__
 
+#include "game-networking.h"
 #include <glib.h>
 
 /**
@@ -48,11 +49,22 @@ typedef struct _wmudMenu {
 	gchar *func;
 } wmudMenu;
 
+typedef void (*wmudMenuCommandFunc)(wmudClient *client);
+/**
+ * WMUD_MENU_COMMAND:
+ * @name: the name of the command. Should be in lowercase
+ *
+ * Shorthand to create the function header for menu command handlers
+ */
+#define WMUD_MENU_COMMAND(name) void wmud_mcmd_ ## name(wmudClient *client)
+
 #define WMUD_MENU_ERROR wmud_menu_error_quark()
 GQuark wmud_menu_error_quark();
 gboolean wmud_menu_init(GSList **menu);
 gboolean wmud_menu_items_check(GSList *menu_items, GError **err);
 void wmud_menu_items_free(GSList **menu_items);
+gchar *wmud_menu_get_command_by_menuchar(gchar menuchar, GSList *game_menu);
+void wmud_menu_execute_command(wmudClient *client, gchar *command);
 
 #endif /* __WMUD_MENU_H__ */
 

@@ -224,12 +224,12 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 								client->authenticated = TRUE;
 								if (client->player->fail_count > 0)
 								{
-									wmud_client_send(client, "There %s %d failed login attempt%s with your account since your last visit\r\n", (client->player->fail_count == 1) ? "was" : "were", client->player->fail_count, (client->player->fail_count > 1) ? "s" : "");
+									wmud_client_send(client, "There %s %d failed login attempt%s with your account since your last visit\r\n", (client->player->fail_count == 1) ? "was" : "were", client->player->fail_count, (client->player->fail_count == 1) ? "" : "s");
 								}
-								client->state = WMUD_CLIENT_STATE_MENU;
 								/* TODO: send MOTD */
 								/* TODO: send menu items */
 								g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
+								client->state = WMUD_CLIENT_STATE_MENU;
 								/* TODO: send menu prologue */
 							}
 							else
@@ -262,7 +262,18 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 						}
 						break;
 					case WMUD_CLIENT_STATE_MENU:
-						//wmud_client_interpret_menu_command(client);
+						{
+							gchar *menu_command;
+							
+							if ((menu_command = wmud_menu_get_command_by_menuchar(*(client->buffer->str), game_menu)) != NULL)
+							{
+								wmud_menu_execute_command(client, menu_command);
+							}
+							else
+							{
+								wmud_client_send(client, "Unknown menu command.\r\n");
+							}
+						}
 						break;
 					case WMUD_CLIENT_STATE_INGAME:
 						wmud_interpret_game_command(client);
