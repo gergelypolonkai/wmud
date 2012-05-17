@@ -278,8 +278,19 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 					case WMUD_CLIENT_STATE_INGAME:
 						wmud_interpret_game_command(client);
 						break;
-					case WMUD_CLIENT_STATE_QUITWAIT:
-						//wmud_interpret_quit_answer(client);
+					case WMUD_CLIENT_STATE_YESNO:
+						if (g_ascii_strcasecmp(client->buffer->str, "y") == 0)
+						{
+							(client->yesNoCallback)(client, TRUE);
+						}
+						else if (g_ascii_strcasecmp(client->buffer->str, "n") == 0)
+						{
+							(client->yesNoCallback)(client, FALSE);
+						}
+						else
+						{
+							wmud_client_send(client, "Please enter a 'Y' or 'N' character: ");
+						}
 						break;
 					case WMUD_CLIENT_STATE_NEWCHAR:
 						if (g_ascii_strcasecmp(client->buffer->str, "n") == 0)

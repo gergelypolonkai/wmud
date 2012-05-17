@@ -39,9 +39,12 @@
  *     main game menu
  * @WMUD_CLIENT_STATE_INGAME: Character login was successful, player is now
  *     in-game
- * @WMUD_CLIENT_STATE_QUITWAIT: Player entered the in-game QUIT command, and we
- *     are now waiting for an answer if they really want to quit
- *     Will be removed soon, this should work totally different (TODO)
+ * @WMUD_CLIENT_STATE_YESNO: Player was asked a yes/no question, and we are
+ *     waiting for the answer. client.yesNoCallback MUST be set at this point!
+ *     TODO: if wmudClient had a prevState field, and there would be some hooks
+ *     that are called before and after the client enters a new state, this
+ *     could be a three-state stuff, in which the player can enter e.g ? as
+ *     the answer, so they would be presented with the question again.
  * @WMUD_CLIENT_STATE_NEWCHAR: Player name entered on the login screen was
  *     invalid. Waiting for answer if this is a new player
  * @WMUD_CLIENT_STATE_REGISTERING: Registering a new player. Waiting for the
@@ -56,7 +59,7 @@ typedef enum {
 	WMUD_CLIENT_STATE_PASSWAIT,
 	WMUD_CLIENT_STATE_MENU,
 	WMUD_CLIENT_STATE_INGAME,
-	WMUD_CLIENT_STATE_QUITWAIT,
+	WMUD_CLIENT_STATE_YESNO,
 	WMUD_CLIENT_STATE_NEWCHAR,
 	WMUD_CLIENT_STATE_REGISTERING,
 	WMUD_CLIENT_STATE_REGEMAIL_CONFIRM
@@ -82,6 +85,10 @@ typedef struct _wmudPlayer {
 	gint fail_count;
 } wmudPlayer;
 
+typedef struct _wmudClient wmudClient;
+
+typedef void (*wmudYesNoCallback)(wmudClient *client, gboolean answer);
+
 /**
  * wmudClient:
  * @socket: The assigned GSocket object
@@ -99,7 +106,7 @@ typedef struct _wmudPlayer {
  * <structname>wmudClient</structname> contains all properties of a connected
  * game client.
  */
-typedef struct _wmudClient {
+struct _wmudClient {
 	GSocket *socket;
 	GSource *socket_source;
 	GString *buffer;
@@ -108,7 +115,8 @@ typedef struct _wmudClient {
 	wmudPlayer *player;
 	gboolean bademail;
 	gint login_try_count;
-} wmudClient;
+	wmudYesNoCallback yesNoCallback;
+};
 
 #endif /* __WMUD_TYPES_H__ */
 
