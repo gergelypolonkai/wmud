@@ -83,6 +83,7 @@ typedef struct _wmudPlayer {
 	gchar *cpassword;
 	gchar *email;
 	gint fail_count;
+	gboolean registered;
 } wmudPlayer;
 
 typedef struct _wmudClient wmudClient;

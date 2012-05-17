@@ -79,9 +79,11 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 		wmud_client_send(client, "\r\nHave a nice real-world day!\r\n\r\n");
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Connection closed.");
-	g_socket_close(client->socket, NULL);
+	g_socket_shutdown(client->socket, TRUE, TRUE, NULL);
 	clients = g_slist_remove(clients, client);
-	wmud_player_free(&(client->player));
+	if (client->player)
+		if (!client->player->registered)
+			wmud_player_free(&(client->player));
 	if (client->buffer)
 		g_string_free(client->buffer, TRUE);
 	g_source_destroy(client->socket_source);
@@ -201,6 +203,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 								{
 									client->state = WMUD_CLIENT_STATE_PASSWAIT;
 									client->player = player;
+									client->player->registered = TRUE;
 									wmud_client_send(client, "Please provide us your password: %c%c%c", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
 								}
 							}
