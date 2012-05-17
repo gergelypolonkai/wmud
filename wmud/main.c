@@ -36,6 +36,7 @@
 #include "game.h"
 #include "configuration.h"
 #include "world.h"
+#include "menu.h"
 
 /**
  * SECTION:utils
@@ -123,6 +124,25 @@ wmud_type_init(void)
 {
 }
 
+void
+wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
+{
+	switch (log_level)
+	{
+		case G_LOG_LEVEL_DEBUG:
+#ifdef DEBUG
+			g_print("DEBUG:            %s\n", message);
+#endif
+			break;
+		case G_LOG_LEVEL_INFO:
+			g_print("INFO:             %s\n", message);
+			break;
+		default:
+			g_print("UNKNOWN LEVEL %03d: %s\n", log_level, message);
+			break;
+	}
+}
+
 /**
  * main:
  * @argc: The number of arguments on the command line
@@ -138,6 +158,7 @@ main(int argc, char **argv)
 	GMainContext *game_context;
 	GSList *game_menu;
 
+	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK , wmud_logger, NULL);
 	/* Initialize the thread and type system */
 	g_thread_init(NULL);
 	g_type_init();
@@ -203,7 +224,7 @@ main(int argc, char **argv)
 		}
 		else
 		{
-			g_critical("Database initialization error!");
+			g_critical("Database initialization error: unknown error!");
 		}
 
 		return 1;
