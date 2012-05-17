@@ -1,5 +1,7 @@
 #! /bin/bash
 
+sqlite3 "@localstatedir@"/iminiru.db < sql/menu.sql
+
 sqlite3 "@localstatedir@"/iminiru.db < sql/planes.sql
 sqlite3 "@localstatedir@"/iminiru.db < sql/planets.sql
 sqlite3 "@localstatedir@"/iminiru.db < sql/rooms.sql

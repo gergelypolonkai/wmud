@@ -8,3 +8,4 @@ DROP TABLE room_exits;
 DROP TABLE rooms;
 DROP TABLE areas;
 DROP TABLE directions;
+DROP TABLE menu;
