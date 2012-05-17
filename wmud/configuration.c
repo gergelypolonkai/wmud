@@ -61,6 +61,18 @@ wmud_configdata_free(ConfigData **config_data)
 	if ((*config_data)->database_file)
 		g_free((*config_data)->database_file);
 
+	if ((*config_data)->smtp_server)
+		g_free((*config_data)->smtp_server);
+
+	if ((*config_data)->smtp_username)
+		g_free((*config_data)->smtp_username);
+
+	if ((*config_data)->smtp_password)
+		g_free((*config_data)->smtp_password);
+
+	if ((*config_data)->smtp_sender)
+		g_free((*config_data)->smtp_sender);
+
 	g_free(*config_data);
 	*config_data = NULL;
 }
@@ -110,6 +122,15 @@ wmud_config_init(ConfigData **config_data, GError **err)
 		return FALSE;
 	}
 
+	if (!g_key_file_has_group(config, "smtp"))
+	{
+		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTP, "Config file (%s) does not contain an [smtp] group", config_file->str);
+		g_key_file_free(config);
+		g_string_free(config_file, TRUE);
+
+		return FALSE;
+	}
+
 	g_clear_error(&in_err);
 	(*config_data)->port = g_key_file_get_integer(config, "global", "port", &in_err);
 	if (in_err)
@@ -153,6 +174,36 @@ wmud_config_init(ConfigData **config_data, GError **err)
 		if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND))
 		{
 			g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOEMAIL, "Config file (%s) does not contain an admin e-mail address", config_file->str);
+			g_key_file_free(config);
+			g_string_free(config_file, TRUE);
+			wmud_configdata_free(config_data);
+
+			return FALSE;
+		}
+	}
+
+	g_clear_error(&in_err);
+	(*config_data)->smtp_server = g_key_file_get_string(config, "smtp", "smtp server", &in_err);
+	if (in_err)
+	{
+		if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND))
+		{
+			g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTPSERVER, "Config file (%s) does not contain an smtp server address", config_file->str);
+			g_key_file_free(config);
+			g_string_free(config_file, TRUE);
+			wmud_configdata_free(config_data);
+
+			return FALSE;
+		}
+	}
+
+	g_clear_error(&in_err);
+	(*config_data)->smtp_sender = g_key_file_get_string(config, "smtp", "smtp sender", &in_err);
+	if (in_err)
+	{
+		if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND))
+		{
+			g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTPSENDER, "Config file (%s) does not contain an smtp sender name", config_file->str);
 			g_key_file_free(config);
 			g_string_free(config_file, TRUE);
 			wmud_configdata_free(config_data);

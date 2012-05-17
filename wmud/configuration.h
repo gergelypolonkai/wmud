@@ -26,7 +26,10 @@ typedef enum {
 	WMUD_CONFIG_ERROR_BADPORT,
 	WMUD_CONFIG_ERROR_NOWORLD,
 	WMUD_CONFIG_ERROR_NOEMAIL,
-	WMUD_CONFIG_ERROR_REUSE
+	WMUD_CONFIG_ERROR_REUSE,
+	WMUD_CONFIG_ERROR_NOSMTP,
+	WMUD_CONFIG_ERROR_NOSMTPSERVER,
+	WMUD_CONFIG_ERROR_NOSMTPSENDER
 } wmudConfigError;
 
 /**
@@ -40,6 +43,11 @@ typedef struct _ConfigData {
 	guint port;
 	gchar *database_file;
 	gchar *admin_email;
+	gchar *smtp_server;
+	gboolean smtp_tls;
+	gchar *smtp_username;
+	gchar *smtp_password;
+	gchar *smtp_sender;
 } ConfigData;
 
 extern ConfigData *active_config;

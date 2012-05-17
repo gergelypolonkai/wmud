@@ -41,3 +41,23 @@ trainable abilities = true
 # If set to true, characters can choose to die, and reborn in a new body if
 # they are old enough (80% of the racial maximum age)
 reborn = true
+
+# SMTP related settings go here. SMTP is required to send out initially
+# generated passwords
+[smtp]
+
+# The SMTP server's address
+smtp server = smtp.gmail.com
+
+# Set to true if the SMTP server provides or requires TLS connections
+smtp tls = true
+
+# The username to use to send e-mails
+smtp username = wmud
+
+# The password to use to send e-mails
+smtp password = wmudPassWD1
+
+# The sender's e-mail address. This will appear in all sent e-mails. Should be
+# in the form Name <e-mail@address>, where Name can be omitted
+smtp sender = wMUD <polesz@w00d5t0ck.info>
