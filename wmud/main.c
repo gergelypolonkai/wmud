@@ -130,9 +130,15 @@ wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 	switch (log_level)
 	{
 		case G_LOG_LEVEL_DEBUG:
+			/* Log debug messages only if we are compiled with
+			 * debug support. The code below actually doesn't
+			 * require it, it's just a conceptional thing. */
 #ifdef DEBUG
 			g_print("DEBUG:            %s\n", message);
 #endif
+			break;
+		case G_LOG_LEVEL_MESSAGE:
+			g_print("MESSAGE:          %s\n", message);
 			break;
 		case G_LOG_LEVEL_INFO:
 			g_print("INFO:             %s\n", message);
