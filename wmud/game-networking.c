@@ -583,7 +583,6 @@ wmud_client_quitanswer(wmudClient *client, gboolean answer)
 {
 	if (answer)
 	{
-		wmud_client_send(client, "Borgo sad... :(\r\n");
 		wmud_client_close(client, TRUE);
 	}
 	else
