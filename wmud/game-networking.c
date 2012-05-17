@@ -591,3 +591,17 @@ wmud_client_send(wmudClient *client, const gchar *fmt, ...)
 	g_string_free(buf, TRUE);
 }
 
+void
+wmud_client_quitanswer(wmudClient *client, gboolean answer)
+{
+	if (answer)
+	{
+		wmud_client_send(client, "Borgo sad... :(\r\n");
+		wmud_client_close(client, TRUE);
+	}
+	else
+	{
+		wmud_client_send(client, "Good boy!\r\n");
+		client->state = WMUD_CLIENT_STATE_MENU;
+	}
+}

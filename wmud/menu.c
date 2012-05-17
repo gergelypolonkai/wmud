@@ -183,7 +183,9 @@ WMUD_MENU_COMMAND(change_name)
 
 WMUD_MENU_COMMAND(quit)
 {
+	client->state = WMUD_CLIENT_STATE_YESNO;
 	wmud_client_send(client, "Are you sure you want to get back to the real world? [y/N] ");
+	client->yesNoCallback = wmud_client_quitanswer;
 }
 
 WMUD_MENU_COMMAND(redisplay_menu)

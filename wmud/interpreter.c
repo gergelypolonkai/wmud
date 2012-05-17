@@ -302,6 +302,7 @@ wmud_interpret_game_command(wmudClient *client)
 WMUD_COMMAND(quit)
 {
 	wmud_client_send(client, "Are you sure you want to get back to that freaky other reality? [y/N] ");
-	client->state = WMUD_CLIENT_STATE_QUITWAIT;
+	client->state = WMUD_CLIENT_STATE_YESNO;
+	client->yesNoCallback = wmud_client_quitanswer;
 }
 
