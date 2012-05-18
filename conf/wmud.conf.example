@@ -46,10 +46,13 @@ reborn = true
 # generated passwords
 [smtp]
 
-# The SMTP server's address
-smtp server = smtp.gmail.com
+# The SMTP server's address. It's in the format server[:port]. If port is
+# omitted, the default given by libcurl will be used
+smtp server = smtp.gmail.com:587
 
-# Set to true if the SMTP server provides or requires TLS connections
+# Set to true if the SMTP server provides or requires TLS connections. It's a
+# wise idea to set it to true, if you know your server supports it, even if it
+# does not require it.
 smtp tls = true
 
 # The username to use to send e-mails
