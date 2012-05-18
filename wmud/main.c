@@ -37,6 +37,7 @@
 #include "configuration.h"
 #include "world.h"
 #include "menu.h"
+#include "texts.h"
 
 /**
  * SECTION:utils
@@ -134,14 +135,17 @@ wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 			 * debug support. The code below actually doesn't
 			 * require it, it's just a conceptional thing. */
 #ifdef DEBUG
-			g_print("DEBUG:            %s\n", message);
+			g_print("DEBUG:             %s\n", message);
 #endif
 			break;
 		case G_LOG_LEVEL_MESSAGE:
-			g_print("MESSAGE:          %s\n", message);
+			g_print("MESSAGE:           %s\n", message);
 			break;
 		case G_LOG_LEVEL_INFO:
-			g_print("INFO:             %s\n", message);
+			g_print("INFO:              %s\n", message);
+			break;
+		case G_LOG_LEVEL_WARNING:
+			g_print("WARNING:           %s\n", message);
 			break;
 		default:
 			g_print("UNKNOWN LEVEL %03d: %s\n", log_level, message);
