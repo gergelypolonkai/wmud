@@ -42,5 +42,11 @@ PKG_CHECK_MODULES([GIO], gio-2.0)
 PKG_CHECK_MODULES([GLIB], glib-2.0)
 PKG_CHECK_MODULES([GTHREAD], gthread-2.0)
 PKG_CHECK_MODULES([SQLITE3], sqlite3)
+PKG_CHECK_MODULES([CURL], libcurl)
+LIBCURL_CHECK_CONFIG
+if test "$libcurl_protocol_SMTP" != "yes"; then
+	echo "Your libCURL installation does not support the SMTP protocol."
+	exit 1
+fi
 
 AC_OUTPUT(Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)
