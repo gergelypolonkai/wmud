@@ -24,11 +24,14 @@
 #ifdef HAVE_CRYPT_H
 #include <crypt.h>
 #endif
+#include <curl/curl.h>
+#include <string.h>
 
 #include "wmud-types.h"
 #include "maintenance.h"
 #include "main.h"
 #include "players.h"
+#include "configuration.h"
 
 /**
  * SECTION:maintenance-thread
@@ -109,13 +112,87 @@ maint_thread_func(GMainLoop *maint_loop)
 	return NULL;
 }
 
+const char *text[] = {
+	"To: Polonkai Gergely <polonkai.gergely@brokernet-group.com>\n",
+	"Subject: Teszt\n",
+	"\n",
+	"Hello!\n"
+};
+
+struct WriteThis {
+	int counter;
+};
+
+static size_t
+wmud_smtp_read_callback(void *ptr, size_t size, size_t nmemb, void *userp)
+{
+	struct WriteThis *pooh = (struct WriteThis *)userp;
+	const char *data;
+
+	if (size * nmemb < 1)
+	{
+		return 0;
+	}
+
+	data = text[pooh->counter];
+
+	if (data)
+	{
+		size_t len = strlen(data);
+		memcpy(ptr, data, len);
+		pooh->counter++;
+		return len;
+	}
+
+	return 0;
+}
+
 void
 wmud_maintenance_init(void)
 {
 	GSource *timeout_source;
 	GMainLoop *maint_loop;
 	GMainContext *maint_context;
-	GError *err = NULL;
+	CURL *curl;
+	CURLM *mcurl;
+	gchar *smtp_server_real;
+	struct WriteThis pooh = {0};
+
+	curl_global_init(CURL_GLOBAL_DEFAULT);
+
+	if (!(curl = curl_easy_init()))
+	{
+		g_error("Could not initialize the CURL library!");
+	}
+
+	if (!(mcurl = curl_multi_init()))
+	{
+		g_error("Could not initialize the CURL library!");
+	}
+
+	smtp_server_real = g_strconcat("smtp://", active_config->smtp_server, NULL);
+	curl_easy_setopt(curl, CURLOPT_URL, smtp_server_real);
+	g_free(smtp_server_real);
+	if (active_config->smtp_username && active_config->smtp_password)
+	{
+		curl_easy_setopt(curl, CURLOPT_USERNAME, active_config->smtp_username);
+		curl_easy_setopt(curl, CURLOPT_PASSWORD, active_config->smtp_password);
+	}
+	curl_easy_setopt(curl, CURLOPT_MAIL_FROM, active_config->smtp_sender);
+	curl_easy_setopt(curl, CURLOPT_USE_SSL, (CURLUSESSL_ALL && active_config->smtp_tls));
+	/* TODO: Maybe these could go into the configuration as well */
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSLVERSION, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_SESSIONID_CACHE, 0L);
+#ifdef DEBUG
+	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+#else
+	curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+#endif
+	curl_easy_setopt(curl, CURLOPT_READFUNCTION, wmud_smtp_read_callback);
+	curl_easy_setopt(curl, CURLOPT_READDATA, &pooh);
+	curl_multi_add_handle(mcurl, curl);
 
 	/* Create the maintenance context and main loop */
 	maint_context = g_main_context_new();
@@ -127,6 +204,6 @@ wmud_maintenance_init(void)
 	g_source_attach(timeout_source, maint_context);
 	g_source_unref(timeout_source);
 
-	g_thread_create((GThreadFunc)maint_thread_func, maint_loop, FALSE, &err);
+	g_thread_new("maintenance", (GThreadFunc)maint_thread_func, maint_loop);
 }
 
