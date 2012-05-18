@@ -221,6 +221,8 @@ main(int argc, char **argv)
 		return 1;
 	}
 
+	wmud_texts_init();
+
 	/* Non-thread initialization ends here */
 
 	wmud_game_init(&game_thread, &game_context);

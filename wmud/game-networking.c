@@ -231,6 +231,7 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 									wmud_client_send(client, "There %s %d failed login attempt%s with your account since your last visit\r\n", (client->player->fail_count == 1) ? "was" : "were", client->player->fail_count, (client->player->fail_count == 1) ? "" : "s");
 								}
 								/* TODO: send MOTD */
+								wmud_text_send_to_client("motd", client);
 								/* TODO: send menu items */
 								g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
 								client->state = WMUD_CLIENT_STATE_MENU;
