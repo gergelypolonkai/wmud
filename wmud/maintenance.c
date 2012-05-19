@@ -86,12 +86,12 @@ wmud_maintenance_check_players(wmudPlayer *player, gpointer user_data)
 gboolean
 wmud_maintenance(gpointer user_data)
 {
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Starting maintenance...");
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Starting maintenance...");
 	/* Run through the player list, and generate a random password for each
 	 * newly registered player */
 	g_slist_foreach(players, (GFunc)wmud_maintenance_check_players, NULL);
 
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Finished maintenance...");
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Finished maintenance...");
 
 	return TRUE;
 }
@@ -199,7 +199,7 @@ wmud_maintenance_init(void)
 	maint_loop = g_main_loop_new(maint_context, FALSE);
 
 	/* Create the timeout source which will do the maintenance tasks */
-	timeout_source = g_timeout_source_new_seconds(3);
+	timeout_source = g_timeout_source_new_seconds(600);
 	g_source_set_callback(timeout_source, wmud_maintenance, NULL, NULL);
 	g_source_attach(timeout_source, maint_context);
 	g_source_unref(timeout_source);
