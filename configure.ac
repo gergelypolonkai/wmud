@@ -6,6 +6,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([wMUD], [0.1.0])
 
 AC_PROG_CC
+AC_PROG_LIBTOOL
 PKG_PROG_PKG_CONFIG
 
 AC_CHECK_HEADERS([crypt.h])
@@ -49,4 +50,4 @@ if test "$libcurl_protocol_SMTP" != "yes"; then
 	exit 1
 fi
 
-AC_OUTPUT(Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)
+AC_OUTPUT(Makefile libgiosmtp/Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)
