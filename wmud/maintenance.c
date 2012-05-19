@@ -204,6 +204,10 @@ wmud_maintenance_init(void)
 	g_source_attach(timeout_source, maint_context);
 	g_source_unref(timeout_source);
 
+#if GLIB_CHECK_VERSION(2,32,0)
 	g_thread_new("maintenance", (GThreadFunc)maint_thread_func, maint_loop);
+#else
+	g_thread_create((GThreadFunc)maint_thread_func, maint_loop, TRUE, NULL);
+#endif
 }
 
