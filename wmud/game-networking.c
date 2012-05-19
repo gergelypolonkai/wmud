@@ -32,6 +32,7 @@
 #include "db.h"
 #include "configuration.h"
 #include "menu.h"
+#include "texts.h"
 
 /**
  * SECTION:game-networking
