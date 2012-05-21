@@ -222,7 +222,10 @@ wmud_menu_init(GSList **menu)
 		return FALSE;
 	}
 
-	/* TODO: free previous menu list, if *menu is not NULL */
+	if (*menu)
+	{
+		wmud_menu_items_free(menu_items);
+	}
 	*menu = menu_items;
 
 	cmdtable = g_hash_table_new(g_str_hash, g_str_equal);
