@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="84">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df name="wmud" root=".">
+      <df name="autom4te.cache">
+      </df>
+      <df name="conf">
+      </df>
+      <df name="data">
+        <df name="texts">
+        </df>
+      </df>
+      <df name="docs">
+        <df name="reference">
+          <df name="wmud">
+            <df name="html">
+            </df>
+            <df name="xml">
+            </df>
+          </df>
+        </df>
+      </df>
+      <df name="iminiru">
+      </df>
+      <df name="libgiosmtp">
+        <df name=".libs">
+        </df>
+        <in>gioextension.c</in>
+        <in>giomodule.c</in>
+      </df>
+      <df name="m4">
+      </df>
+      <df name="old-codebase">
+        <df name="bin">
+        </df>
+        <df name="cnf">
+          <in>acconfig.h</in>
+        </df>
+        <df name="doc">
+          <df name="OLD-DOCS">
+          </df>
+          <df name="sources">
+          </df>
+        </df>
+        <df name="lib">
+          <df name="etc">
+          </df>
+          <df name="house">
+          </df>
+          <df name="misc">
+          </df>
+          <df name="plralias">
+            <df name="A-E">
+            </df>
+            <df name="F-J">
+            </df>
+            <df name="K-O">
+            </df>
+            <df name="P-T">
+            </df>
+            <df name="U-Z">
+            </df>
+            <df name="ZZZ">
+            </df>
+          </df>
+          <df name="plrobjs">
+            <df name="A-E">
+            </df>
+            <df name="F-J">
+            </df>
+            <df name="K-O">
+            </df>
+            <df name="P-T">
+            </df>
+            <df name="U-Z">
+            </df>
+            <df name="ZZZ">
+            </df>
+          </df>
+          <df name="text">
+            <df name="help">
+            </df>
+          </df>
+          <df name="world">
+            <df name="mob">
+            </df>
+            <df name="obj">
+            </df>
+            <df name="shp">
+            </df>
+            <df name="wld">
+            </df>
+            <df name="zon">
+            </df>
+          </df>
+        </df>
+        <df name="log">
+        </df>
+        <df name="src">
+          <df name="doc">
+          </df>
+          <df name="util">
+            <in>autowiz.c</in>
+            <in>delobjs.c</in>
+            <in>listrent.c</in>
+            <in>mudpasswd.c</in>
+            <in>play2to3.c</in>
+            <in>purgeplay.c</in>
+            <in>shopconv.c</in>
+            <in>showplay.c</in>
+            <in>sign.c</in>
+            <in>split.c</in>
+            <in>wld2html.c</in>
+          </df>
+          <in>act.comm.c</in>
+          <in>act.informative.c</in>
+          <in>act.item.c</in>
+          <in>act.movement.c</in>
+          <in>act.offensive.c</in>
+          <in>act.other.c</in>
+          <in>act.social.c</in>
+          <in>act.wizard.c</in>
+          <in>alias.c</in>
+          <in>ban.c</in>
+          <in>boards.c</in>
+          <in>boards.h</in>
+          <in>bsd-snprintf.c</in>
+          <in>bsd-snprintf.h</in>
+          <in>castle.c</in>
+          <in>class.c</in>
+          <in>comm.c</in>
+          <in>comm.h</in>
+          <in>config.c</in>
+          <in>constants.c</in>
+          <in>constants.h</in>
+          <in>db.c</in>
+          <in>db.h</in>
+          <in>fight.c</in>
+          <in>graph.c</in>
+          <in>handler.c</in>
+          <in>handler.h</in>
+          <in>house.c</in>
+          <in>house.h</in>
+          <in>interpreter.c</in>
+          <in>interpreter.h</in>
+          <in>limits.c</in>
+          <in>magic.c</in>
+          <in>mail.c</in>
+          <in>mail.h</in>
+          <in>mobact.c</in>
+          <in>modify.c</in>
+          <in>objsave.c</in>
+          <in>olc.c</in>
+          <in>olc.h</in>
+          <in>races.c</in>
+          <in>random.c</in>
+          <in>screen.h</in>
+          <in>shop.c</in>
+          <in>shop.h</in>
+          <in>spec_assign.c</in>
+          <in>spec_procs.c</in>
+          <in>spell_parser.c</in>
+          <in>spells.c</in>
+          <in>spells.h</in>
+          <in>structs.h</in>
+          <in>sysdep.h</in>
+          <in>telnet.h</in>
+          <in>utils.c</in>
+          <in>utils.h</in>
+          <in>weather.c</in>
+        </df>
+      </df>
+      <df name="sql">
+      </df>
+      <df name="wmud">
+        <df name=".libs">
+        </df>
+        <in>configuration.c</in>
+        <in>configuration.h</in>
+        <in>db.c</in>
+        <in>db.h</in>
+        <in>game-networking.c</in>
+        <in>game-networking.h</in>
+        <in>game.c</in>
+        <in>game.h</in>
+        <in>interpreter.c</in>
+        <in>interpreter.h</in>
+        <in>main.c</in>
+        <in>main.h</in>
+        <in>maintenance.c</in>
+        <in>maintenance.h</in>
+        <in>menu.c</in>
+        <in>menu.h</in>
+        <in>players.c</in>
+        <in>players.h</in>
+        <in>texts.c</in>
+        <in>texts.h</in>
+        <in>wmud-types.h</in>
+        <in>world.c</in>
+        <in>world.h</in>
+      </df>
+      <in>config.h</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+      <itemPath>configure</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+          <cTool>
+            <incDir>
+              <pElem>/usr/lib/glib-2.0/include</pElem>
+              <pElem>/usr/include/glib-2.0</pElem>
+              <pElem>.</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>HAVE_CONFIG_H</Elem>
+            </preprocessorList>
+          </cTool>
+        </makeTool>
+      </makefileType>
+      <folder path="wmud/libgiosmtp">
+        <cTool>
+          <incDir>
+            <pElem>libgiosmtp</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </cTool>
+      </folder>
+      <folder path="wmud/wmud">
+        <cTool>
+          <incDir>
+            <pElem>wmud</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>WMUD_CONFDIR="/usr/local/etc"</Elem>
+            <Elem>WMUD_STATEDIR="/usr/local/var"</Elem>
+          </preprocessorList>
+        </cTool>
+      </folder>
+      <item path="old-codebase/cnf/acconfig.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.comm.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.informative.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.item.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.movement.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.offensive.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.other.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.social.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/act.wizard.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/alias.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/ban.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/boards.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/boards.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/bsd-snprintf.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/bsd-snprintf.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/castle.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/class.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/comm.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/comm.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/config.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/constants.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/constants.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/db.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/db.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/fight.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/graph.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/handler.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/handler.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/house.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/house.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/interpreter.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/interpreter.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/limits.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/magic.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/mail.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/mail.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/mobact.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/modify.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/objsave.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/olc.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/olc.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/races.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/random.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/screen.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/shop.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/shop.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/spec_assign.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/spec_procs.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/spell_parser.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/spells.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/spells.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/structs.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/sysdep.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/telnet.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/autowiz.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/delobjs.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/listrent.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/mudpasswd.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/play2to3.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/purgeplay.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/shopconv.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/showplay.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/sign.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/split.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/util/wld2html.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/utils.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="old-codebase/src/utils.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="old-codebase/src/weather.c" ex="true" tool="0" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
