@@ -12,44 +12,8 @@ Legend
 [ i] implementation began
 [XX] finished
 
-Data storage and code flow
---------------------------
-
-[ i] * Store EVERYTHING in an SQLite3 database
-
-[ i] * Separate threads for separate jobs. Game thread for accepting players,
-	 maintenance thread to continuously maintain the database, chat threads
-	 for different chat protocols, world builder thread for online world
-         building.
-
-[  ] * All descriptions should be written in a markup language to support bold,
-         underline, colours, and such
-
-[f ] * Loadable modules for commands, races, classes, etc.
-
-[f ] * Forgot password option
-
-[f ] * Remind the player if they had changed their password too long ago
-
 Game world
 ----------
-
-[  ] * Movement
-[ X]   - Directions are loaded from the database
-[  ]   - Rooms may have other exits, like portals, which can be ENTER'ed.
-[  ]   - Doors can be locked or hidden
-[  ]   - <mob> arrives from <direction>
-
-[ X] * Planets/Planes
-[ X]   - Rooms are connected to Planets
-[ X]   - Planets are connected to Planes
-[  ]   - Rooms may have different descriptions depending on the Plane the
-           Character is active on
-
-[f ] * Player grouping (AKA Party or formations)
-[f ]   - Group leader (can promote others, demoting themselves)
-[f ]   - Maximum group size
-[  ]   - Following is not grouping
 
 [  ] * People start in a well-defined start location (randomly selected during
          character generation)
