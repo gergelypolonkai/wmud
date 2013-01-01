@@ -1,2 +1,0 @@
-aclocal -I .
-autoconf
