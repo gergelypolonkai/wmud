@@ -103,6 +103,7 @@ debug_context(char *file, int line)
 	debug_context_loc.file = g_strdup(file);
 	debug_context_loc.line = line;
 }
+
 /**
  * DebugContext:
  *
@@ -127,14 +128,11 @@ wmud_type_init(void)
 void
 wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
 {
-	switch (log_level)
-	{
+	switch (log_level) {
 		case G_LOG_LEVEL_DEBUG:
-			/* Log debug messages only if we are compiled with
-			 * debug support. The code below actually doesn't
-			 * require it, it's just a conceptional thing. */
-#ifdef DEBUG
 			g_print("DEBUG:             %s\n", message);
+#ifndef DEBUG
+			g_warn("Logging a debug-level message without debugging support!");
 #endif
 			break;
 		case G_LOG_LEVEL_MESSAGE:
