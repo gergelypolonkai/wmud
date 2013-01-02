@@ -83,8 +83,7 @@ check_direction_dups2(wmudDirection *dir1, wmudDirection *dir2)
 static void
 check_direction_dups1(wmudDirection *dir, struct findData *find_data)
 {
-	if (find_data->last != dir->name)
-	{
+	if (find_data->last != dir->name) {
 		find_data->found = (find_data->found > 1) ? find_data->found : 0;
 		find_data->last = dir->name;
 	}
@@ -98,17 +97,16 @@ check_direction_command(wmudDirection *dir, gboolean *found)
 {
 	wmudCommand *cmd;
 
-	for (cmd = command_list; cmd->command; cmd++)
-	{
-		if (g_ascii_strcasecmp(dir->short_name, cmd->command) == 0)
-		{
+	for (cmd = command_list; cmd->command; cmd++) {
+		if (g_ascii_strcasecmp(dir->short_name, cmd->command) == 0) {
 			*found = TRUE;
+
 			return;
 		}
 
-		if (g_ascii_strcasecmp(dir->name, cmd->command) == 0)
-		{
+		if (g_ascii_strcasecmp(dir->name, cmd->command) == 0) {
 			*found = TRUE;
+
 			return;
 		}
 	}
@@ -131,16 +129,14 @@ wmud_interpreter_check_directions(GSList *directions, GError **err)
 
 	g_slist_foreach(directions, (GFunc)check_direction_command, &command_found);
 
-	if (command_found)
-	{
+	if (command_found) {
 		g_set_error(err, WMUD_INTERPRETER_ERROR, WMUD_INTERPRETER_ERROR_DUPCMD, "Direction commands are not unique. Please check the database!");
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Direction command are not unique. Please check the database!");
 	}
 
 	g_slist_foreach(directions, (GFunc)check_direction_dups1, &find_data);
 
-	if (find_data.found > 1)
-	{
+	if (find_data.found > 1) {
 		g_set_error(err, WMUD_INTERPRETER_ERROR, WMUD_INTERPRETER_ERROR_DUPCMD, "Direction commands defined in the database are not unique!");
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Direction commands defined in the databsae are not unique.");
 
@@ -170,9 +166,10 @@ wmud_interpret_game_command(wmudClient *client)
 	    match_count = 0;
 	GSList *matches = NULL;
 
-	if (strchr(client->buffer->str, '\r') || strchr(client->buffer->str, '\n'))
-	{
-		/* TODO: We should NEVER reach this point! */
+	if (strchr(client->buffer->str, '\r') || strchr(client->buffer->str, '\n')) {
+		/* We should NEVER reach this point! */
+		g_assert_not_reached();
+
 		return;
 	}
 
@@ -180,44 +177,33 @@ wmud_interpret_game_command(wmudClient *client)
 
 	GString *token;
 
-	while (*a)
-	{
-		for (start = a; *start; start++)
-		{
-			if (!str_delim)
-			{
-				if ((*start == '"') || (*start == '\''))
-				{
+	while (*a) {
+		for (start = a; *start; start++) {
+			if (!str_delim) {
+				if ((*start == '"') || (*start == '\'')) {
 					str_delim = *start;
 					start++;
+
 					break;
-				}
-				else if (g_ascii_isspace(*start) || (!*start))
-				{
+				} else if (g_ascii_isspace(*start) || (!*start)) {
 					break;
 				}
 			}
 		}
 
-		for (end = start; *end; end++)
-		{
-			if (!str_delim && strchr("'\" \t", *end))
-			{
+		for (end = start; *end; end++) {
+			if (!str_delim && strchr("'\" \t", *end)) {
 				break;
-			}
-			else if (str_delim && (*end == str_delim))
-			{
+			} else if (str_delim && (*end == str_delim)) {
 				str_delim = 0;
+
 				break;
-			}
-			else if (!*end)
-			{
+			} else if (!*end) {
 				break;
 			}
 		}
 
-		if (*start)
-		{
+		if (*start) {
 			token = g_string_new_len(start, end - start);
 			command_parts = g_slist_prepend(command_parts, token);
 			command_parts_count++;
@@ -228,8 +214,7 @@ wmud_interpret_game_command(wmudClient *client)
 			a++;
 	}
 
-	if (str_delim)
-	{
+	if (str_delim) {
 		wmud_client_send(client, "You should close quotes of any kind, like %c, shouldn't you?\r\n", str_delim);
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(command_parts, (GDestroyNotify)destroy_string);
@@ -240,29 +225,26 @@ wmud_interpret_game_command(wmudClient *client)
 		return;
 	}
 
-	if (command_parts_count == 0)
-	{
+	if (command_parts_count == 0) {
 		/* TODO: handle empty command */
+
 		return;
 	}
 
 	command_parts = g_slist_reverse(command_parts);
 
-	for (cmd = command_list; cmd->command; cmd++)
-	{
+	for (cmd = command_list; cmd->command; cmd++) {
 		GString *input = (GString *)(command_parts->data);
 		gint cmp;
 
-		if (((cmp = g_ascii_strncasecmp(input->str, cmd->command, input->len)) == 0) && !cmd->command[input->len])
-		{
+		if (((cmp = g_ascii_strncasecmp(input->str, cmd->command, input->len)) == 0) && !cmd->command[input->len]) {
 			g_slist_free(matches);
 			match_count = 1;
 			matches = NULL;
 			matches = g_slist_prepend(matches, cmd);
+
 			break;
-		}
-		else if (cmp == 0)
-		{
+		} else if (cmp == 0) {
 			matches = g_slist_prepend(matches, cmd);
 			match_count++;
 		}
@@ -305,4 +287,3 @@ WMUD_COMMAND(quit)
 	client->state = WMUD_CLIENT_STATE_YESNO;
 	client->yesNoCallback = wmud_client_quitanswer;
 }
-

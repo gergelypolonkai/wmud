@@ -125,13 +125,16 @@ wmud_player_free(wmudPlayer **player)
 {
 	if (!*player)
 		return;
+
 	if ((*player)->player_name)
 		g_free((*player)->player_name);
+
 	if ((*player)->cpassword)
 		g_free((*player)->cpassword);
+
 	if ((*player)->email)
 		g_free((*player)->email);
+
 	g_free(*player);
 	*player = NULL;
 }
-

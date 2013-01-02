@@ -35,21 +35,25 @@ struct findData {
 	guint found;
 	gchar *last;
 };
+
 struct dirCheckData {
 	GSList *directions;
 	GSList *rooms;
 	gboolean sane;
 };
+
 struct assocPlanetPlanes {
 	GSList *planets;
 	GSList *planes;
 	gboolean bad_planet;
 	gboolean bad_plane;
 };
+
 struct assocRoomAreas {
 	GSList *areas;
 	gboolean found;
 };
+
 struct assocExitRooms {
 	GSList *rooms;
 	GSList *directions;
@@ -70,8 +74,7 @@ check_plane_dups2(wmudPlane *plane, gchar *name)
 static void
 check_plane_dups1(wmudPlane *plane, struct findData *find_data)
 {
-	if (find_data->last != plane->name)
-	{
+	if (find_data->last != plane->name) {
 		find_data->last = plane->name;
 		find_data->found = (find_data->found > 1) ? find_data->found : 0;
 	}
@@ -113,8 +116,7 @@ check_planet_dups2(wmudPlanet *planet, gchar *name)
 static void
 check_planet_dups1(wmudPlanet *planet, struct findData *find_data)
 {
-	if (find_data->last != planet->name)
-	{
+	if (find_data->last != planet->name) {
 		find_data->last = planet->name;
 		find_data->found = (find_data->found > 1) ? find_data->found : 0;
 	}
@@ -156,8 +158,7 @@ check_area_dups2(wmudArea *area, gchar *name)
 static void
 check_area_dups1(wmudArea *area, struct findData *find_data)
 {
-	if (find_data->last != area->name)
-	{
+	if (find_data->last != area->name) {
 		find_data->last = area->name;
 		find_data->found = (find_data->found > 1) ? find_data->found : 0;
 	}
@@ -239,18 +240,13 @@ wmud_world_check_exits(GSList *exits, GSList *directions, GSList *rooms, GError 
 static gint
 check_room_dups2(wmudRoom *room1, wmudRoom *room2)
 {
-	if (room1->area_id == room2->area_id)
-	{
-		return g_ascii_strcasecmp(room1->name, room2->name);
-	}
-	return 1;
+	return (room1->area_id == room2->area_id) ? g_ascii_strcasecmp(room1->name, room2->name) : 1;
 }
 
 static void
 check_room_dups1(wmudRoom *room, struct findData *find_data)
 {
-	if (find_data->last != (gchar *)room)
-	{
+	if (find_data->last != (gchar *)room) {
 		find_data->last = (gchar *)room;
 		find_data->found = (find_data->found > 1) ? find_data->found : 0;
 	}
@@ -307,15 +303,14 @@ planet_plane_assoc(wmudPlanetPlaneAssoc *association, struct assocPlanetPlanes *
 	GSList *planet,
 	       *plane;
 
-	if ((planet = g_slist_find_custom(assoc_data->planets, &(association->planet_id), (GCompareFunc)find_planet_by_id)) == NULL)
-	{
+	if ((planet = g_slist_find_custom(assoc_data->planets, &(association->planet_id), (GCompareFunc)find_planet_by_id)) == NULL) {
 		g_debug("Planet: %d", association->planet_id);
 		assoc_data->bad_planet = TRUE;
 
 		return;
 	}
-	if ((plane = g_slist_find_custom(assoc_data->planes, &(association->plane_id), (GCompareFunc)find_plane_by_id)) == NULL)
-	{
+
+	if ((plane = g_slist_find_custom(assoc_data->planes, &(association->plane_id), (GCompareFunc)find_plane_by_id)) == NULL) {
 		g_debug("Plane: %d", association->plane_id);
 		assoc_data->bad_plane = TRUE;
 
@@ -354,15 +349,13 @@ wmud_world_assoc_planets_planes(GSList *planets, GSList *planes, GSList *planet_
 
 	g_slist_foreach(planet_planes, (GFunc)planet_plane_assoc, &planet_plane_assoc_data);
 
-	if (planet_plane_assoc_data.bad_planet || planet_plane_assoc_data.bad_plane)
-	{
+	if (planet_plane_assoc_data.bad_planet || planet_plane_assoc_data.bad_plane) {
 		g_set_error(err, WMUD_WORLD_ERROR, WMUD_WORLD_ERROR_BADASSOC, "An illegal planet <-> plane association was found in the database!");
 
 		return FALSE;
 	}
 
-	if (g_slist_find_custom(planets, NULL, (GCompareFunc)find_noplane_planet) != NULL)
-	{
+	if (g_slist_find_custom(planets, NULL, (GCompareFunc)find_noplane_planet) != NULL) {
 		g_set_error(err, WMUD_WORLD_ERROR, WMUD_WORLD_ERROR_BADPLANET, "A planet with no planes associated was found in the database!");
 
 		return FALSE;
@@ -385,12 +378,9 @@ assoc_room_area(wmudRoom *room, struct assocRoomAreas *find_data)
 {
 	GSList *area_item;
 
-	if ((area_item = g_slist_find_custom(find_data->areas, &(room->area_id), (GCompareFunc)find_area_by_id)) == NULL)
-	{
+	if ((area_item = g_slist_find_custom(find_data->areas, &(room->area_id), (GCompareFunc)find_area_by_id)) == NULL) {
 		find_data->found = TRUE;
-	}
-	else
-	{
+	} else {
 		wmudArea *area = area_item->data;
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Associating room _%s_[%d] to area _%s_[%d]", room->name, room->id, area->name, area->id);
 		area->rooms = g_slist_append(area->rooms, room);
@@ -416,8 +406,7 @@ wmud_world_assoc_rooms_areas(GSList *rooms, GSList *areas, GError **err)
 
 	g_slist_foreach(rooms, (GFunc)assoc_room_area, &find_data);
 
-	if (find_data.found)
-	{
+	if (find_data.found) {
 		g_set_error(err, WMUD_WORLD_ERROR, WMUD_WORLD_ERROR_BADASSOC, "Found a bad Area <-> Room association in the database!");
 
 		return FALSE;
@@ -441,10 +430,7 @@ assoc_room_planets(wmudRoom *room, GSList *planets)
 gint
 find_noplane_room(wmudRoom *room, gconstpointer notused)
 {
-	if (room->planes == NULL)
-		return 0;
-
-	return 1;
+	return (room->planes == NULL) ? 0 : 1;
 }
 
 /**
@@ -511,6 +497,7 @@ void
 wmud_world_assoc_exits_rooms(GSList *exits, GSList *directions, GSList *rooms, GError **err)
 {
 	struct assocExitRooms assoc_data = {rooms, directions};
+
 	g_slist_foreach(exits, (GFunc)assoc_room_exit, &assoc_data);
 }
 
@@ -519,8 +506,10 @@ free_direction(wmudDirection *dir)
 {
 	if (dir->short_name)
 		g_free(dir->short_name);
+
 	if (dir->name)
 		g_free(dir->name);
+
 	g_free(dir);
 }
 
@@ -529,8 +518,7 @@ wmud_world_free_directions(GSList *directions)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Freeing direction list");
 
-	if (directions)
-	{
+	if (directions) {
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(directions, (GDestroyNotify)free_direction);
 #else
@@ -554,8 +542,7 @@ wmud_world_free_planes(GSList *planes)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Freeing planes list");
 
-	if (planes)
-	{
+	if (planes) {
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(planes, (GDestroyNotify)free_plane);
 #else
@@ -579,8 +566,7 @@ wmud_world_free_planets(GSList *planets)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Freeing planets list");
 
-	if (planets)
-	{
+	if (planets) {
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(planets, (GDestroyNotify)free_planet);
 #else
@@ -604,8 +590,7 @@ wmud_world_free_areas(GSList *areas)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Freeing areas list");
 
-	if (areas)
-	{
+	if (areas) {
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(areas, (GDestroyNotify)free_area);
 #else
@@ -620,8 +605,10 @@ free_room(wmudRoom *room)
 {
 	if (room->name)
 		g_free(room->name);
+
 	if (room->distant_description)
 		g_free(room->distant_description);
+
 	if (room->close_description)
 		g_free(room->close_description);
 
@@ -633,8 +620,7 @@ wmud_world_free_rooms(GSList *rooms)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Freeing rooms list");
 
-	if (rooms)
-	{
+	if (rooms) {
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(rooms, (GDestroyNotify)free_room);
 #else
@@ -649,8 +635,7 @@ wmud_world_free_exits(GSList *exits)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Freeing exits list");
 
-	if (exits)
-	{
+	if (exits) {
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(exits, (GDestroyNotify)g_free);
 #else
@@ -665,8 +650,7 @@ wmud_world_free_planet_planes(GSList *planet_planes)
 {
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Freeing planet <-> plane associations list");
 
-	if (planet_planes)
-	{
+	if (planet_planes) {
 #if GLIB_CHECK_VERSION(2, 28, 0)
 		g_slist_free_full(planet_planes, (GDestroyNotify)g_free);
 #else
@@ -695,24 +679,24 @@ wmud_world_load(GError **err)
 	GError *in_err = NULL;
 
 	/* Load directions from the database and check them */
-	if (!wmud_db_load_directions(&directions, &in_err))
-	{
+	if (!wmud_db_load_directions(&directions, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load directions from database: %s", in_err->message);
 		wmud_world_free_directions(directions);
 		g_clear_error(&in_err);
 
 		return FALSE;
 	}
-	if (!directions)
-	{
+
+	if (!directions) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No directions were found in the database!");
 		g_clear_error(&in_err);
 
 		return FALSE;
 	}
+
 	g_clear_error(&in_err);
-	if (!wmud_interpreter_check_directions(directions, &in_err))
-	{
+
+	if (!wmud_interpreter_check_directions(directions, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Direction list pre-flight check error: %s", in_err->message);
 		wmud_world_free_directions(directions);
 		g_clear_error(&in_err);
@@ -722,8 +706,8 @@ wmud_world_load(GError **err)
 
 	/* Load planes from the database and check them */
 	g_clear_error(&in_err);
-	if (!wmud_db_load_planes(&planes, &in_err))
-	{
+
+	if (!wmud_db_load_planes(&planes, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load planes from database: %s", in_err->message);
 		wmud_world_free_planes(planes);
 		wmud_world_free_directions(directions);
@@ -731,17 +715,18 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
-	if (!planes)
-	{
+
+	if (!planes) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No planes were found in the database!");
 		wmud_world_free_directions(directions);
 		g_clear_error(&in_err);
 
 		return FALSE;
 	}
+
 	g_clear_error(&in_err);
-	if (!wmud_world_check_planes(planes, &in_err))
-	{
+
+	if (!wmud_world_check_planes(planes, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Plane list pre-flight check error: %s", in_err->message);
 		wmud_world_free_planes(planes);
 		wmud_world_free_directions(directions);
@@ -752,8 +737,8 @@ wmud_world_load(GError **err)
 
 	/* Load planets from the database and check them */
 	g_clear_error(&in_err);
-	if (!wmud_db_load_planets(&planets, &in_err))
-	{
+
+	if (!wmud_db_load_planets(&planets, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load planets from database: %s", in_err->message);
 		wmud_world_free_planets(planets);
 		wmud_world_free_planes(planes);
@@ -762,8 +747,8 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
-	if (!planets)
-	{
+
+	if (!planets) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No planets were found in the database!");
 		wmud_world_free_planes(planes);
 		wmud_world_free_directions(directions);
@@ -771,9 +756,10 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
+
 	g_clear_error(&in_err);
-	if (!wmud_world_check_planets(planets, &in_err))
-	{
+
+	if (!wmud_world_check_planets(planets, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Planet list pre-flight check error: %s", in_err->message);
 		wmud_world_free_planets(planets);
 		wmud_world_free_planes(planes);
@@ -785,8 +771,8 @@ wmud_world_load(GError **err)
 
 	/* Load areas from the database and check them */
 	g_clear_error(&in_err);
-	if (!wmud_db_load_areas(&areas, &in_err))
-	{
+
+	if (!wmud_db_load_areas(&areas, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load areas from database: %s", in_err->message);
 		wmud_world_free_areas(areas);
 		wmud_world_free_planets(planets);
@@ -796,8 +782,8 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
-	if (!areas)
-	{
+
+	if (!areas) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No areas were found in the database!");
 		wmud_world_free_planets(planets);
 		wmud_world_free_planes(planes);
@@ -806,9 +792,10 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
+
 	g_clear_error(&in_err);
-	if (!wmud_world_check_areas(areas, &in_err))
-	{
+
+	if (!wmud_world_check_areas(areas, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Area list pre-flight check error: %s", in_err->message);
 		wmud_world_free_areas(areas);
 		wmud_world_free_planets(planets);
@@ -821,8 +808,8 @@ wmud_world_load(GError **err)
 
 	/* Load rooms from the database and check them */
 	g_clear_error(&in_err);
-	if (!wmud_db_load_rooms(&rooms, &in_err))
-	{
+
+	if (!wmud_db_load_rooms(&rooms, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load areas from database: %s", in_err->message);
 		wmud_world_free_rooms(rooms);
 		wmud_world_free_areas(areas);
@@ -833,8 +820,8 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
-	if (!rooms)
-	{
+
+	if (!rooms) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No rooms were found in the database!");
 		wmud_world_free_areas(areas);
 		wmud_world_free_planets(planets);
@@ -844,9 +831,10 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
+
 	g_clear_error(&in_err);
-	if (!wmud_world_check_rooms(rooms, &in_err))
-	{
+
+	if (!wmud_world_check_rooms(rooms, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Room list pre-flight check error: %s", in_err->message);
 		wmud_world_free_rooms(rooms);
 		wmud_world_free_areas(areas);
@@ -860,8 +848,8 @@ wmud_world_load(GError **err)
 
 	/* Load room exits from the database and check them */
 	g_clear_error(&in_err);
-	if (!wmud_db_load_exits(&exits, &in_err))
-	{
+
+	if (!wmud_db_load_exits(&exits, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load exits from database: %s", in_err->message);
 		wmud_world_free_exits(exits);
 		wmud_world_free_rooms(rooms);
@@ -873,8 +861,8 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
-	if (!exits)
-	{
+
+	if (!exits) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No exits were found in the database!");
 		wmud_world_free_rooms(rooms);
 		wmud_world_free_areas(areas);
@@ -885,9 +873,10 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
+
 	g_clear_error(&in_err);
-	if (!wmud_world_check_exits(exits, directions, rooms, &in_err))
-	{
+
+	if (!wmud_world_check_exits(exits, directions, rooms, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Exit list pre-flight check error: %s", in_err->message);
 		wmud_world_free_rooms(rooms);
 		wmud_world_free_areas(areas);
@@ -900,8 +889,7 @@ wmud_world_load(GError **err)
 	}
 
 	/* Load planet-plane associations from the database */
-	if (!wmud_db_load_planet_planes(&planet_planes, &in_err))
-	{
+	if (!wmud_db_load_planet_planes(&planet_planes, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load exits from database: %s", in_err->message);
 		wmud_world_free_planet_planes(planet_planes);
 		wmud_world_free_exits(exits);
@@ -914,8 +902,8 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
-	if (!planet_planes)
-	{
+
+	if (!planet_planes) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No planet-plane associations were found in the database!");
 		wmud_world_free_exits(exits);
 		wmud_world_free_rooms(rooms);
@@ -927,14 +915,15 @@ wmud_world_load(GError **err)
 
 		return FALSE;
 	}
+
 	g_clear_error(&in_err);
 
 	/* World loading finished. Now let's tie the parts together... */
 
 	/* Put the planets on the planes */
 	g_clear_error(&in_err);
-	if (!wmud_world_assoc_planets_planes(planets, planes, planet_planes, &in_err))
-	{
+
+	if (!wmud_world_assoc_planets_planes(planets, planes, planet_planes, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Planets <-> Planes association error: %s", in_err->message);
 		wmud_world_free_planet_planes(planet_planes);
 		wmud_world_free_exits(exits);
@@ -949,8 +938,7 @@ wmud_world_load(GError **err)
 
 	/* Generate the areas */
 	g_clear_error(&in_err);
-	if (!wmud_world_assoc_rooms_areas(rooms, areas, &in_err))
-	{
+	if (!wmud_world_assoc_rooms_areas(rooms, areas, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Rooms <-> Areas association error: %s", in_err->message);
 		wmud_world_free_planet_planes(planet_planes);
 		wmud_world_free_exits(exits);
@@ -965,8 +953,8 @@ wmud_world_load(GError **err)
 
 	/* Teleport the previously built areas to the planets */
 	g_clear_error(&in_err);
-	if (!wmud_world_assoc_rooms_planets(rooms, planets, &in_err))
-	{
+
+	if (!wmud_world_assoc_rooms_planets(rooms, planets, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Rooms <-> Planets association error: %s", in_err->message);
 		wmud_world_free_planet_planes(planet_planes);
 		wmud_world_free_exits(exits);
@@ -992,4 +980,3 @@ wmud_world_load(GError **err)
 
 	return TRUE;
 }
-

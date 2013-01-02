@@ -48,6 +48,7 @@ wmud_menu_items_check(GSList *menu_items, GError **err)
 	/* TODO: Check for duplicate menuchars */
 	/* TODO: Check for duplicate menu texts */
 	/* TODO: Check for duplicate placements */
+
 	return TRUE;
 }
 
@@ -56,10 +57,13 @@ menu_item_free(wmudMenu *menu_item)
 {
 	if (menu_item->text)
 		g_free(menu_item->text);
+
 	if (menu_item->display_text)
 		g_free(menu_item->display_text);
+
 	if (menu_item->display_text_ansi)
 		g_free(menu_item->display_text_ansi);
+
 	if (menu_item->func)
 		g_free(menu_item->func);
 
@@ -77,6 +81,7 @@ wmud_menu_items_free(GSList **menu_items)
 		g_slist_foreach(*menu_items, (GFunc)menu_item_free, NULL);
 		g_slist_free(*menu_items);
 #endif
+
 		*menu_items = NULL;
 	}
 }
@@ -93,14 +98,12 @@ menu_item_prepare(wmudMenu *item, GHashTable *cmdtable)
 	m1 = g_ascii_tolower(item->menuchar);
 	m2 = g_ascii_toupper(item->menuchar);
 	for (a = item->text; *a; a++)
-		if ((*a == m1) || (*a == m2))
-		{
+		if ((*a == m1) || (*a == m2)) {
 			found = a;
 			break;
 		}
 
-	if (found)
-	{
+	if (found) {
 		gchar *tmp;
 
 		tmp = g_ascii_strdown(item->text, -1);
@@ -110,9 +113,7 @@ menu_item_prepare(wmudMenu *item, GHashTable *cmdtable)
 
 		ds->str[found - item->text] = g_ascii_toupper(item->menuchar);
 		dsa->str[found - item->text] = g_ascii_toupper(item->menuchar);
-	}
-	else
-	{
+	} else {
 		found = item->text;
 		ds = g_string_new(item->text);
 		dsa = g_string_new(item->text);
@@ -130,7 +131,6 @@ menu_item_prepare(wmudMenu *item, GHashTable *cmdtable)
 	g_string_insert(dsa, found - item->text + 8, "\x1b[0m");
 	item->display_text = g_string_free(ds, FALSE);
 	item->display_text_ansi = g_string_free(dsa, FALSE);
-
 }
 
 WMUD_MENU_COMMAND(enter_world)
@@ -199,23 +199,20 @@ wmud_menu_init(GSList **menu)
 	GError *in_err = NULL;
 	GHashTable *cmdtable;
 
-	if (!wmud_db_load_menu(&menu_items, &in_err))
-	{
+	if (!wmud_db_load_menu(&menu_items, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Unable to load menu items from the database: %s", in_err->message);
 		wmud_menu_items_free(&menu_items);
 
 		return FALSE;
 	}
 
-	if (!menu_items)
-	{
+	if (!menu_items) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "No menu items were found in the database!");
 
 		return FALSE;
 	}
 
-	if (!wmud_menu_items_check(menu_items, &in_err))
-	{
+	if (!wmud_menu_items_check(menu_items, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Menu items pre-flight check error: %s", in_err->message);
 		wmud_menu_items_free(&menu_items);
 
@@ -223,9 +220,8 @@ wmud_menu_init(GSList **menu)
 	}
 
 	if (*menu)
-	{
 		wmud_menu_items_free(menu_items);
-	}
+
 	*menu = menu_items;
 
 	cmdtable = g_hash_table_new(g_str_hash, g_str_equal);
@@ -257,9 +253,7 @@ static gint
 find_by_menuchar(wmudMenu *item, gchar *menuchar)
 {
 	if (g_ascii_toupper(*menuchar) == g_ascii_toupper(item->menuchar))
-	{
 		return 0;
-	}
 
 	return 1;
 }
@@ -270,9 +264,7 @@ wmud_menu_get_command_by_menuchar(gchar menuchar, GSList *game_menu)
 	GSList *item;
 
 	if ((item = g_slist_find_custom(game_menu, &menuchar, (GCompareFunc)find_by_menuchar)) != NULL)
-	{
 		return ((wmudMenu *)(item->data))->func;
-	}
 
 	return NULL;
 }
@@ -283,12 +275,7 @@ wmud_menu_execute_command(wmudClient *client, gchar *command)
 	wmudMenuCommandFunc func;
 
 	if ((func = g_hash_table_lookup(mcmd_table, command)) == NULL)
-	{
 		wmud_client_send(client, "Unknown menu command.\r\n");
-	}
 	else
-	{
 		func(client);
-	}
 }
-

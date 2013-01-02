@@ -66,14 +66,12 @@ gboolean
 rl_sec_elapsed(gpointer user_data)
 {
 	elapsed_seconds++;
-	if (elapsed_seconds == G_MAXUINT32)
-	{
+	if (elapsed_seconds == G_MAXUINT32) {
 		elapsed_seconds = 0;
 		elapsed_cycle++;
 	}
 
-	if (elapsed_seconds % 30 == 0)
-	{
+	if (elapsed_seconds % 30 == 0) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "Heartbeat");
 	}
 
@@ -116,7 +114,7 @@ wmud_game_init(GThread **game_thread, GMainContext **game_context)
 	g_source_unref(timeout_source);
 
 	g_clear_error(&err);
-#if GLIB_CHECK_VERSION(2,32,0)
+#if GLIB_CHECK_VERSION(2, 32, 0)
 	*game_thread = g_thread_new("game", (GThreadFunc)game_thread_func, game_loop);
 #else
 	*game_thread = g_thread_create((GThreadFunc)game_thread_func, game_loop, TRUE, &err);
@@ -124,4 +122,3 @@ wmud_game_init(GThread **game_thread, GMainContext **game_context)
 
 	return TRUE;
 }
-

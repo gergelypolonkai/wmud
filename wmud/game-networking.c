@@ -82,11 +82,13 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Connection closed.");
 	g_socket_shutdown(client->socket, TRUE, TRUE, NULL);
 	clients = g_slist_remove(clients, client);
-	if (client->player)
-		if (!client->player->registered)
-			wmud_player_free(&(client->player));
+
+	if (client->player && !client->player->registered)
+		wmud_player_free(&(client->player));
+
 	if (client->buffer)
 		g_string_free(client->buffer, TRUE);
+
 	g_source_destroy(client->socket_source);
 	g_free(client);
 }
@@ -114,19 +116,16 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 {
 	GError *err = NULL;
 
-	if (condition & G_IO_HUP)
-	{
+	if (condition & G_IO_HUP) {
 		wmud_client_close(client, FALSE);
+
 		return FALSE;
-	}
-	else if ((condition & G_IO_IN) || (condition & G_IO_PRI))
-	{
+	} else if ((condition & G_IO_IN) || (condition & G_IO_PRI)) {
 		gssize len;
 		gchar *buf2;
 		gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
 
-		if ((len = g_socket_receive(client_socket, buf, MAX_RECV_LEN, NULL, &err)) == 0)
-		{
+		if ((len = g_socket_receive(client_socket, buf, MAX_RECV_LEN, NULL, &err)) == 0) {
 			g_free(buf);
 			wmud_client_close(client, FALSE);
 
@@ -134,26 +133,21 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 		}
 
 		buf2 = buf;
-		while (TRUE)
-		{
+		while (TRUE) {
 			char *r = strchr((char *)buf2, '\r'),
 			     *n = strchr((char *)buf2, '\n');
 
-			if (r || n)
-			{
+			if (r || n) {
 				gint i,
 				     sloc = -1;
 
-				if ((r < n) && r)
-				{
+				if ((r < n) && r) {
 					if (client->buffer->len > 0)
 						g_string_append_len(client->buffer, buf2, (r - buf2));
 					else
 						g_string_overwrite_len(client->buffer, 0, buf2, (r - buf2));
 					buf2 = r;
-				}
-				else if (n)
-				{
+				} else if (n) {
 					if (client->buffer->len > 0)
 						g_string_append_len(client->buffer, buf2, (n - buf2));
 					else
@@ -162,28 +156,22 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 				}
 
 				/* Remove telnet codes from the string */
-				for (i = 0; i < client->buffer->len; i++)
-				{
+				for (i = 0; i < client->buffer->len; i++) {
 					guchar c = (client->buffer->str)[i];
 
-					if ((c >= 240) || (c == 1))
-					{
+					if ((c >= 240) || (c == 1)) {
 						if (sloc == -1)
 							sloc = i;
-					}
-					else
-					{
-						if (sloc != -1)
-						{
+					} else {
+						if (sloc != -1) {
 							g_string_erase(client->buffer, sloc, i - sloc);
 							sloc = -1;
 						}
 					}
 				}
+
 				if (sloc != -1)
-				{
 					g_string_erase(client->buffer, sloc, -1);
-				}
 
 				switch (client->state)
 				{
@@ -349,11 +337,10 @@ wmud_client_callback(GSocket *client_socket, GIOCondition condition, wmudClient 
 				g_string_erase(client->buffer, 0, -1);
 
 				for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
+
 				if (!*buf2)
 					break;
-			}
-			else
-			{
+			} else {
 				if (client->buffer->len > 0)
 					g_string_append(client->buffer, buf2);
 				else
@@ -405,8 +392,8 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 	g_source_attach(client_source, accept_data->context);
 
 	g_clear_error(&err);
-	if ((remote_addr = g_socket_get_remote_address(client_socket, &err)) != NULL)
-	{
+
+	if ((remote_addr = g_socket_get_remote_address(client_socket, &err)) != NULL) {
 		GInetAddress *addr;
 		gchar *ip_addr;
 
@@ -416,18 +403,13 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 		g_free(ip_addr);
 		g_object_unref(addr);
 		g_object_unref(remote_addr);
-	}
-	else
-	{
+	} else {
 		if (err)
-		{
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "New game connection. The remote address is unknown. This is a bug. Message from upper level: %s", err->message);
-		}
 		else
-		{
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "New game connection. The remote address is unknown. This is a bug.");
-		}
 	}
+
 	g_clear_error(&err);
 	wmud_client_send(client, "By what name shall we call you? ");
 
@@ -452,10 +434,10 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 	GSocketListener *game_listener;
 	gboolean need_ipv4_socket = TRUE;
 	GSocket *game_socket6,
-		*game_socket4;
+	        *game_socket4;
 	GError *in_err = NULL;
 	GSource *game_net_source4 = NULL,
-		*game_net_source6 = NULL;
+	        *game_net_source6 = NULL;
 
 	clients = NULL;
 	game_listener = g_socket_listener_new();
@@ -463,8 +445,7 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 	/* The following snippet is borrowed from GLib 2.30's gsocketlistener.c
 	 * code, to create the necessary sockets to listen on both IPv4 and
 	 * IPv6 address */
-	if ((game_socket6 = g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL)
-	{
+	if ((game_socket6 = g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL) {
 		GInetAddress *inet_address;
 		GSocketAddress *address;
 		gboolean result;
@@ -475,15 +456,16 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 
 		g_socket_set_listen_backlog(game_socket6, 10);
 
-		result = g_socket_bind(game_socket6, address, TRUE, NULL)
-			&& g_socket_listen(game_socket6, NULL);
+		result =
+		         g_socket_bind(game_socket6, address, TRUE, NULL)
+		         && g_socket_listen(game_socket6, NULL);
 
 		g_object_unref(address);
 
-		if (!result)
-		{
+		if (!result) {
 			g_object_unref(game_socket6);
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "Unable to create listener IPv6 socket");
+
 			return FALSE;
 		}
 
@@ -491,14 +473,14 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 			need_ipv4_socket = FALSE;
 
 		game_net_source6 = g_socket_create_source(game_socket6, G_IO_IN, NULL);
-		/* This function should never return error. If so, that would be a really big bug which will trigger a higher level problem for sure */
+
+		/* This function should never return error. If so, that would be a
+		 * really big bug which will trigger a higher level problem for sure */
 		g_socket_listener_add_socket(game_listener, game_socket6, NULL, NULL);
 	}
 
-	if (need_ipv4_socket)
-	{
-		if ((game_socket4 = g_socket_new(G_SOCKET_FAMILY_IPV4, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL)
-		{
+	if (need_ipv4_socket) {
+		if ((game_socket4 = g_socket_new(G_SOCKET_FAMILY_IPV4, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL) {
 			GInetAddress *inet_address;
 			GSocketAddress *address;
 			gboolean result;
@@ -514,22 +496,21 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 
 			g_object_unref(address);
 
-			if (!result)
-			{
+			if (!result) {
 				g_object_unref(game_socket4);
+
 				if (!game_socket6)
 					g_object_unref(game_socket6);
 
 				g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "Unable to create listener IPv4 socket!\n");
+
 				return FALSE;
 			}
 
 			game_net_source4 = g_socket_create_source(game_socket4, G_IO_IN, NULL);
 			g_socket_listener_add_socket(game_listener, game_socket4, NULL, NULL);
 		}
-	}
-	else
-	{
+	} else {
 		if (game_socket6 != NULL)
 			g_clear_error(&in_err);
 		else
@@ -540,13 +521,12 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 	accept_data->listener = game_listener;
 	accept_data->context = game_context;
 
-	if (game_net_source6)
-	{
+	if (game_net_source6) {
 		g_source_set_callback(game_net_source6, (GSourceFunc)game_source_callback, (gpointer)accept_data, NULL);
 		g_source_attach(game_net_source6, game_context);
 	}
-	if (game_net_source4)
-	{
+
+	if (game_net_source4) {
 		g_source_set_callback(game_net_source4, (GSourceFunc)game_source_callback, (gpointer)accept_data, NULL);
 		g_source_attach(game_net_source4, game_context);
 	}
@@ -554,6 +534,7 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 	game_menu = menu_items;
 
 	email_regex = g_regex_new("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", G_REGEX_CASELESS, 0, NULL);
+
 	return TRUE;
 }
 
@@ -583,12 +564,9 @@ wmud_client_send(wmudClient *client, const gchar *fmt, ...)
 void
 wmud_client_quitanswer(wmudClient *client, gboolean answer)
 {
-	if (answer)
-	{
+	if (answer) {
 		wmud_client_close(client, TRUE);
-	}
-	else
-	{
+	} else {
 		wmud_client_send(client, "Good boy!\r\n");
 		client->state = WMUD_CLIENT_STATE_MENU;
 	}
@@ -597,14 +575,11 @@ wmud_client_quitanswer(wmudClient *client, gboolean answer)
 void
 wmud_client_newchar_answer(wmudClient *client, gboolean answer)
 {
-	if (answer)
-	{
+	if (answer) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Creating new player\n");
 		wmud_client_send(client, "Welcome to this MUD!\r\nPlease enter your e-mail address: ");
 		client->state = WMUD_CLIENT_STATE_REGISTERING;
-	}
-	else
-	{
+	} else {
 		wmud_client_send(client, "What is your player-name, then? ");
 		client->state = WMUD_CLIENT_STATE_FRESH;
 	}

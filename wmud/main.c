@@ -68,8 +68,7 @@ wmud_random_string(gint len)
 	gchar *ret = g_malloc0(len + 1);
 	gint i;
 
-	for (i = 0; i < len; i++)
-	{
+	for (i = 0; i < len; i++) {
 		gchar c = 0;
 		/* Include only printable characters, but exclude $ because of
 		 * salt generation, and space to avoid misunderstanding in the
@@ -177,31 +176,21 @@ main(int argc, char **argv)
 	/* TODO: Command line parsing */
 	/* TODO: Create signal handlers! */
 
-	if (!wmud_config_init(&active_config, &err))
-	{
+	if (!wmud_config_init(&active_config, &err)) {
 		if (err)
-		{
 			g_critical("Config file parsing error: %s", err->message);
-		}
 		else
-		{
 			g_critical("Config file parsing error!");
-		}
 
 		return 1;
 	}
 
 	g_clear_error(&err);
-	if (!wmud_db_init(&err))
-	{
+	if (!wmud_db_init(&err)) {
 		if (err)
-		{
 			g_critical("Database initialization error: %s", err->message);
-		}
 		else
-		{
 			g_critical("Database initialization error!");
-		}
 
 		return 1;
 	}
@@ -209,13 +198,9 @@ main(int argc, char **argv)
 	g_clear_error(&err);
 	wmud_db_load_players(&err);
 	if (!wmud_world_load(&err))
-	{
-		/* TODO: Send some kind of an error? */
 		return 1;
-	}
 
-	if (!wmud_menu_init(&game_menu))
-	{
+	if (!wmud_menu_init(&game_menu)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "An error occured during menu loading.");
 
 		return 1;
@@ -228,16 +213,11 @@ main(int argc, char **argv)
 	wmud_game_init(&game_thread, &game_context);
 
 	g_clear_error(&err);
-	if (!wmud_networking_init(active_config->port, game_context, game_menu, &err))
-	{
+	if (!wmud_networking_init(active_config->port, game_context, game_menu, &err)) {
 		if (err)
-		{
 			g_critical("Database initialization error: %s", err->message);
-		}
 		else
-		{
 			g_critical("Database initialization error: unknown error!");
-		}
 
 		return 1;
 	}

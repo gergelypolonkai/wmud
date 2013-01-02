@@ -51,8 +51,7 @@
 void
 wmud_maintenance_check_players(wmudPlayer *player, gpointer user_data)
 {
-	if (player->cpassword == NULL)
-	{
+	if (player->cpassword == NULL) {
 		gchar *pw,
 		      *salt,
 		      *cpw;
@@ -68,8 +67,8 @@ wmud_maintenance_check_players(wmudPlayer *player, gpointer user_data)
 				" password set", player->player_name);
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "New password will be %s", pw);
 		player->cpassword = cpw;
-		/* TODO: Send e-mail about the new password. Upon completion,
-		 * set it in the database */
+		/* TODO: Send e-mail about the new password. Upon completion, set it in
+		 * the database */
 
 		g_free(pw);
 		g_free(salt);
@@ -130,14 +129,11 @@ wmud_smtp_read_callback(void *ptr, size_t size, size_t nmemb, void *userp)
 	const char *data;
 
 	if (size * nmemb < 1)
-	{
 		return 0;
-	}
 
 	data = text[pooh->counter];
 
-	if (data)
-	{
+	if (data) {
 		size_t len = strlen(data);
 		memcpy(ptr, data, len);
 		pooh->counter++;
@@ -161,26 +157,25 @@ wmud_maintenance_init(void)
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 
 	if (!(curl = curl_easy_init()))
-	{
 		g_error("Could not initialize the CURL library!");
-	}
 
 	if (!(mcurl = curl_multi_init()))
-	{
 		g_error("Could not initialize the CURL library!");
-	}
 
 	smtp_server_real = g_strconcat("smtp://", active_config->smtp_server, NULL);
 	curl_easy_setopt(curl, CURLOPT_URL, smtp_server_real);
 	g_free(smtp_server_real);
-	if (active_config->smtp_username && active_config->smtp_password)
-	{
+
+	if (active_config->smtp_username && active_config->smtp_password) {
 		curl_easy_setopt(curl, CURLOPT_USERNAME, active_config->smtp_username);
 		curl_easy_setopt(curl, CURLOPT_PASSWORD, active_config->smtp_password);
 	}
+
 	curl_easy_setopt(curl, CURLOPT_MAIL_FROM, active_config->smtp_sender);
 	curl_easy_setopt(curl, CURLOPT_USE_SSL, (CURLUSESSL_ALL && active_config->smtp_tls));
+
 	/* TODO: Maybe these could go into the configuration as well */
+
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 	curl_easy_setopt(curl, CURLOPT_SSLVERSION, 0L);
@@ -204,10 +199,9 @@ wmud_maintenance_init(void)
 	g_source_attach(timeout_source, maint_context);
 	g_source_unref(timeout_source);
 
-#if GLIB_CHECK_VERSION(2,32,0)
+#if GLIB_CHECK_VERSION(2, 32, 0)
 	g_thread_new("maintenance", (GThreadFunc)maint_thread_func, maint_loop);
 #else
 	g_thread_create((GThreadFunc)maint_thread_func, maint_loop, TRUE, NULL);
 #endif
 }
-

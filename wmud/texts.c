@@ -37,8 +37,7 @@ wmud_texts_init(void)
 
 	text_table = g_hash_table_new(g_str_hash, g_str_equal);
 
-	for (i = 0; i < g_strv_length((gchar **)text_files); i++)
-	{
+	for (i = 0; i < g_strv_length((gchar **)text_files); i++) {
 		GFile *tf;
 		GFileInfo *tfi;
 		GError *err = NULL;
@@ -56,12 +55,13 @@ wmud_texts_init(void)
 		contents = g_malloc0(tfs + 1);
 
 		g_clear_error(&err);
-		if (!g_file_load_contents(tf, NULL, &contents, &length, NULL, &err))
-		{
+
+		if (!g_file_load_contents(tf, NULL, &contents, &length, NULL, &err)) {
 			g_object_unref(tfi);
 			g_object_unref(tf);
 			continue;
 		}
+
 		g_hash_table_insert(text_table, (char *)text_files[i], contents);
 
 		g_object_unref(tfi);
@@ -78,4 +78,3 @@ wmud_text_send_to_client(gchar *text_name, wmudClient *client)
 	gchar *text = g_hash_table_lookup(text_table, text_name);
 	wmud_client_send(client, "%s\r\n", text);
 }
-

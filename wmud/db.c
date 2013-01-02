@@ -59,8 +59,7 @@ wmud_db_init(GError **err)
 
 	g_string_append_printf(db_file, "/%s", active_config->database_file);
 
-	if ((sqlite_code = sqlite3_open(db_file->str, &dbh)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_open(db_file->str, &dbh)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_CANTOPEN, "Can not open databsae file (%s): %s", db_file->str, sqlite3_errmsg(dbh));
 
 		return FALSE;
@@ -89,18 +88,15 @@ wmud_db_load_players(GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, login, password, email FROM players", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, login, password, email FROM players", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudPlayer *player = g_new0(wmudPlayer, 1);
 			player->id = sqlite3_column_int(sth, 0);
 			player->player_name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
@@ -110,13 +106,9 @@ wmud_db_load_players(GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded player _%s_", player->player_name);
 
 			players = g_slist_prepend(players, player);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
 			return FALSE;
@@ -144,37 +136,32 @@ wmud_db_save_player(wmudPlayer *player, GError **err)
 	sqlite3_stmt *sth = NULL;
 	int sqlite_code;
 
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "INSERT INTO players (id, login, password, email) VALUES (NULL, ?, NULL, ?)", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "INSERT INTO players (id, login, password, email) VALUES (NULL, ?, NULL, ?)", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_bind_text(sth, 1, player->player_name, -1, SQLITE_STATIC)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_bind_text(sth, 1, player->player_name, -1, SQLITE_STATIC)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_bind_text(sth, 2, player->email, -1, SQLITE_STATIC)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_bind_text(sth, 2, player->email, -1, SQLITE_STATIC)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_step(sth)) != SQLITE_DONE)
-	{
+	if ((sqlite_code = sqlite3_step(sth)) != SQLITE_DONE) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Statement cannot be executed in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
@@ -191,26 +178,22 @@ wmud_db_load_planes(GSList **planes, GError **err)
 	int sqlite_code;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planes");
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planes", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planes", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planes(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudPlane *plane = g_new0(wmudPlane, 1);
 			plane->id = sqlite3_column_int(sth, 0);
 			plane->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
@@ -218,13 +201,9 @@ wmud_db_load_planes(GSList **planes, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded plane _%s_", plane->name);
 
 			*planes = g_slist_prepend(*planes, plane);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_planes(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
 			return FALSE;
@@ -243,26 +222,22 @@ wmud_db_load_planets(GSList **planets, GError **err)
 	int sqlite_code;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planets");
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planets", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planets", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planets(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudPlanet *planet = g_new0(wmudPlanet, 1);
 			planet->id = sqlite3_column_int(sth, 0);
 			planet->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
@@ -270,15 +245,12 @@ wmud_db_load_planets(GSList **planets, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet _%s_", planet->name);
 
 			*planets = g_slist_prepend(*planets, planet);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_planets(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
+
 			return FALSE;
 		}
 	}
@@ -294,26 +266,22 @@ wmud_db_load_directions(GSList **directions, GError **err)
 	sqlite3_stmt *sth = NULL;
 	int sqlite_code;
 
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, short_name, name FROM directions", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, short_name, name FROM directions", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_directions(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudDirection *dir = g_new0(wmudDirection, 1);
 			dir->id = sqlite3_column_int(sth, 0);
 			dir->short_name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
@@ -322,13 +290,9 @@ wmud_db_load_directions(GSList **directions, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded direction _%s_", dir->name);
 
 			*directions = g_slist_prepend(*directions, dir);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_directions(): %s", sqlite3_errmsg(dbh));
 			return FALSE;
 		}
@@ -346,26 +310,22 @@ wmud_db_load_areas(GSList **areas, GError **err)
 	int sqlite_code;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading areas");
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM areas", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM areas", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudArea *area = g_new0(wmudArea, 1);
 			area->id = sqlite3_column_int(sth, 0);
 			area->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
@@ -373,13 +333,9 @@ wmud_db_load_areas(GSList **areas, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded area _%s_", area->name);
 
 			*areas = g_slist_prepend(*areas, area);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
 			return FALSE;
@@ -398,26 +354,22 @@ wmud_db_load_rooms(GSList **rooms, GError **err)
 	int sqlite_code;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, area, name, distant_description, close_description FROM rooms", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, area, name, distant_description, close_description FROM rooms", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_rooms(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudRoom *room = g_new0(wmudRoom, 1);
 			room->id = sqlite3_column_int(sth, 0);
 			room->area_id = sqlite3_column_int(sth, 1);
@@ -428,13 +380,9 @@ wmud_db_load_rooms(GSList **rooms, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded room %d/_%s_", room->area_id, room->name);
 
 			*rooms = g_slist_prepend(*rooms, room);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_rooms(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
 			return FALSE;
@@ -453,26 +401,22 @@ wmud_db_load_exits(GSList **exits, GError **err)
 	int sqlite_code;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT room_id, direction, other_side FROM room_exits", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT room_id, direction, other_side FROM room_exits", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudExit *room_exit = g_new0(wmudExit, 1);
 			room_exit->source_room_id = sqlite3_column_int(sth, 0);
 			room_exit->direction_id = sqlite3_column_int(sth, 1);
@@ -481,15 +425,12 @@ wmud_db_load_exits(GSList **exits, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded exit %d =%d=> %d", room_exit->source_room_id, room_exit->direction_id, room_exit->destination_room_id);
 
 			*exits = g_slist_prepend(*exits, room_exit);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
+
 			return FALSE;
 		}
 	}
@@ -506,26 +447,23 @@ wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 	int sqlite_code;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT planet_id, plane_id FROM planet_planes", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT planet_id, plane_id FROM planet_planes", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planet_planes(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+
+		if (sqlite_code == SQLITE_ROW) {
 			wmudPlanetPlaneAssoc *planet_plane = g_new0(wmudPlanetPlaneAssoc, 1);
 			planet_plane->planet_id = sqlite3_column_int(sth, 0);
 			planet_plane->plane_id = sqlite3_column_int(sth, 1);
@@ -533,15 +471,12 @@ wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet-plane association %d <> %d", planet_plane->planet_id, planet_plane->plane_id);
 
 			*planet_planes = g_slist_prepend(*planet_planes, planet_plane);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
+
 			return FALSE;
 		}
 	}
@@ -558,26 +493,22 @@ wmud_db_load_menu(GSList **menu_items, GError **err)
 	int sqlite_code;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading menu items");
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu ORDER BY placement", -1, &sth, NULL)) != SQLITE_OK)
-	{
+	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu ORDER BY placement", -1, &sth, NULL)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_menu(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	while (1)
-	{
+	while (1) {
 		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW)
-		{
+		if (sqlite_code == SQLITE_ROW) {
 			wmudMenu *menu_item = g_new0(wmudMenu, 1);
 			menu_item->id = sqlite3_column_int(sth, 0);
 			menu_item->menuchar = *(sqlite3_column_text(sth, 1));
@@ -589,15 +520,12 @@ wmud_db_load_menu(GSList **menu_items, GError **err)
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded menu item %d: %s", menu_item->id, menu_item->text);
 
 			*menu_items = g_slist_prepend(*menu_items, menu_item);
-		}
-		else if (sqlite_code == SQLITE_DONE)
-		{
+		} else if (sqlite_code == SQLITE_DONE) {
 			break;
-		}
-		else
-		{
+		} else {
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_menu_items(): %s", sqlite3_errmsg(dbh));
 			sqlite3_finalize(sth);
+
 			return FALSE;
 		}
 	}
@@ -605,5 +533,4 @@ wmud_db_load_menu(GSList **menu_items, GError **err)
 	sqlite3_finalize(sth);
 
 	return TRUE;
-	return FALSE;
 }
