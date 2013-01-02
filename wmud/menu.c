@@ -226,7 +226,7 @@ wmud_menu_init(GSList **menu)
 	}
 
 	if (*menu)
-		wmud_menu_items_free(menu_items);
+		wmud_menu_items_free(menu);
 
 	*menu = menu_items;
 
