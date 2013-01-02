@@ -488,8 +488,6 @@ state_passwait(wmudClient *client)
 				                 " account since your last"
 				                 " visit\r\n", (client->player->fail_count == 1) ? "was" : "were", client->player->fail_count, (client->player->fail_count == 1) ? "" : "s");
 
-			/* TODO: send MOTD */
-
 			wmud_text_send_to_client("motd", client);
 			wmud_menu_present(client);
 		} else {
