@@ -58,6 +58,8 @@ typedef void (*wmudMenuCommandFunc)(wmudClient *client);
  */
 #define WMUD_MENU_COMMAND(name) void wmud_mcmd_ ## name(wmudClient *client)
 
+GSList *game_menu;
+
 #define WMUD_MENU_ERROR wmud_menu_error_quark()
 GQuark wmud_menu_error_quark();
 gboolean wmud_menu_init(GSList **menu);
@@ -65,6 +67,7 @@ gboolean wmud_menu_items_check(GSList *menu_items, GError **err);
 void wmud_menu_items_free(GSList **menu_items);
 gchar *wmud_menu_get_command_by_menuchar(gchar menuchar, GSList *game_menu);
 void wmud_menu_execute_command(wmudClient *client, gchar *command);
+void wmud_menu_present(wmudClient *client);
 
 #endif /* __WMUD_MENU_H__ */
 

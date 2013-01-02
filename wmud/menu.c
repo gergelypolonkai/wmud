@@ -36,6 +36,12 @@
 
 GHashTable *mcmd_table = NULL;
 
+/**
+ * game_menu:
+ * The list of menu items to display after a successful login
+ */
+GSList *game_menu = NULL;
+
 GQuark
 wmud_menu_error_quark()
 {
@@ -123,7 +129,7 @@ menu_item_prepare(wmudMenu *item, GHashTable *cmdtable)
 		g_string_prepend_c(dsa, ' ');
 		g_string_prepend_c(dsa, g_ascii_toupper(item->menuchar));
 	}
-	
+
 	g_string_insert_c(ds, found - item->text, '(');
 	g_string_insert_c(ds, found - item->text + 2, ')');
 
@@ -279,3 +285,20 @@ wmud_menu_execute_command(wmudClient *client, gchar *command)
 	else
 		func(client);
 }
+
+void
+send_menu_item(wmudMenu *item, wmudClient *client)
+{
+	/* TODO: Send ANSI menu item only to ANSI players! */
+	wmud_client_send(client, "%s\r\n", item->display_text_ansi);
+}
+
+void
+wmud_menu_present(wmudClient *client)
+{
+	g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
+	client->state = WMUD_CLIENT_STATE_MENU;
+
+	/* TODO: send menu prologue */
+}
+

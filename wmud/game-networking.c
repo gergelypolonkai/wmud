@@ -53,12 +53,6 @@ struct AcceptData {
  */
 GSList *clients = NULL;
 
-/**
- * game_menu:
- * The list of menu items to display after a successful login
- */
-static GSList *game_menu = NULL;
-
 static GRegex *email_regex = NULL;
 
 void wmud_client_interpret_newplayer_email(wmudClient *client);
@@ -97,13 +91,6 @@ wmud_client_close(wmudClient *client, gboolean send_goodbye)
 
 	g_source_destroy(client->socket_source);
 	g_free(client);
-}
-
-void
-send_menu_item(wmudMenu *item, wmudClient *client)
-{
-	/* TODO: Send ANSI menu item only to ANSI players! */
-	wmud_client_send(client, "%s\r\n", item->display_text_ansi);
 }
 
 /**
@@ -504,13 +491,7 @@ state_passwait(wmudClient *client)
 			/* TODO: send MOTD */
 
 			wmud_text_send_to_client("motd", client);
-
-			/* TODO: send menu items */
-
-			g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
-			client->state = WMUD_CLIENT_STATE_MENU;
-
-			/* TODO: send menu prologue */
+			wmud_menu_present(client);
 		} else {
 			wmud_client_send(client, "%c%c%cThis password doesn't"
 			                 " seem to be valid. Let's try it again..."
