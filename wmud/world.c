@@ -889,6 +889,8 @@ wmud_world_load(GError **err)
 	}
 
 	/* Load planet-plane associations from the database */
+	g_clear_error(&in_err);
+
 	if (!wmud_db_load_planet_planes(&planet_planes, &in_err)) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load exits from database: %s", in_err->message);
 		wmud_world_free_planet_planes(planet_planes);
