@@ -49,7 +49,12 @@ wmud_texts_init(void)
 		g_debug("Loading text file %s from %s", text_files[i], text_file);
 		tf = g_file_new_for_path(text_file);
 		tfi = g_file_query_info(tf, G_FILE_ATTRIBUTE_STANDARD_SIZE, G_FILE_QUERY_INFO_NONE, NULL, &err);
-		/* TODO: Error checking! */
+
+		if (err) {
+			g_warning("Error loading %s: %s", text_files[i], err->message);
+			continue;
+		}
+
 		tfs = g_file_info_get_attribute_uint64(tfi, G_FILE_ATTRIBUTE_STANDARD_SIZE);
 
 		contents = g_malloc0(tfs + 1);
