@@ -196,6 +196,7 @@ WMUD_MENU_COMMAND(quit)
 
 WMUD_MENU_COMMAND(redisplay_menu)
 {
+	wmud_menu_present(client);
 }
 
 gboolean
