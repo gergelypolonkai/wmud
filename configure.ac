@@ -51,4 +51,4 @@ if test "$libcurl_protocol_SMTP" != "yes"; then
 	exit 1
 fi
 
-AC_OUTPUT(Makefile libgiosmtp/Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)
+AC_OUTPUT(Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)
