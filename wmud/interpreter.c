@@ -250,11 +250,9 @@ wmud_interpret_game_command(wmudClient *client)
 		}
 	}
 
-	switch (match_count)
-	{
+	switch (match_count) {
 		case 0:
-			switch (random_number(1, 3))
-			{
+			switch (random_number(1, 3)) {
 				case 1:
 					wmud_client_send(client, "Huh?\r\n");
 					break;
