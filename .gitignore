@@ -27,3 +27,4 @@ create-world.sh
 drop-world.sh
 libtool
 nbproject/private
+conf/wmud.conf
