@@ -22,7 +22,6 @@
 #include <glib.h>
 
 #include "wmudplayer.h"
-#include "wmud-types.h"
 
 #define WMUD_DB_ERROR wmud_db_error_quark()
 GQuark wmud_db_error_quark();

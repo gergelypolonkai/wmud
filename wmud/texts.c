@@ -19,7 +19,6 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include "wmud-types.h"
 #include "game-networking.h"
 #include "texts.h"
 

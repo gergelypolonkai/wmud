@@ -22,7 +22,6 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <gio/gio.h>
-#include "wmud-types.h"
 
 #define WMUD_TYPE_PLAYER            (wmud_player_get_type())
 #define WMUD_PLAYER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), WMUD_TYPE_PLAYER, WmudPlayer))

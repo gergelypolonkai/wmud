@@ -27,7 +27,6 @@
 #include <curl/curl.h>
 #include <string.h>
 
-#include "wmud-types.h"
 #include "maintenance.h"
 #include "main.h"
 #include "players.h"

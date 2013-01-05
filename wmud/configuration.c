@@ -23,7 +23,6 @@
 
 #include <glib.h>
 
-#include "wmud-types.h"
 #include "configuration.h"
 
 /**

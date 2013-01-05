@@ -27,7 +27,7 @@ struct _WmudClientPrivate
 	GSocket *socket;
 	GSource *socket_source;
 	GString *buffer;
-	wmudClientState state;
+	WmudClientState state;
 	gboolean authenticated;
 	WmudPlayer *player;
 	gboolean bademail;
@@ -167,14 +167,14 @@ wmud_client_get_buffer(WmudClient *self)
 	return self->priv->buffer;
 }
 
-wmudClientState
+WmudClientState
 wmud_client_get_state(WmudClient *self)
 {
 	return self->priv->state;
 }
 
 void
-wmud_client_set_state(WmudClient *self, wmudClientState state)
+wmud_client_set_state(WmudClient *self, WmudClientState state)
 {
 	self->priv->state = state;
 }

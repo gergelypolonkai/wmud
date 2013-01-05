@@ -22,7 +22,6 @@
 #include <glib.h>
 
 #include "wmudclient.h"
-#include "wmud-types.h"
 
 /**
  * TELNET_IAC:
