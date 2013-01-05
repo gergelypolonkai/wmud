@@ -29,14 +29,14 @@
  *
  * Command handler function type
  */
-typedef void (*wmudCommandFunc)(wmudClient *client, gchar *command, GSList *token_list);
+typedef void (*wmudCommandFunc)(WmudClient *client, gchar *command, GSList *token_list);
 /**
  * WMUD_COMMAND:
  * @name: the name of the command. Should be in lowercase
  *
  * Shorthand to create the function header for command handlers
  */
-#define WMUD_COMMAND(name) void gcmd_ ## name(wmudClient *client, gchar *command, GSList *token_list)
+#define WMUD_COMMAND(name) void gcmd_ ## name(WmudClient *client, gchar *command, GSList *token_list)
 
 /**
  * wmudCommand:
@@ -59,7 +59,7 @@ typedef enum {
 } wmudInterpreterError;
 
 gboolean wmud_interpreter_check_directions(GSList *directions, GError **err);
-void wmud_interpret_game_command(wmudClient *client);
+void wmud_interpret_game_command(WmudClient *client);
 
 #endif /* __WMUD_INTERPRETER_H__ */
 

@@ -83,38 +83,5 @@ typedef struct _wmudPlayer {
 	gboolean registered;
 } wmudPlayer;
 
-typedef struct _wmudClient wmudClient;
-
-typedef void (*wmudYesNoCallback)(wmudClient *client, gboolean answer);
-
-/**
- * wmudClient:
- * @socket: The assigned GSocket object
- * @buffer: The client receive buffer. It may hold partial or multiple lines
- *     until processed
- * @state: The state of the client
- * @authenticated: TRUE if the client is an authenticated game player
- * @player: The associatec player structure. It is also used during
- *     registration, so it should be always checked if the player is a saved
- *     database user
- * @bademail: indicates that the entered e-mail address is invalid
- * @socket_source: the #GSource associated with the client socket
- * @login_try_count: the failed login count of the client
- *
- * <structname>wmudClient</structname> contains all properties of a connected
- * game client.
- */
-struct _wmudClient {
-	GSocket *socket;
-	GSource *socket_source;
-	GString *buffer;
-	wmudClientState state;
-	gboolean authenticated;
-	wmudPlayer *player;
-	gboolean bademail;
-	gint login_try_count;
-	wmudYesNoCallback yesNoCallback;
-};
-
 #endif /* __WMUD_TYPES_H__ */
 

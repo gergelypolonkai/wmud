@@ -78,7 +78,7 @@ wmud_texts_init(void)
 }
 
 void
-wmud_text_send_to_client(gchar *text_name, wmudClient *client)
+wmud_text_send_to_client(gchar *text_name, WmudClient *client)
 {
 	gchar *text = g_hash_table_lookup(text_table, text_name);
 	wmud_client_send(client, "%s\r\n", text);

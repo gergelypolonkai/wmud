@@ -53,9 +53,9 @@ GSList *players = NULL;
  * Return value: %TRUE if the password is valid, %FALSE otherwise.
  */
 gboolean
-wmud_player_auth(wmudClient *client)
+wmud_player_auth(WmudClient *client)
 {
-	if (g_strcmp0(crypt(client->buffer->str, client->player->cpassword), client->player->cpassword) == 0)
+	if (g_strcmp0(crypt(wmud_client_get_buffer(client)->str, wmud_client_get_player(client)->cpassword), wmud_client_get_player(client)->cpassword) == 0)
 		return TRUE;
 
 	return FALSE;

@@ -189,9 +189,9 @@ WMUD_MENU_COMMAND(change_name)
 
 WMUD_MENU_COMMAND(quit)
 {
-	client->state = WMUD_CLIENT_STATE_YESNO;
+	wmud_client_set_state(client, WMUD_CLIENT_STATE_YESNO);
+	wmud_client_set_yesno_callback(client, wmud_client_quitanswer);
 	wmud_client_send(client, "Are you sure you want to get back to the real world? [y/N] ");
-	client->yesNoCallback = wmud_client_quitanswer;
 }
 
 WMUD_MENU_COMMAND(redisplay_menu)
@@ -277,7 +277,7 @@ wmud_menu_get_command_by_menuchar(gchar menuchar, GSList *game_menu)
 }
 
 void
-wmud_menu_execute_command(wmudClient *client, gchar *command)
+wmud_menu_execute_command(WmudClient *client, gchar *command)
 {
 	wmudMenuCommandFunc func;
 
@@ -288,17 +288,17 @@ wmud_menu_execute_command(wmudClient *client, gchar *command)
 }
 
 void
-send_menu_item(wmudMenu *item, wmudClient *client)
+send_menu_item(wmudMenu *item, WmudClient *client)
 {
 	/* TODO: Send ANSI menu item only to ANSI players! */
 	wmud_client_send(client, "%s\r\n", item->display_text_ansi);
 }
 
 void
-wmud_menu_present(wmudClient *client)
+wmud_menu_present(WmudClient *client)
 {
 	g_slist_foreach(game_menu, (GFunc)send_menu_item, client);
-	client->state = WMUD_CLIENT_STATE_MENU;
+	wmud_client_set_state(client, WMUD_CLIENT_STATE_MENU);
 
 	/* TODO: send menu prologue */
 }

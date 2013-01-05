@@ -148,13 +148,13 @@ wmud_interpreter_check_directions(GSList *directions, GError **err)
 
 /**
  * wmud_interpret_game_command:
- * @client: the wmudClient whose command should be processed
+ * @client: the WmudClient whose command should be processed
  *
- * Processes a wmudClient's buffer, and executes the game command if there is
+ * Processes a WmudClient's buffer, and executes the game command if there is
  * one
  */
 void
-wmud_interpret_game_command(wmudClient *client)
+wmud_interpret_game_command(WmudClient *client)
 {
 	GSList *command_parts = NULL;
 	gchar *a,
@@ -166,14 +166,14 @@ wmud_interpret_game_command(wmudClient *client)
 	    match_count = 0;
 	GSList *matches = NULL;
 
-	if (strchr(client->buffer->str, '\r') || strchr(client->buffer->str, '\n')) {
+	if (strchr(wmud_client_get_buffer(client)->str, '\r') || strchr(wmud_client_get_buffer(client)->str, '\n')) {
 		/* We should NEVER reach this point! */
 		g_assert_not_reached();
 
 		return;
 	}
 
-	a = client->buffer->str;
+	a = wmud_client_get_buffer(client)->str;
 
 	GString *token;
 
@@ -282,6 +282,6 @@ wmud_interpret_game_command(wmudClient *client)
 WMUD_COMMAND(quit)
 {
 	wmud_client_send(client, "Are you sure you want to get back to that freaky other reality? [y/N] ");
-	client->state = WMUD_CLIENT_STATE_YESNO;
-	client->yesNoCallback = wmud_client_quitanswer;
+	wmud_client_set_state(client, WMUD_CLIENT_STATE_YESNO);
+	wmud_client_set_yesno_callback(client, wmud_client_quitanswer);
 }

@@ -22,6 +22,6 @@
 #include "wmud-types.h"
 
 void wmud_texts_init(void);
-void wmud_text_send_to_client(gchar *text, wmudClient *client);
+void wmud_text_send_to_client(gchar *text, WmudClient *client);
 
 #endif /* __WMUD_TEXTS_H__ */

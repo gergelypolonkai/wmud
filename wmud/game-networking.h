@@ -21,6 +21,7 @@
 
 #include <glib.h>
 
+#include "wmudclient.h"
 #include "wmud-types.h"
 
 /**
@@ -63,8 +64,7 @@
 extern GSList *clients;
 
 gboolean wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu_items, GError **err);
-void wmud_client_send(wmudClient *client, const gchar *fmt, ...);
-void wmud_client_quitanswer(wmudClient *client, gboolean answer);
-void wmud_client_newchar_answer(wmudClient *client, gboolean answer);
+void wmud_client_quitanswer(WmudClient *client, gboolean answer);
+void wmud_client_newchar_answer(WmudClient *client, gboolean answer);
 
 #endif

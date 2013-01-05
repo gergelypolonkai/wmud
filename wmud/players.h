@@ -22,10 +22,11 @@
 #include <glib.h>
 
 #include "wmud-types.h"
+#include "wmudclient.h"
 
 extern GSList *players;
 
-gboolean wmud_player_auth(wmudClient *client);
+gboolean wmud_player_auth(WmudClient *client);
 wmudPlayer *wmud_player_exists(gchar *player_name);
 void wmud_player_free(wmudPlayer **player);
 wmudPlayer *wmud_player_dup(wmudPlayer *player);

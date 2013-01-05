@@ -49,14 +49,14 @@ typedef struct _wmudMenu {
 	gchar *func;
 } wmudMenu;
 
-typedef void (*wmudMenuCommandFunc)(wmudClient *client);
+typedef void (*wmudMenuCommandFunc)(WmudClient *client);
 /**
  * WMUD_MENU_COMMAND:
  * @name: the name of the command. Should be in lowercase
  *
  * Shorthand to create the function header for menu command handlers
  */
-#define WMUD_MENU_COMMAND(name) void wmud_mcmd_ ## name(wmudClient *client)
+#define WMUD_MENU_COMMAND(name) void wmud_mcmd_ ## name(WmudClient *client)
 
 GSList *game_menu;
 
@@ -66,8 +66,8 @@ gboolean wmud_menu_init(GSList **menu);
 gboolean wmud_menu_items_check(GSList *menu_items, GError **err);
 void wmud_menu_items_free(GSList **menu_items);
 gchar *wmud_menu_get_command_by_menuchar(gchar menuchar, GSList *game_menu);
-void wmud_menu_execute_command(wmudClient *client, gchar *command);
-void wmud_menu_present(wmudClient *client);
+void wmud_menu_execute_command(WmudClient *client, gchar *command);
+void wmud_menu_present(WmudClient *client);
 
 #endif /* __WMUD_MENU_H__ */
 
