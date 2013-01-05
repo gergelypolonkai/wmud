@@ -29,7 +29,7 @@ struct _WmudClientPrivate
 	GString *buffer;
 	wmudClientState state;
 	gboolean authenticated;
-	wmudPlayer *player;
+	WmudPlayer *player;
 	gboolean bademail;
 	gint login_try_count;
 	WmudClientYesnoCallback yesno_callback;
@@ -149,10 +149,8 @@ wmud_client_close(WmudClient *self, gboolean send_goodbye)
 	g_socket_shutdown(self->priv->socket, TRUE, TRUE, NULL);
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Connection closed.");
 
-	/* TODO: player->registered should be a wmud_player_get_registered()
-	 * call after wmudPlayer is migrated to be a GObject */
-	if (self->priv->player && !self->priv->player->registered)
-		wmud_player_free(&(self->priv->player));
+	if (self->priv->player && !wmud_player_get_registered(self->priv->player))
+		g_object_unref(self->priv->player);
 
 	g_object_unref(self);
 }
@@ -182,12 +180,12 @@ wmud_client_set_state(WmudClient *self, wmudClientState state)
 }
 
 void
-wmud_client_set_player(WmudClient *self, wmudPlayer *player)
+wmud_client_set_player(WmudClient *self, WmudPlayer *player)
 {
 	self->priv->player = player;
 }
 
-wmudPlayer *
+WmudPlayer *
 wmud_client_get_player(WmudClient *self)
 {
 	return self->priv->player;

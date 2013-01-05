@@ -34,6 +34,7 @@
 #include "menu.h"
 #include "texts.h"
 #include "wmudclient.h"
+#include "wmudplayer.h"
 
 /**
  * SECTION:game-networking
@@ -399,26 +400,26 @@ static void
 state_fresh(WmudClient *client)
 {
 	if (*(wmud_client_get_buffer(client)->str)) {
-		wmudPlayer *player;
+		WmudPlayer *player;
 
 		if ((player = wmud_player_exists(wmud_client_get_buffer(client)->str)) != NULL) {
 			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Trying to"
 			          " login with playername '%s'",
 			          wmud_client_get_buffer(client)->str);
 
-			if (player->cpassword == NULL) {
+			if (wmud_player_get_cpassword(player) == NULL) {
 				wmud_client_send(client, "Your registration is"
 				                 " not finished yet.\r\n");
 				remove_client(client, TRUE);
 			} else {
 				wmud_client_set_state(client, WMUD_CLIENT_STATE_PASSWAIT);
-				player->registered = TRUE;
+				wmud_player_set_registered(player, TRUE);
 				wmud_client_set_player(client, player);
 				wmud_client_send(client, "Please provide us your password: %c%c%c", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
 			}
 		} else {
-			wmudPlayer *player = g_new0(wmudPlayer, 1);
-			player->player_name = g_strdup(wmud_client_get_buffer(client)->str);
+			WmudPlayer *player = g_new0(WmudPlayer, 1);
+			wmud_player_set_player_name(player, wmud_client_get_buffer(client)->str);
 			wmud_client_set_player(client, player);
 			wmud_client_set_state(client, WMUD_CLIENT_STATE_YESNO);
 			wmud_client_set_yesno_callback(client, wmud_client_newchar_answer);
@@ -431,20 +432,27 @@ static void
 state_passwait(WmudClient *client)
 {
 	if (*(wmud_client_get_buffer(client)->str)) {
-		if (wmud_player_auth(client)) {
+		WmudPlayer *player;
+
+		player = wmud_client_get_player(client);
+
+		if (wmud_player_password_valid(player, wmud_client_get_buffer(client)->str)) {
+			gint fail_count;
+
 			wmud_client_send(client, "%c%c%c\r\nLogin successful."
 					 "\r\n", TELNET_IAC, TELNET_WONT,
 			                 TELNET_ECHO);
 			wmud_client_set_authenticated(client, TRUE);
 
-			if (wmud_client_get_player(client)->fail_count > 0)
+			if ((fail_count = wmud_player_get_fail_count(player)) > 0) {
 				wmud_client_send(client, "There %s %d failed"
 				                 " login attempt%s with your"
 				                 " account since your last"
 				                 " visit\r\n",
-						 (wmud_client_get_player(client)->fail_count == 1) ? "was" : "were",
-						 wmud_client_get_player(client)->fail_count,
-						 (wmud_client_get_player(client)->fail_count == 1) ? "" : "s");
+						 (fail_count == 1) ? "was" : "were",
+						 fail_count,
+						 (fail_count == 1) ? "" : "s");
+			}
 
 			wmud_text_send_to_client("motd", client);
 			wmud_menu_present(client);
@@ -455,7 +463,7 @@ state_passwait(WmudClient *client)
 					 " be called? ", TELNET_IAC,
 					 TELNET_WONT, TELNET_ECHO);
 			wmud_client_set_state(client, WMUD_CLIENT_STATE_FRESH);
-			wmud_client_get_player(client)->fail_count++;
+			wmud_player_increase_fail_count(player);
 			wmud_client_increase_login_fail_count(client);
 			if (wmud_client_get_login_fail_count(client) == 3) {
 				wmud_client_send(client, "You are trying "
@@ -507,7 +515,7 @@ state_registering(WmudClient *client)
 		remove_client(client, TRUE);
 
 	if (g_regex_match(email_regex, wmud_client_get_buffer(client)->str, 0, NULL)) {
-		wmud_client_get_player(client)->email = g_strdup(wmud_client_get_buffer(client)->str);
+		wmud_player_set_email(wmud_client_get_player(client), wmud_client_get_buffer(client)->str);
 		wmud_client_set_state(client, WMUD_CLIENT_STATE_REGEMAIL_CONFIRM);
 		wmud_client_send(client, "It seems to be a valid"
 				 " address to me, but could you"
@@ -535,7 +543,7 @@ state_regemail_confirm(WmudClient *client)
 {
 	GError *err = NULL;
 
-	if (g_ascii_strcasecmp(wmud_client_get_player(client)->email, wmud_client_get_buffer(client)->str) == 0) {
+	if (g_ascii_strcasecmp(wmud_player_get_email(wmud_client_get_player(client)), wmud_client_get_buffer(client)->str) == 0) {
 		if (wmud_db_save_player(wmud_client_get_player(client), &err)) {
 			wmud_client_send(client, "Good. We will generate the password for this player name, and send it to you\r\nvia e-mail. Please come back to us, if you get that code, so you can log\r\nin.\r\n");
 			players = g_slist_prepend(players, wmud_player_dup(wmud_client_get_player(client)));
@@ -546,8 +554,7 @@ state_regemail_confirm(WmudClient *client)
 
 		remove_client(client, TRUE);
 	} else {
-		g_free(wmud_client_get_player(client)->email);
-		wmud_client_get_player(client)->email = NULL;
+		wmud_player_set_email(wmud_client_get_player(client), NULL);
 
 		wmud_client_send(client, "This is not the same as you entered before.\r\nLet's just try it again: ");
 		wmud_client_set_state(client, WMUD_CLIENT_STATE_REGISTERING);

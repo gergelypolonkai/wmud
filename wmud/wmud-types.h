@@ -62,26 +62,5 @@ typedef enum {
 	WMUD_CLIENT_STATE_REGEMAIL_CONFIRM
 } wmudClientState;
 
-/**
- * wmudPlayer:
- * @id: Player's database ID
- * @player_name: Player's login name
- * @cpassword: crypt()ed password of the player. This is NULL for newly
- *     registered players, who have no password generated for them by the
- *     maintenance loop
- * @email: E-mail address of the player
- *
- * The <structname>wmudPlayer</structname> structure contains all information of
- * a player.
- */
-typedef struct _wmudPlayer {
-	guint32 id;
-	gchar *player_name;
-	gchar *cpassword;
-	gchar *email;
-	gint fail_count;
-	gboolean registered;
-} wmudPlayer;
-
 #endif /* __WMUD_TYPES_H__ */
 

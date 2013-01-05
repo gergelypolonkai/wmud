@@ -42,29 +42,10 @@
  */
 GSList *players = NULL;
 
-/**
- * wmud_player_auth:
- * @client: The client to be authenticated. The authentication password comes
- *          from the client's buffer.
- *
- * Tries to authenticate a client based on the associated player structure, and
- * the password stored in the client's buffer.
- *
- * Return value: %TRUE if the password is valid, %FALSE otherwise.
- */
-gboolean
-wmud_player_auth(WmudClient *client)
-{
-	if (g_strcmp0(crypt(wmud_client_get_buffer(client)->str, wmud_client_get_player(client)->cpassword), wmud_client_get_player(client)->cpassword) == 0)
-		return TRUE;
-
-	return FALSE;
-}
-
 static gint
-find_player_by_name(wmudPlayer *player, gchar *player_name)
+find_player_by_name(WmudPlayer *player, gchar *player_name)
 {
-	return g_ascii_strcasecmp(player->player_name, player_name);
+	return g_ascii_strcasecmp(wmud_player_get_player_name(player), player_name);
 }
 
 /**
@@ -73,10 +54,10 @@ find_player_by_name(wmudPlayer *player, gchar *player_name)
  *
  * Check if the player with the given name already exists.
  *
- * Return value: the wmudPlayer structure for the given player name, or %NULL
- *               if it can not be found.
+ * Return value: the WmudPlayer object for the given player name, or %NULL if
+ *               it can not be found.
  */
-wmudPlayer *
+WmudPlayer *
 wmud_player_exists(gchar *player_name)
 {
 	GSList *player_elem;
@@ -88,53 +69,3 @@ wmud_player_exists(gchar *player_name)
 
 }
 
-/**
- * wmud_player_dup:
- * @player: the player structure to duplicate
- *
- * Duplicates a #wmudPlayer structure.
- *
- * Return value: the new, duplicated player structure. It must be freed with wmud_player_free().
- */
-wmudPlayer *
-wmud_player_dup(wmudPlayer *player)
-{
-	wmudPlayer *new_player;
-
-	if (!player)
-		return NULL;
-
-	new_player = g_new0(wmudPlayer, 1);
-	new_player->id = player->id;
-	new_player->player_name = g_strdup(player->player_name);
-	new_player->cpassword = g_strdup(player->cpassword);
-	new_player->email = g_strdup(player->email);
-
-	return new_player;
-}
-
-/**
- * wmud_player_free:
- * @player: A pointer to the player structure to be freed
- *
- * Frees a #wmudPlayer structure with all its fields, and sets the structure
- * variable to %NULL.
- */
-void
-wmud_player_free(wmudPlayer **player)
-{
-	if (!*player)
-		return;
-
-	if ((*player)->player_name)
-		g_free((*player)->player_name);
-
-	if ((*player)->cpassword)
-		g_free((*player)->cpassword);
-
-	if ((*player)->email)
-		g_free((*player)->email);
-
-	g_free(*player);
-	*player = NULL;
-}

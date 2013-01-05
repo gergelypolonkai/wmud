@@ -22,12 +22,13 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <gio/gio.h>
+#include "wmudplayer.h"
 #include "wmud-types.h"
 
 #define WMUD_TYPE_CLIENT            (wmud_client_get_type())
 #define WMUD_CLIENT(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), WMUD_TYPE_CLIENT, WmudClient))
 #define WMUD_IS_CLIENT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), WMUD_TYPE_CLIENT))
-#define WMUD_TYPE_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST((klass), WMUD_TYPE_CLIENT, WmudClientClass))
+#define WMUD_CLIENT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), WMUD_TYPE_CLIENT, WmudClientClass))
 #define WMUD_IS_CLIENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), WMUD_TYPE_CLIENT))
 #define WMUD_CLIENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), WMUT_TYPE_CLIENT, WmudClientClass))
 
@@ -60,8 +61,8 @@ GString *wmud_client_get_buffer(WmudClient *client);
 gsize wmud_client_get_buffer_length(WmudClient *client);
 void wmud_client_set_state(WmudClient *client, wmudClientState state);
 wmudClientState wmud_client_get_state(WmudClient *client);
-void wmud_client_set_player(WmudClient *client, wmudPlayer *player);
-wmudPlayer *wmud_client_get_player(WmudClient *client);
+void wmud_client_set_player(WmudClient *client, WmudPlayer *player);
+WmudPlayer *wmud_client_get_player(WmudClient *client);
 void wmud_client_set_yesno_callback(WmudClient *client, WmudClientYesnoCallback yesno_callback);
 WmudClientYesnoCallback wmud_client_get_yesno_callback(WmudClient *client);
 void wmud_client_set_authenticated(WmudClient *client, gboolean authenticated);
@@ -70,5 +71,5 @@ gint wmud_client_get_login_fail_count(WmudClient *client);
 void wmud_client_set_bademail(WmudClient *client, gboolean bademail);
 gboolean wmud_client_get_bademail(WmudClient *client);
 
-#endif /* __WMUD_WMUDMENU_H__ */
+#endif /* __WMUD_WMUDCLIENT_H__ */
 

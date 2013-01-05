@@ -26,6 +26,7 @@
 #include "players.h"
 #include "configuration.h"
 #include "menu.h"
+#include "wmudplayer.h"
 
 /**
  * SECTION:db
@@ -97,13 +98,13 @@ wmud_db_load_players(GError **err)
 	while (1) {
 		sqlite_code = sqlite3_step(sth);
 		if (sqlite_code == SQLITE_ROW) {
-			wmudPlayer *player = g_new0(wmudPlayer, 1);
-			player->id = sqlite3_column_int(sth, 0);
-			player->player_name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
-			player->cpassword = g_strdup((gchar *)sqlite3_column_text(sth, 2));
-			player->email = g_strdup((gchar *)sqlite3_column_text(sth, 3));
+			WmudPlayer *player = wmud_player_new();
+			wmud_player_set_id(player, sqlite3_column_int(sth, 0));
+			wmud_player_set_player_name(player, (const gchar *)sqlite3_column_text(sth, 1));
+			wmud_player_set_cpassword(player, (const gchar *)sqlite3_column_text(sth, 2));
+			wmud_player_set_email(player, (const gchar *)sqlite3_column_text(sth, 3));
 
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded player _%s_", player->player_name);
+			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded player _%s_", wmud_player_get_player_name(player));
 
 			players = g_slist_prepend(players, player);
 		} else if (sqlite_code == SQLITE_DONE) {
@@ -131,7 +132,7 @@ wmud_db_load_players(GError **err)
  *               set accordingly.
  */
 gboolean
-wmud_db_save_player(wmudPlayer *player, GError **err)
+wmud_db_save_player(WmudPlayer *player, GError **err)
 {
 	sqlite3_stmt *sth = NULL;
 	int sqlite_code;
@@ -149,13 +150,13 @@ wmud_db_save_player(wmudPlayer *player, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_bind_text(sth, 1, player->player_name, -1, SQLITE_STATIC)) != SQLITE_OK) {
+	if ((sqlite_code = sqlite3_bind_text(sth, 1, wmud_player_get_player_name(player), -1, SQLITE_STATIC)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_bind_text(sth, 2, player->email, -1, SQLITE_STATIC)) != SQLITE_OK) {
+	if ((sqlite_code = sqlite3_bind_text(sth, 2, wmud_player_get_email(player), -1, SQLITE_STATIC)) != SQLITE_OK) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
 
 		return FALSE;

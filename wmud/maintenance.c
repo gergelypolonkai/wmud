@@ -32,6 +32,7 @@
 #include "main.h"
 #include "players.h"
 #include "configuration.h"
+#include "wmudplayer.h"
 
 /**
  * SECTION:maintenance-thread
@@ -42,16 +43,16 @@
 
 /**
  * wmud_maintenance_check_players:
- * @player: #wmudPLayer structure of the player record to check
+ * @player: #WmudPLayer object of the player record to check
  * @user_data: not used
  *
  * Callback called from within the maintenance loop. Checks if the player has
  * an unset password, and generate one for them, if so.
  */
 void
-wmud_maintenance_check_players(wmudPlayer *player, gpointer user_data)
+wmud_maintenance_check_players(WmudPlayer *player, gpointer user_data)
 {
-	if (player->cpassword == NULL) {
+	if (wmud_player_get_cpassword(player) == NULL) {
 		gchar *pw,
 		      *salt,
 		      *cpw;
@@ -64,9 +65,9 @@ wmud_maintenance_check_players(wmudPlayer *player, gpointer user_data)
 		cpw = g_strdup(crypt(pw, full_salt->str));
 
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Player %s has no"
-				" password set", player->player_name);
+				" password set", wmud_player_get_player_name(player));
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "New password will be %s", pw);
-		player->cpassword = cpw;
+		wmud_player_set_cpassword(player, cpw);
 		/* TODO: Send e-mail about the new password. Upon completion, set it in
 		 * the database */
 
