@@ -16,9 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include "wmudclient.h"
 
+#include "wmudclient.h"
 #include "players.h"
+
+/**
+ * SECTION:wmudclient
+ * @short_description: wMUD Client
+ * @inclide: wmudclient.h
+ *
+ * #WmudClient is for storing an active client connection
+ **/
+
+G_DEFINE_TYPE(WmudClient, wmud_client, G_TYPE_OBJECT);
+
+enum {
+	SIG_CONNECTED,
+	SIG_NET_HUP,
+	SIG_NET_RECV,
+	SIG_LAST
+};
+
+static guint signals[SIG_LAST] = { 0 };
 
 #define WMUD_CLIENT_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE((obj), WMUD_TYPE_CLIENT, WmudClientPrivate))
 
@@ -33,9 +52,8 @@ struct _WmudClientPrivate
 	gboolean bademail;
 	gint login_try_count;
 	WmudClientYesnoCallback yesno_callback;
+	time_t last_recv;
 };
-
-G_DEFINE_TYPE(WmudClient, wmud_client, G_TYPE_OBJECT);
 
 static void
 wmud_client_dispose(GObject *gobject)
@@ -62,6 +80,12 @@ wmud_client_finalize(GObject *gobject)
 	G_OBJECT_CLASS(wmud_client_parent_class)->finalize(gobject);
 }
 
+static void net_recv(WmudClient *self)
+{
+	self->priv->last_recv = time(NULL);
+	g_message("net-recv");
+}
+
 static void
 wmud_client_class_init(WmudClientClass *klass)
 {
@@ -69,6 +93,47 @@ wmud_client_class_init(WmudClientClass *klass)
 
 	gobject_class->dispose = wmud_client_dispose;
 	gobject_class->finalize = wmud_client_finalize;
+
+	/**
+	 * WmudClient::connected:
+	 * @client: The client emitting the signal
+	 *
+	 * Emitted when a new client connection is accepted
+	 **/
+	signals[SIG_CONNECTED] = g_signal_newv("connected",
+	                                       WMUD_TYPE_CLIENT,
+	                                       G_SIGNAL_RUN_LAST,
+	                                       NULL,
+	                                       NULL, NULL,
+	                                       g_cclosure_marshal_VOID__OBJECT,
+	                                       G_TYPE_NONE, 0, NULL);
+
+	/**
+	 * WmudClient::net-hup:
+	 * @client: The client emitting the signal
+	 *
+	 * Emitted when the remote side closes the connection
+	 **/
+	signals[SIG_NET_HUP] = g_signal_newv("net-hup",
+			                     WMUD_TYPE_CLIENT,
+					     G_SIGNAL_RUN_LAST,
+					     NULL,
+					     NULL, NULL,
+					     g_cclosure_marshal_VOID__OBJECT,
+					     G_TYPE_NONE, 0, NULL);
+	/**
+	 * WmudClient::net-recv:
+	 * @client: The client emitting the signal
+	 *
+	 * Emitted when data is received through the client socket
+	 **/
+	signals[SIG_NET_RECV] = g_signal_newv("net-recv",
+	                                      WMUD_TYPE_CLIENT,
+				              G_SIGNAL_RUN_LAST,
+					      g_cclosure_new(G_CALLBACK(net_recv), NULL, NULL),
+					      NULL, NULL,
+					      g_cclosure_marshal_VOID__VOID,
+					      G_TYPE_NONE, 0, NULL);
 
 	g_type_class_add_private(klass, sizeof(WmudClientPrivate));
 }
@@ -80,6 +145,20 @@ wmud_client_init(WmudClient *self)
 	self->priv->socket_source = NULL;
 	self->priv->state = WMUD_CLIENT_STATE_FRESH;
 	self->priv->buffer = g_string_new("");
+	self->priv->last_recv = time(NULL);
+
+	g_signal_emit_by_name(self, "connected", G_TYPE_NONE);
+}
+
+static gboolean
+net_emitter(GSocket *client_socket, GIOCondition condition, WmudClient *self)
+{
+	if (condition & G_IO_HUP)
+		g_signal_emit_by_name(self, "net-close", G_TYPE_NONE);
+	else if ((condition & G_IO_IN) || (condition & G_IO_PRI))
+		g_signal_emit_by_name(self, "net-recv", G_TYPE_NONE);
+
+	return TRUE;
 }
 
 WmudClient *
@@ -94,6 +173,8 @@ wmud_client_set_socket(WmudClient *self, GSocket *socket)
 	/* TODO: Check if a socket is already set! */
 	self->priv->socket = socket;
 	self->priv->socket_source = g_socket_create_source(socket, G_IO_IN | G_IO_OUT | G_IO_PRI | G_IO_ERR | G_IO_HUP | G_IO_NVAL, NULL);
+
+	g_source_set_callback(self->priv->socket_source, (GSourceFunc)net_emitter, self, NULL);
 }
 
 GSocket *
@@ -231,5 +312,17 @@ gboolean
 wmud_client_get_bademail(WmudClient *self)
 {
 	return self->priv->bademail;
+}
+
+void
+wmud_client_set_context(WmudClient *self, GMainContext *context)
+{
+	g_source_attach(self->priv->socket_source, context);
+}
+
+guint32
+wmud_client_get_last_recv_age(WmudClient *self)
+{
+	return (time(NULL) - self->priv->last_recv);
 }
 

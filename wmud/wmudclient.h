@@ -31,6 +31,11 @@
 #define WMUD_IS_CLIENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), WMUD_TYPE_CLIENT))
 #define WMUD_CLIENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), WMUT_TYPE_CLIENT, WmudClientClass))
 
+/**
+ * WmudClient:
+ *
+ * A connected game client
+ */
 typedef struct _WmudClient WmudClient;
 typedef struct _WmudClientClass WmudClientClass;
 typedef struct _WmudClientPrivate WmudClientPrivate;
@@ -102,6 +107,8 @@ void wmud_client_increase_login_fail_count(WmudClient *client);
 gint wmud_client_get_login_fail_count(WmudClient *client);
 void wmud_client_set_bademail(WmudClient *client, gboolean bademail);
 gboolean wmud_client_get_bademail(WmudClient *client);
+guint32 wmud_client_get_last_recv_age(WmudClient *client);
+void wmud_client_set_context(WmudClient *client, GMainContext *context);
 
 #endif /* __WMUD_WMUDCLIENT_H__ */
 

@@ -73,6 +73,12 @@ remove_client(WmudClient *client, gboolean send_quitmessage)
 	wmud_client_close(client, send_quitmessage);
 }
 
+static void
+hup_client(WmudClient *client)
+{
+	remove_client(client, FALSE);
+}
+
 /**
  * wmud_client_callback:
  * @client: the socket of the client on which the data arrived
@@ -80,116 +86,107 @@ remove_client(WmudClient *client, gboolean send_quitmessage)
  * @client: the WmudClient structure of the client
  *
  * Processes incoming client data, and client hangup
- *
- * Return value: %FALSE if the connection is closed after this call, %TRUE
- * otherwise
  */
-static gboolean
-wmud_client_callback(GSocket *client_socket, GIOCondition condition, WmudClient *client)
+static void
+recv_client(WmudClient *client)
 {
 	GError *err = NULL;
+	GSocket *client_socket;
+	gssize len;
+	gchar *buf2;
+	gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
 
-	if (condition & G_IO_HUP) {
+	client_socket = wmud_client_get_socket(client);
+
+	if ((len = g_socket_receive(client_socket, buf, MAX_RECV_LEN, NULL, &err)) == 0) {
+		g_free(buf);
 		remove_client(client, FALSE);
 
-		return FALSE;
-	} else if ((condition & G_IO_IN) || (condition & G_IO_PRI)) {
-		gssize len;
-		gchar *buf2;
-		gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
-
-		if ((len = g_socket_receive(client_socket, buf, MAX_RECV_LEN, NULL, &err)) == 0) {
-			g_free(buf);
-			remove_client(client, FALSE);
-
-			return FALSE;
-		}
-
-		buf2 = buf;
-		while (TRUE) {
-			char *r = strchr((char *)buf2, '\r'),
-			     *n = strchr((char *)buf2, '\n');
-
-			if (r || n) {
-				gint i,
-				     sloc = -1;
-
-				if ((r < n) && r) {
-					if (wmud_client_get_buffer_length(client) > 0)
-						g_string_append_len(wmud_client_get_buffer(client), buf2, (r - buf2));
-					else
-						g_string_overwrite_len(wmud_client_get_buffer(client), 0, buf2, (r - buf2));
-					buf2 = r;
-				} else if (n) {
-					if (wmud_client_get_buffer_length(client) > 0)
-						g_string_append_len(wmud_client_get_buffer(client), buf2, (n - buf2));
-					else
-						g_string_overwrite_len(wmud_client_get_buffer(client), 0, buf2, (n - buf2));
-					buf2 = n;
-				}
-
-				/* Remove telnet codes from the string */
-				for (i = 0; i < wmud_client_get_buffer_length(client); i++) {
-					guchar c = (wmud_client_get_buffer(client)->str)[i];
-
-					if ((c >= 240) || (c == 1)) {
-						if (sloc == -1)
-							sloc = i;
-					} else {
-						if (sloc != -1) {
-							g_string_erase(wmud_client_get_buffer(client), sloc, i - sloc);
-							sloc = -1;
-						}
-					}
-				}
-
-				if (sloc != -1)
-					g_string_erase(wmud_client_get_buffer(client), sloc, -1);
-
-				switch (wmud_client_get_state(client))
-				{
-					case WMUD_CLIENT_STATE_FRESH:
-						state_fresh(client);
-						break;
-					case WMUD_CLIENT_STATE_PASSWAIT:
-						state_passwait(client);
-						break;
-					case WMUD_CLIENT_STATE_MENU:
-						state_menu(client);
-						break;
-					case WMUD_CLIENT_STATE_INGAME:
-						wmud_interpret_game_command(client);
-						break;
-					case WMUD_CLIENT_STATE_YESNO:
-						state_yesno(client);
-						break;
-					case WMUD_CLIENT_STATE_REGISTERING:
-						state_registering(client);
-						break;
-					case WMUD_CLIENT_STATE_REGEMAIL_CONFIRM:
-						state_regemail_confirm(client);
-						break;
-				}
-				g_string_erase(wmud_client_get_buffer(client), 0, -1);
-
-				for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
-
-				if (!*buf2)
-					break;
-			} else {
-				if (wmud_client_get_buffer_length(client) > 0)
-					g_string_append(wmud_client_get_buffer(client), buf2);
-				else
-					g_string_overwrite(wmud_client_get_buffer(client), 0, buf2);
-
-				break;
-			}
-		}
-
-		g_free(buf);
+		return;
 	}
 
-	return TRUE;
+	buf2 = buf;
+	while (TRUE) {
+		char *r = strchr((char *)buf2, '\r'),
+		     *n = strchr((char *)buf2, '\n');
+
+		if (r || n) {
+			gint i,
+			     sloc = -1;
+
+			if ((r < n) && r) {
+				if (wmud_client_get_buffer_length(client) > 0)
+					g_string_append_len(wmud_client_get_buffer(client), buf2, (r - buf2));
+				else
+					g_string_overwrite_len(wmud_client_get_buffer(client), 0, buf2, (r - buf2));
+				buf2 = r;
+			} else if (n) {
+				if (wmud_client_get_buffer_length(client) > 0)
+					g_string_append_len(wmud_client_get_buffer(client), buf2, (n - buf2));
+				else
+					g_string_overwrite_len(wmud_client_get_buffer(client), 0, buf2, (n - buf2));
+				buf2 = n;
+			}
+
+			/* Remove telnet codes from the string */
+			for (i = 0; i < wmud_client_get_buffer_length(client); i++) {
+				guchar c = (wmud_client_get_buffer(client)->str)[i];
+
+				if ((c >= 240) || (c == 1)) {
+					if (sloc == -1)
+						sloc = i;
+				} else {
+					if (sloc != -1) {
+						g_string_erase(wmud_client_get_buffer(client), sloc, i - sloc);
+						sloc = -1;
+					}
+				}
+			}
+
+			if (sloc != -1)
+				g_string_erase(wmud_client_get_buffer(client), sloc, -1);
+
+			switch (wmud_client_get_state(client))
+			{
+				case WMUD_CLIENT_STATE_FRESH:
+					state_fresh(client);
+					break;
+				case WMUD_CLIENT_STATE_PASSWAIT:
+					state_passwait(client);
+					break;
+				case WMUD_CLIENT_STATE_MENU:
+					state_menu(client);
+					break;
+				case WMUD_CLIENT_STATE_INGAME:
+					wmud_interpret_game_command(client);
+					break;
+				case WMUD_CLIENT_STATE_YESNO:
+					state_yesno(client);
+					break;
+				case WMUD_CLIENT_STATE_REGISTERING:
+					state_registering(client);
+					break;
+				case WMUD_CLIENT_STATE_REGEMAIL_CONFIRM:
+					state_regemail_confirm(client);
+					break;
+			}
+			g_string_erase(wmud_client_get_buffer(client), 0, -1);
+
+			for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
+
+			if (!*buf2)
+				break;
+		} else {
+			if (wmud_client_get_buffer_length(client) > 0)
+				g_string_append(wmud_client_get_buffer(client), buf2);
+			else
+				g_string_overwrite(wmud_client_get_buffer(client), 0, buf2);
+
+			break;
+		}
+	}
+
+	g_free(buf);
 }
 
 /**
@@ -207,7 +204,6 @@ gboolean
 game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData *accept_data)
 {
 	GSocket *client_socket;
-	GSource *client_source;
 	GError *err = NULL;
 	GSocketAddress *remote_addr;
 	WmudClient *client;
@@ -218,12 +214,11 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
 
 	client = wmud_client_new();
 	wmud_client_set_socket(WMUD_CLIENT(client), client_socket);
-	client_source = wmud_client_get_socket_source(client);
+	wmud_client_set_context(client, accept_data->context);
+	g_signal_connect(client, "net-hup", G_CALLBACK(hup_client), NULL);
+	g_signal_connect(client, "net-recv", G_CALLBACK(recv_client), NULL);
 
 	clients = g_slist_prepend(clients, client);
-
-	g_source_set_callback(client_source, (GSourceFunc)wmud_client_callback, client, NULL);
-	g_source_attach(client_source, accept_data->context);
 
 	g_clear_error(&err);
 
