@@ -57,8 +57,8 @@ wmud_configdata_free(ConfigData **config_data)
 	if ((*config_data)->admin_email)
 		g_free((*config_data)->admin_email);
 
-	if ((*config_data)->database_file)
-		g_free((*config_data)->database_file);
+	if ((*config_data)->database_dsn)
+		g_free((*config_data)->database_dsn);
 
 	if ((*config_data)->smtp_server)
 		g_free((*config_data)->smtp_server);
@@ -93,6 +93,7 @@ wmud_config_init(ConfigData **config_data, GError **err)
 	GString *config_file = g_string_new(WMUD_CONFDIR);
 	GKeyFile *config;
 	GError *in_err = NULL;
+	gchar *pos;
 
 	if (!config_data)
 		return FALSE;
@@ -127,6 +128,14 @@ wmud_config_init(ConfigData **config_data, GError **err)
 		return FALSE;
 	}
 
+	if (!g_key_file_has_group(config, "database")) {
+		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NODATABASE, "Config file (%s) does not contain a [database] group", config_file->str);
+		g_key_file_free(config);
+		g_string_free(config_file, TRUE);
+
+		return FALSE;
+	}
+
 	g_clear_error(&in_err);
 	(*config_data)->port = g_key_file_get_integer(config, "global", "port", &in_err);
 	if (in_err)
@@ -141,17 +150,6 @@ wmud_config_init(ConfigData **config_data, GError **err)
 
 			return FALSE;
 		}
-
-		return FALSE;
-	}
-
-	g_clear_error(&in_err);
-	(*config_data)->database_file = g_key_file_get_string(config, "global", "world file", &in_err);
-	if (in_err && g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOWORLD, "Config file (%s) does not contain a world file path", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
-		wmud_configdata_free(config_data);
 
 		return FALSE;
 	}
@@ -189,8 +187,30 @@ wmud_config_init(ConfigData **config_data, GError **err)
 		return FALSE;
 	}
 
+	g_clear_error(&in_err);
+	(*config_data)->database_dsn = g_key_file_get_string(config, "database", "dsn", &in_err);
+	if (in_err && g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOWORLD, "Config file (%s) does not contain a database dsn", config_file->str);
+		g_key_file_free(config);
+		g_string_free(config_file, TRUE);
+		wmud_configdata_free(config_data);
+
+		return FALSE;
+	}
+
+	if ((pos = g_strstr_len((*config_data)->database_dsn, -1, "{statedir}")) != NULL) {
+		guint real_pos = pos - (*config_data)->database_dsn;
+		GString *tmp = g_string_new((*config_data)->database_dsn);
+
+		g_string_erase(tmp, real_pos, 10);
+		g_string_insert(tmp, real_pos, WMUD_STATEDIR);
+		(*config_data)->database_dsn = tmp->str;
+		g_string_free(tmp, FALSE);
+	}
+
 	g_key_file_free(config);
 	g_string_free(config_file, TRUE);
 
 	return TRUE;
 }
+

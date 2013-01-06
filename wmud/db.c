@@ -18,7 +18,8 @@
  */
 
 #include <glib.h>
-#include <sqlite3.h>
+#include <libgda/libgda.h>
+#include <sql-parser/gda-sql-parser.h>
 
 #include "world.h"
 #include "main.h"
@@ -38,7 +39,8 @@
  * different (e.g MySQL or PostgreSQL) database.
  */
 
-static sqlite3 *dbh = NULL;
+static GdaConnection *dbh = NULL;
+static GdaSqlParser *parser = NULL;
 
 GQuark
 wmud_db_error_quark()
@@ -55,16 +57,20 @@ wmud_db_error_quark()
 gboolean
 wmud_db_init(GError **err)
 {
-	GString *db_file = g_string_new(WMUD_STATEDIR);
-	int sqlite_code;
+	GError *local_err = NULL;
 
-	g_string_append_printf(db_file, "/%s", active_config->database_file);
+	gda_init();
 
-	if ((sqlite_code = sqlite3_open(db_file->str, &dbh)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_CANTOPEN, "Can not open databsae file (%s): %s", db_file->str, sqlite3_errmsg(dbh));
+	/* TODO: error checking! */
+	dbh = gda_connection_open_from_string("sqlite", active_config->database_dsn, NULL, 0, &local_err);
+
+	if (dbh == NULL) {
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_CANTOPEN, "Can not open databsae (%s): %s", active_config->database_dsn, local_err->message);
 
 		return FALSE;
 	}
+
+	parser = gda_sql_parser_new();
 
 	return TRUE;
 }
@@ -78,45 +84,49 @@ wmud_db_init(GError **err)
 gboolean
 wmud_db_load_players(GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res;
+	GdaDataModelIter *iter;
 
-	if (dbh == NULL)
-	{
+	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, login, password, email FROM players", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT id, login, password, email FROM players", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		WmudPlayer *player;
+
+		player = wmud_player_new();
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		wmud_player_set_id(player, g_value_get_int(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		wmud_player_set_player_name(player, g_value_get_string(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 2);
+		wmud_player_set_cpassword(player, g_value_get_string(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 3);
+		wmud_player_set_email(player, g_value_get_string(val));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded player _%s_", wmud_player_get_player_name(player));
+
+		players = g_slist_prepend(players, player);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			WmudPlayer *player = wmud_player_new();
-			wmud_player_set_id(player, sqlite3_column_int(sth, 0));
-			wmud_player_set_player_name(player, (const gchar *)sqlite3_column_text(sth, 1));
-			wmud_player_set_cpassword(player, (const gchar *)sqlite3_column_text(sth, 2));
-			wmud_player_set_email(player, (const gchar *)sqlite3_column_text(sth, 3));
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded player _%s_", wmud_player_get_player_name(player));
-
-			players = g_slist_prepend(players, player);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_players(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return FALSE;
 }
@@ -134,6 +144,7 @@ wmud_db_load_players(GError **err)
 gboolean
 wmud_db_save_player(WmudPlayer *player, GError **err)
 {
+	/*
 	sqlite3_stmt *sth = NULL;
 	int sqlite_code;
 
@@ -170,13 +181,16 @@ wmud_db_save_player(WmudPlayer *player, GError **err)
 
 	g_clear_error(err);
 	return TRUE;
+	*/
+	return FALSE;
 }
 
 gboolean
 wmud_db_load_planes(GSList **planes, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planes");
 	if (dbh == NULL) {
@@ -186,32 +200,32 @@ wmud_db_load_planes(GSList **planes, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planes", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planes(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT id, name FROM planes", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudPlane *plane;
+
+		plane = g_new0(wmudPlane, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		plane->id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		plane->name = g_strdup(g_value_get_string(val));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded plane _%s_", plane->name);
+
+		*planes = g_slist_prepend(*planes, plane);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			wmudPlane *plane = g_new0(wmudPlane, 1);
-			plane->id = sqlite3_column_int(sth, 0);
-			plane->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded plane _%s_", plane->name);
-
-			*planes = g_slist_prepend(*planes, plane);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_planes(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
@@ -219,8 +233,9 @@ wmud_db_load_planes(GSList **planes, GError **err)
 gboolean
 wmud_db_load_planets(GSList **planets, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planets");
 	if (dbh == NULL) {
@@ -230,33 +245,32 @@ wmud_db_load_planets(GSList **planets, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM planets", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planets(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT id, name FROM planets", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudPlanet *planet;
+
+		planet = g_new0(wmudPlanet, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		planet->id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		planet->name = g_strdup(g_value_get_string(val));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet _%s_", planet->name);
+
+		*planets = g_slist_prepend(*planets, planet);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			wmudPlanet *planet = g_new0(wmudPlanet, 1);
-			planet->id = sqlite3_column_int(sth, 0);
-			planet->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet _%s_", planet->name);
-
-			*planets = g_slist_prepend(*planets, planet);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_planets(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
@@ -264,8 +278,9 @@ wmud_db_load_planets(GSList **planets, GError **err)
 gboolean
 wmud_db_load_directions(GSList **directions, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	if (dbh == NULL) {
 		if (err)
@@ -274,32 +289,35 @@ wmud_db_load_directions(GSList **directions, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, short_name, name FROM directions", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_directions(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT id, short_name, name FROM directions", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudDirection *dir;
+
+		dir = g_new0(wmudDirection, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		dir->id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		dir->short_name = g_strdup(g_value_get_string(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 2);
+		dir->name = g_strdup(g_value_get_string(val));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded direction _%s_", dir->name);
+
+		*directions = g_slist_prepend(*directions, dir);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			wmudDirection *dir = g_new0(wmudDirection, 1);
-			dir->id = sqlite3_column_int(sth, 0);
-			dir->short_name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
-			dir->name = g_strdup((gchar *)sqlite3_column_text(sth, 2));
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded direction _%s_", dir->name);
-
-			*directions = g_slist_prepend(*directions, dir);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_directions(): %s", sqlite3_errmsg(dbh));
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
@@ -307,8 +325,9 @@ wmud_db_load_directions(GSList **directions, GError **err)
 gboolean
 wmud_db_load_areas(GSList **areas, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading areas");
 	if (dbh == NULL) {
@@ -318,32 +337,32 @@ wmud_db_load_areas(GSList **areas, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, name FROM areas", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT id, name FROM areas", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudArea *area;
+
+		area = g_new0(wmudArea, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		area->id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		area->name = g_strdup(g_value_get_string(val));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded area _%s_", area->name);
+
+		*areas = g_slist_prepend(*areas, area);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			wmudArea *area = g_new0(wmudArea, 1);
-			area->id = sqlite3_column_int(sth, 0);
-			area->name = g_strdup((gchar *)sqlite3_column_text(sth, 1));
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded area _%s_", area->name);
-
-			*areas = g_slist_prepend(*areas, area);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_areas(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
@@ -351,8 +370,9 @@ wmud_db_load_areas(GSList **areas, GError **err)
 gboolean
 wmud_db_load_rooms(GSList **rooms, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
 	if (dbh == NULL) {
@@ -362,35 +382,41 @@ wmud_db_load_rooms(GSList **rooms, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, area, name, distant_description, close_description FROM rooms", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_rooms(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT id, area, name, distant_description, close_description FROM rooms", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudRoom *room;
+
+		room = g_new0(wmudRoom, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		room->id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		room->area_id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 2);
+		room->name = g_strdup(g_value_get_string(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 3);
+		room->distant_description = g_strdup(g_value_get_string(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 4);
+		room->close_description = g_strdup(g_value_get_string(val));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded room %d/_%s_", room->area_id, room->name);
+
+		*rooms = g_slist_prepend(*rooms, room);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			wmudRoom *room = g_new0(wmudRoom, 1);
-			room->id = sqlite3_column_int(sth, 0);
-			room->area_id = sqlite3_column_int(sth, 1);
-			room->name = g_strdup((gchar *)sqlite3_column_text(sth, 2));
-			room->distant_description = g_strdup((gchar *)sqlite3_column_text(sth, 3));
-			room->close_description = g_strdup((gchar *)sqlite3_column_text(sth, 4));
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded room %d/_%s_", room->area_id, room->name);
-
-			*rooms = g_slist_prepend(*rooms, room);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_rooms(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
@@ -398,8 +424,9 @@ wmud_db_load_rooms(GSList **rooms, GError **err)
 gboolean
 wmud_db_load_exits(GSList **exits, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
 	if (dbh == NULL) {
@@ -409,34 +436,35 @@ wmud_db_load_exits(GSList **exits, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT room_id, direction, other_side FROM room_exits", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT room_id, direction, other_side FROM room_exits", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudExit *room_exit;
+
+		room_exit = g_new0(wmudExit, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		room_exit->source_room_id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		room_exit->direction_id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 2);
+		room_exit->destination_room_id = g_value_get_int(val);
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded exit %d =%d=> %d", room_exit->source_room_id, room_exit->direction_id, room_exit->destination_room_id);
+
+		*exits = g_slist_prepend(*exits, room_exit);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			wmudExit *room_exit = g_new0(wmudExit, 1);
-			room_exit->source_room_id = sqlite3_column_int(sth, 0);
-			room_exit->direction_id = sqlite3_column_int(sth, 1);
-			room_exit->destination_room_id = sqlite3_column_int(sth, 2);
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded exit %d =%d=> %d", room_exit->source_room_id, room_exit->direction_id, room_exit->destination_room_id);
-
-			*exits = g_slist_prepend(*exits, room_exit);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
@@ -444,8 +472,9 @@ wmud_db_load_exits(GSList **exits, GError **err)
 gboolean
 wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
 	if (dbh == NULL) {
@@ -455,34 +484,32 @@ wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT planet_id, plane_id FROM planet_planes", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_planet_planes(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT planet_id, plane_id FROM planet_planes", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudPlanetPlaneAssoc *planet_plane;
+
+		planet_plane = g_new0(wmudPlanetPlaneAssoc, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		planet_plane->planet_id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		planet_plane->plane_id = g_value_get_int(val);
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet-plane association %d <> %d", planet_plane->planet_id, planet_plane->plane_id);
+
+		*planet_planes = g_slist_prepend(*planet_planes, planet_plane);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-
-		if (sqlite_code == SQLITE_ROW) {
-			wmudPlanetPlaneAssoc *planet_plane = g_new0(wmudPlanetPlaneAssoc, 1);
-			planet_plane->planet_id = sqlite3_column_int(sth, 0);
-			planet_plane->plane_id = sqlite3_column_int(sth, 1);
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded planet-plane association %d <> %d", planet_plane->planet_id, planet_plane->plane_id);
-
-			*planet_planes = g_slist_prepend(*planet_planes, planet_plane);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_exits(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
@@ -490,8 +517,9 @@ wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 gboolean
 wmud_db_load_menu(GSList **menu_items, GError **err)
 {
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GdaStatement *sth = NULL;
+	GdaDataModel *res = NULL;
+	GdaDataModelIter *iter;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading menu items");
 	if (dbh == NULL) {
@@ -501,37 +529,45 @@ wmud_db_load_menu(GSList **menu_items, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu ORDER BY placement", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_load_menu(): %s", sqlite3_errmsg(dbh));
+	sth = gda_sql_parser_parse_string(parser, "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu ORDER BY placement", NULL, NULL);
+	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+	iter = gda_data_model_create_iter(res);
+	gda_data_model_iter_move_next(iter);
 
-		return FALSE;
+	while (gda_data_model_iter_is_valid(iter)) {
+		const GValue *val;
+		wmudMenu *menu_item;
+
+		menu_item = g_new0(wmudMenu, 1);
+
+		val = gda_data_model_iter_get_value_at(iter, 0);
+		menu_item->id = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 1);
+		menu_item->menuchar = *(g_value_get_string(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 2);
+		menu_item->need_active_char = g_value_get_boolean(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 3);
+		menu_item->placement = g_value_get_int(val);
+
+		val = gda_data_model_iter_get_value_at(iter, 4);
+		menu_item->text = g_strdup(g_value_get_string(val));
+
+		val = gda_data_model_iter_get_value_at(iter, 5);
+		menu_item->func = g_strdup(g_value_get_string(val));
+
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded menu item %d: %s(%c)", menu_item->id, menu_item->text, menu_item->menuchar);
+
+		*menu_items = g_slist_prepend(*menu_items, menu_item);
+
+		gda_data_model_iter_move_next(iter);
 	}
 
-	while (1) {
-		sqlite_code = sqlite3_step(sth);
-		if (sqlite_code == SQLITE_ROW) {
-			wmudMenu *menu_item = g_new0(wmudMenu, 1);
-			menu_item->id = sqlite3_column_int(sth, 0);
-			menu_item->menuchar = *(sqlite3_column_text(sth, 1));
-			menu_item->need_active_char = (sqlite3_column_int(sth, 2) != 0);
-			menu_item->placement = sqlite3_column_int(sth, 3);
-			menu_item->text = g_strdup((gchar *)sqlite3_column_text(sth, 4));
-			menu_item->func = g_strdup((gchar *)sqlite3_column_text(sth, 5));
-
-			g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded menu item %d: %s", menu_item->id, menu_item->text);
-
-			*menu_items = g_slist_prepend(*menu_items, menu_item);
-		} else if (sqlite_code == SQLITE_DONE) {
-			break;
-		} else {
-			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Query error in wmud_db_load_menu_items(): %s", sqlite3_errmsg(dbh));
-			sqlite3_finalize(sth);
-
-			return FALSE;
-		}
-	}
-
-	sqlite3_finalize(sth);
+	g_object_unref(iter);
+	g_object_unref(sth);
 
 	return TRUE;
 }
+

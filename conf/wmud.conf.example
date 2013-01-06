@@ -1,8 +1,4 @@
 [global]
-# The world database file. This file holds everything needed to create the
-# in-game world and let players login.
-world file = iminiru.db
-
 # The game thread will listen on this port.
 port = 4000
 
@@ -64,3 +60,9 @@ smtp password = wmudPassWD1
 # The sender's e-mail address. This will appear in all sent e-mails. Should be
 # in the form Name <e-mail@address>, where Name can be omitted
 smtp sender = wMUD <polesz@w00d5t0ck.info>
+
+[database]
+# The world database file. This file holds everything needed to create the
+# in-game world and let players login.
+dsn = SQLite://DB_DIR={statedir};DB_NAME=iminiru.db
+
