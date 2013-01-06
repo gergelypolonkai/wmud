@@ -18,6 +18,7 @@
  */
 
 #include "wmudclient.h"
+#include "wmudclientstate.h"
 #include "players.h"
 
 /**
