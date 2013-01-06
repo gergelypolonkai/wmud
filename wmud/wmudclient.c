@@ -106,7 +106,7 @@ wmud_client_class_init(WmudClientClass *klass)
 	                                       G_SIGNAL_RUN_LAST,
 	                                       NULL,
 	                                       NULL, NULL,
-	                                       g_cclosure_marshal_VOID__OBJECT,
+	                                       NULL,
 	                                       G_TYPE_NONE, 0, NULL);
 
 	/**
@@ -120,7 +120,7 @@ wmud_client_class_init(WmudClientClass *klass)
 					     G_SIGNAL_RUN_LAST,
 					     NULL,
 					     NULL, NULL,
-					     g_cclosure_marshal_VOID__OBJECT,
+					     NULL,
 					     G_TYPE_NONE, 0, NULL);
 	/**
 	 * WmudClient::net-recv:
@@ -133,7 +133,7 @@ wmud_client_class_init(WmudClientClass *klass)
 				              G_SIGNAL_RUN_LAST,
 					      g_cclosure_new(G_CALLBACK(net_recv), NULL, NULL),
 					      NULL, NULL,
-					      g_cclosure_marshal_VOID__VOID,
+					      NULL,
 					      G_TYPE_NONE, 0, NULL);
 
 	g_type_class_add_private(klass, sizeof(WmudClientPrivate));
