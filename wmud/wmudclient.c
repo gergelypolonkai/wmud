@@ -86,7 +86,6 @@ wmud_client_finalize(GObject *gobject)
 static void net_recv(WmudClient *self)
 {
 	self->priv->last_recv = time(NULL);
-	g_message("net-recv");
 }
 
 static void
