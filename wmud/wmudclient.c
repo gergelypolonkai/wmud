@@ -35,6 +35,7 @@ enum {
 	SIG_CONNECTED,
 	SIG_NET_HUP,
 	SIG_NET_RECV,
+	SIG_STATE_CHANGE,
 	SIG_LAST
 };
 
@@ -135,6 +136,22 @@ wmud_client_class_init(WmudClientClass *klass)
 					      NULL, NULL,
 					      NULL,
 					      G_TYPE_NONE, 0, NULL);
+
+	/**
+	 * WmudClient::state-change:
+	 * @client: The client emitting the signal
+	 * @old_state: The state which we are changing from.
+	 * @new_state: The state which we are changing to.
+	 *
+	 * Emitted when the client changes state
+	 **/
+	signals[SIG_STATE_CHANGE] = g_signal_new("state-change",
+	                                          WMUD_TYPE_CLIENT,
+						  G_SIGNAL_RUN_LAST,
+						  0,
+						  NULL, NULL,
+						  NULL,
+						  G_TYPE_NONE, 2, WMUD_TYPE_CLIENT_STATE, WMUD_TYPE_CLIENT_STATE);
 
 	g_type_class_add_private(klass, sizeof(WmudClientPrivate));
 }
@@ -256,9 +273,13 @@ wmud_client_get_state(WmudClient *self)
 }
 
 void
-wmud_client_set_state(WmudClient *self, WmudClientState state)
+wmud_client_set_state(WmudClient *self, WmudClientState new_state)
 {
-	self->priv->state = state;
+	WmudClientState old_state = self->priv->state;
+
+	self->priv->state = new_state;
+
+	g_signal_emit_by_name(self, "state-change", old_state, new_state, G_TYPE_NONE);
 }
 
 void
