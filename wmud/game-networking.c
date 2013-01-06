@@ -413,7 +413,8 @@ state_fresh(WmudClient *client)
 				wmud_client_send(client, "Please provide us your password: %c%c%c", TELNET_IAC, TELNET_WILL, TELNET_ECHO);
 			}
 		} else {
-			WmudPlayer *player = g_new0(WmudPlayer, 1);
+			WmudPlayer *player = wmud_player_new();
+
 			wmud_player_set_player_name(player, wmud_client_get_buffer(client)->str);
 			wmud_client_set_player(client, player);
 			wmud_client_set_state(client, WMUD_CLIENT_STATE_YESNO);
