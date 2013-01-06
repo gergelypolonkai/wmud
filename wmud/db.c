@@ -88,6 +88,7 @@ wmud_db_load_players(GError **err)
 	GdaDataModel *res;
 	GdaDataModelIter *iter;
 
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading players");
 	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
@@ -282,6 +283,7 @@ wmud_db_load_directions(GSList **directions, GError **err)
 	GdaDataModel *res = NULL;
 	GdaDataModelIter *iter;
 
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading directions");
 	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
@@ -428,7 +430,7 @@ wmud_db_load_exits(GSList **exits, GError **err)
 	GdaDataModel *res = NULL;
 	GdaDataModelIter *iter;
 
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading exits");
 	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
@@ -476,7 +478,7 @@ wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 	GdaDataModel *res = NULL;
 	GdaDataModelIter *iter;
 
-	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planet<->plane associations");
 	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
