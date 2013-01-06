@@ -25,6 +25,7 @@
 #ifdef HAVE_CRYPT_H
 #include <crypt.h>
 #endif
+#include <time.h>
 
 #include "main.h"
 #include "game-networking.h"
@@ -127,24 +128,34 @@ wmud_type_init(void)
 void
 wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
 {
+	static char timestamp[20];
+	struct tm *tm;
+	time_t ts = time(NULL);
+	size_t last_char;
+
+	tm = localtime(&ts);
+
+	last_char = strftime((char *)&timestamp, 20, "%F %T", tm);
+	timestamp[last_char] = '\0';
+
 	switch (log_level) {
 		case G_LOG_LEVEL_DEBUG:
-			g_print("DEBUG:             %s\n", message);
+			g_print("[%s] DEBUG:             %s\n", timestamp, message);
 #ifndef DEBUG
 			g_warn("Logging a debug-level message without debugging support!");
 #endif
 			break;
 		case G_LOG_LEVEL_MESSAGE:
-			g_print("MESSAGE:           %s\n", message);
+			g_print("[%s] MESSAGE:           %s\n", timestamp, message);
 			break;
 		case G_LOG_LEVEL_INFO:
-			g_print("INFO:              %s\n", message);
+			g_print("[%s] INFO:              %s\n", timestamp, message);
 			break;
 		case G_LOG_LEVEL_WARNING:
-			g_print("WARNING:           %s\n", message);
+			g_print("[%s] WARNING:           %s\n", timestamp, message);
 			break;
 		default:
-			g_print("UNKNOWN LEVEL %03d: %s\n", log_level, message);
+			g_print("[%s] UNKNOWN LEVEL %03d: %s\n", timestamp, log_level, message);
 			break;
 	}
 }
