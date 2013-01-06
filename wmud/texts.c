@@ -21,6 +21,7 @@
 
 #include "game-networking.h"
 #include "texts.h"
+#include "wmudclient.h"
 
 static const gchar *text_files[] = {
 	"motd",

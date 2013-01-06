@@ -21,7 +21,7 @@
 
 #include <glib.h>
 
-#include "wmudclient.h"
+#include "wmudplayer.h"
 
 extern GSList *players;
 
