@@ -810,7 +810,7 @@ wmud_world_load(GError **err)
 	g_clear_error(&in_err);
 
 	if (!wmud_db_load_rooms(&rooms, &in_err)) {
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load areas from database: %s", in_err->message);
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load rooms from database: %s", in_err->message);
 		wmud_world_free_rooms(rooms);
 		wmud_world_free_areas(areas);
 		wmud_world_free_planets(planets);
@@ -892,7 +892,7 @@ wmud_world_load(GError **err)
 	g_clear_error(&in_err);
 
 	if (!wmud_db_load_planet_planes(&planet_planes, &in_err)) {
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load exits from database: %s", in_err->message);
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Could not load planet-plane associations from database: %s", in_err->message);
 		wmud_world_free_planet_planes(planet_planes);
 		wmud_world_free_exits(exits);
 		wmud_world_free_rooms(rooms);
