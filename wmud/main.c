@@ -142,7 +142,7 @@ wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 		case G_LOG_LEVEL_DEBUG:
 			g_print("[%s] DEBUG:             %s\n", timestamp, message);
 #ifndef DEBUG
-			g_warn("Logging a debug-level message without debugging support!");
+			g_warning("Logging a debug-level message without debugging support!");
 #endif
 			break;
 		case G_LOG_LEVEL_MESSAGE:
