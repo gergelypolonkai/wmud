@@ -154,6 +154,9 @@ wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 		case G_LOG_LEVEL_WARNING:
 			g_print("[%s] WARNING:           %s\n", timestamp, message);
 			break;
+		case G_LOG_LEVEL_CRITICAL:
+			g_print("[%s] CRITICAL:          %s\n", timestamp, message);
+			break;
 		default:
 			g_print("[%s] UNKNOWN LEVEL %03d: %s\n", timestamp, log_level, message);
 			break;
