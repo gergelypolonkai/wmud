@@ -19,6 +19,7 @@
 
 #include "wmudclient.h"
 #include "wmudclientstate.h"
+#include "enumtypes.h"
 #include "players.h"
 
 /**

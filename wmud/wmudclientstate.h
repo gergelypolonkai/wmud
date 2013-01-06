@@ -36,9 +36,5 @@ typedef enum {
 	WMUD_CLIENT_STATE_REGEMAIL_CONFIRM
 } WmudClientState;
 
-
-GType wmud_client_state_get_type (void) G_GNUC_CONST;
-#define WMUD_TYPE_CLIENT_STATE (wmud_client_state_get_type())
-
 #endif /* __WMUD_CLIENT_STATE_H__ */
 

@@ -51,4 +51,6 @@ if test "$libcurl_protocol_SMTP" != "yes"; then
 	exit 1
 fi
 
+AM_PATH_GLIB_2_0
+
 AC_OUTPUT(Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)
