@@ -43,7 +43,7 @@ AC_DEFINE([MAX_RECV_LEN], [1024], [The maximum length of the recv() queue in byt
 PKG_CHECK_MODULES([GIO], gio-2.0)
 PKG_CHECK_MODULES([GLIB], glib-2.0)
 PKG_CHECK_MODULES([GTHREAD], gthread-2.0)
-PKG_CHECK_MODULES([GDA], libgda-4.0)
+PKG_CHECK_MODULES([GDA], libgda-5.0)
 PKG_CHECK_MODULES([CURL], libcurl)
 LIBCURL_CHECK_CONFIG
 if test "$libcurl_protocol_SMTP" != "yes"; then
