@@ -18,6 +18,14 @@ GQuark wmud_config_error_quark();
  * @WMUD_CONFIG_ERROR_NOEMAIL: Indicates that the config file doesn't contain
  *     an administrator e-mail address
  * @WMUD_CONFIG_ERROR_REUSE: configuration data is reused (non-NULL)
+ * @WMUD_CONFIG_ERROR_NOSMTP: Indicates that the config file read doesn't
+ *     contain an [SMTP] section
+ * @WMUD_CONFIG_ERROR_NOSMTPSERVER: Indicates that the config file read doesn't
+ *     contain an SMTP server address
+ * @WMUD_CONFIG_ERROR_NOSMTPSENDER: Indicates that the config file read doesn't
+ *     contain an SMTP sender address
+ * @WMUD_CONFIG_ERROR_NODATABASE: Indicates that the config file read doesn't
+ *     contain a [database] section
  *
  * Error codes returned by configuration file parsing functions.
  */
@@ -36,9 +44,15 @@ typedef enum {
 /**
  * ConfigData:
  * @port: the port number of the game interface to listen on
- * @database_file: the database file of the world associated with this
- *                 configuration
+ * @database_dsn: the data source name for the world associated with this
+ *     configuration
  * @admin_email: the world administrator's e-mail address
+ * @smtp_server: the SMTP server address to send mails through
+ * @smtp_tls: defines wether a TLS connection should be used for the SMTP
+ *     server
+ * @smtp_username: the username to use while authenticating to the SMTP server
+ * @smtp_password: the password to use while authenticating to the SMTP server
+ * @smtp_sender: the sender address who sends the outgoing mails
  */
 typedef struct _ConfigData {
 	guint port;

@@ -38,6 +38,7 @@ GHashTable *mcmd_table = NULL;
 
 /**
  * game_menu:
+ *
  * The list of menu items to display after a successful login
  */
 GSList *game_menu = NULL;

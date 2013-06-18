@@ -19,6 +19,14 @@
 #ifndef __WMUD_WMUDCLIENT_H__
 #define __WMUD_WMUDCLIENT_H__
 
+/**
+ * SECTION:wmudclient
+ * @short_description: wMUD Client
+ * @inclide: wmudclient.h
+ *
+ * #WmudClient is for storing an active client connection
+ **/
+
 #include <glib-object.h>
 #include <glib.h>
 #include <gio/gio.h>
@@ -34,6 +42,7 @@
 
 /**
  * WmudClient:
+ * @parent_instance: the parent GObject instance
  *
  * A connected game client
  */

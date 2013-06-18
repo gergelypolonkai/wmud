@@ -51,6 +51,7 @@ struct AcceptData {
 
 /**
  * clients:
+ *
  * The full #GSList of the currently connected #WmudClient objects.
  */
 GSList *clients = NULL;
@@ -249,6 +250,7 @@ game_source_callback(GSocket *socket, GIOCondition condition, struct AcceptData 
  * wmud_networking_init:
  * @port_number: the port number on which the game listener should listen
  * @game_context: the #GMainContext of the game thread
+ * @menu_items: a #GSList of menu items to present to the client
  * @err: the GError in which possible errors will be reported
  *
  * Initializes the game network listener

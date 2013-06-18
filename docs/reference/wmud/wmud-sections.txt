@@ -1,6 +1,14 @@
 <SECTION>
-<TITLE>wMUD's Data Types</TITLE>
-<FILE>types</FILE>
+<TITLE>WmudClient</TITLE>
+<FILE>wmudclient</FILE>
+WmudClient
+WmudClientState
+</SECTION>
+
+<SECTION>
+<TITLE>WmudPlayer</TITLE>
+<FILE>wmudplayer</FILE>
+WmudPlayer
 </SECTION>
 
 <SECTION>
@@ -29,8 +37,6 @@ wmud_maintenance_init
 <SECTION>
 <TITLE></TITLE>
 <FILE>game-thread</FILE>
-wmudClientState
-wmudClient
 elapsed_seconds
 elapsed_cycle
 game_context
@@ -71,7 +77,6 @@ wmud_db_save_player
 <SECTION>
 <TITLE></TITLE>
 <FILE>player</FILE>
-wmudPlayer
 players
 wmud_player_dup
 wmud_player_free
