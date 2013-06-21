@@ -30,7 +30,9 @@ wmud_SOURCES =            \
 	wmudplayer.h      \
 	wmudclientstate.h \
 	enumtypes.h       \
-	enumtypes.c
+	enumtypes.c            \
+	wmudworld.c            \
+	wmudworld.h
 
 wmud_LDADD = $(MEMCACHED_LIBS) $(GLIB_LIBS) $(GIO_LIBS) $(GTHREAD_LIBS) $(GDA_LIBS) $(CURL_LIBS)
 

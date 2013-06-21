@@ -68,6 +68,19 @@ wmud_player_set_registered
 </SECTION>
 
 <SECTION>
+<TITLE>WmudWorld</TITLE>
+<FILE>wmudworld</FILE>
+WMUD_IS_WORLD
+WMUD_IS_WORLD_CLASS
+WMUD_TYPE_WORLD
+WMUD_WORLD
+WMUD_WORLD_CLASS
+WMUD_WORLD_GET_CLASS
+WmudWorldPrivate
+wmud_world_new
+</SECTION>
+
+<SECTION>
 <TITLE></TITLE>
 <FILE>utils</FILE>
 random_number
