@@ -36,6 +36,7 @@ typedef struct _WmudPlayerPrivate WmudPlayerPrivate;
 
 struct _WmudPlayer
 {
+	/*< private >*/
 	GObject  parent_instance;
 
 	/*< private >*/
@@ -63,7 +64,7 @@ gchar *wmud_player_get_email(WmudPlayer *player);
 void wmud_player_set_id(WmudPlayer *player, guint32 id);
 guint32 wmud_player_get_id(WmudPlayer *player);
 WmudPlayer *wmud_player_dup(WmudPlayer *player);
-gboolean wmud_player_password_valid(WmudPlayer *self, const gchar *password);
+gboolean wmud_player_password_valid(WmudPlayer *player, const gchar *password);
 
 #endif /* __WMUD_WMUDPLAYER_H__ */
 

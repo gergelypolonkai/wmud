@@ -19,6 +19,7 @@
     <!--xi:include href="xml/types.xml"/-->
     <xi:include href="xml/utils.xml"/>
     <xi:include href="xml/wmudclient.xml"/>
+    <xi:include href="xml/wmudplayer.xml"/>
     <xi:include href="xml/configuration.xml"/>
     <xi:include href="xml/maintenance-thread.xml"/>
     <xi:include href="xml/game-thread.xml"/>

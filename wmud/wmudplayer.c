@@ -195,7 +195,7 @@ wmud_player_dup(WmudPlayer *self)
 
 /**
  * wmud_player_password_valid:
- * @client:   The client to be authenticated
+ * @player:   The client to be authenticated
  * @password: The password in clear text
  *
  * Tries to authenticate a client with the name stored in the player object,
@@ -204,8 +204,8 @@ wmud_player_dup(WmudPlayer *self)
  * Return value: %TRUE if the password is valid, %FALSE otherwise.
  */
 gboolean
-wmud_player_password_valid(WmudPlayer *self, const gchar *password)
+wmud_player_password_valid(WmudPlayer *player, const gchar *password)
 {
-	return (g_strcmp0(crypt(password, self->priv->cpassword), self->priv->cpassword) == 0);
+	return (g_strcmp0(crypt(password, player->priv->cpassword), player->priv->cpassword) == 0);
 }
 
