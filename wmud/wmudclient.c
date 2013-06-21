@@ -25,7 +25,7 @@
 /**
  * SECTION:wmudclient
  * @short_description: wMUD Client
- * @inclide: wmudclient.h
+ * @include: wmudclient.h
  *
  * #WmudClient is for storing an active client connection
  **/
@@ -232,7 +232,7 @@ wmud_client_send(WmudClient *self, const gchar *fmt, ...)
 
 /**
  * wmud_client_close:
- * @client: the client whose connection should be dropped
+ * @self: the client whose connection should be dropped
  * @send_goodbye: if set to %TRUE, we will send a nice good-bye message to the
  *                client before dropping the connection
  *
@@ -330,10 +330,17 @@ wmud_client_set_bademail(WmudClient *self, gboolean bademail)
 	self->priv->bademail = bademail;
 }
 
+/**
+ * wmud_client_get_bademail:
+ * @client: the client whose bad e-mail status is to be retrieved
+ *
+ * Gets the bad e-mail status, e.g if the player on the other side entered a
+ * syntactically bad e-mail address
+ */
 gboolean
-wmud_client_get_bademail(WmudClient *self)
+wmud_client_get_bademail(WmudClient *client)
 {
-	return self->priv->bademail;
+	return client->priv->bademail;
 }
 
 void

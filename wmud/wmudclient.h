@@ -19,14 +19,6 @@
 #ifndef __WMUD_WMUDCLIENT_H__
 #define __WMUD_WMUDCLIENT_H__
 
-/**
- * SECTION:wmudclient
- * @short_description: wMUD Client
- * @inclide: wmudclient.h
- *
- * #WmudClient is for storing an active client connection
- **/
-
 #include <glib-object.h>
 #include <glib.h>
 #include <gio/gio.h>
@@ -42,20 +34,26 @@
 
 /**
  * WmudClient:
- * @parent_instance: the parent GObject instance
  *
  * A connected game client
  */
 typedef struct _WmudClient WmudClient;
 typedef struct _WmudClientClass WmudClientClass;
 typedef struct _WmudClientPrivate WmudClientPrivate;
+
+/**
+ * WmudClientYesnoCallback:
+ * @client: the client who is waiting for the answer
+ * @answer: the answer itself, where TRUE means yes and FALSE means no
+ *
+ * A callback function used by yes/no questions
+ */
 typedef void (*WmudClientYesnoCallback)(WmudClient *client, gboolean answer);
 
 struct _WmudClient
 {
-	GObject  parent_instance;
-
 	/*< private >*/
+	GObject  parent_instance;
 	WmudClientPrivate *priv;
 };
 
@@ -88,4 +86,3 @@ guint32 wmud_client_get_last_recv_age(WmudClient *client);
 void wmud_client_set_context(WmudClient *client, GMainContext *context);
 
 #endif /* __WMUD_WMUDCLIENT_H__ */
-
