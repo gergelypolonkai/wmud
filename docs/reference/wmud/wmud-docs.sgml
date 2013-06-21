@@ -28,7 +28,7 @@
     <xi:include href="xml/interpreter.xml"/>
     <xi:include href="xml/db.xml"/>
     <xi:include href="xml/player.xml"/>
-    <!--xi:include href="xml/menu.xml"/-->
+    <xi:include href="xml/menu.xml"/>
     <!--xi:include href="xml/world.xml"/-->
   </chapter>
   <!--chapter id="object-tree">

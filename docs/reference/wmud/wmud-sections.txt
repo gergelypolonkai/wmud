@@ -81,7 +81,7 @@ wmud_world_new
 </SECTION>
 
 <SECTION>
-<TITLE></TITLE>
+<TITLE>Utility and uncategorized functions</TITLE>
 <FILE>utils</FILE>
 random_number
 wmud_random_string
@@ -115,6 +115,8 @@ wmud_game_init
 <SECTION>
 <TITLE></TITLE>
 <FILE>game-networking</FILE>
+TELNET_DO
+TELNET_DONT
 TELNET_IAC
 TELNET_WILL
 TELNET_WONT
@@ -127,10 +129,14 @@ wmud_client_send
 <SECTION>
 <TITLE></TITLE>
 <FILE>interpreter</FILE>
+wmudInterpreterError
+WMUD_INTERPRETER_ERROR
 wmudCommandFunc
 wmudCommand
 WMUD_COMMAND
 wmud_interpret_game_command
+wmud_interpreter_check_directions
+wmud_interpreter_error_quark
 </SECTION>
 
 <SECTION>
@@ -141,6 +147,15 @@ wmudDbError
 wmud_db_init
 wmud_db_load_players
 wmud_db_save_player
+wmud_db_error_quark
+wmud_db_load_areas
+wmud_db_load_directions
+wmud_db_load_exits
+wmud_db_load_menu
+wmud_db_load_planes
+wmud_db_load_planet_planes
+wmud_db_load_planets
+wmud_db_load_rooms
 </SECTION>
 
 <SECTION>
@@ -148,17 +163,52 @@ wmud_db_save_player
 <FILE>player</FILE>
 players
 wmud_player_dup
-wmud_player_free
-wmud_player_auth
 wmud_player_exists
 </SECTION>
 
 <SECTION>
 <TITLE></TITLE>
 <FILE>menu</FILE>
+wmudMenu
+wmudMenuCommandFunc
+WMUD_MENU_COMMAND
+WMUD_MENU_ERROR
+wmud_menu_error_quark
+wmud_menu_execute_command
+wmud_menu_get_command_by_menuchar
+wmud_menu_init
+wmud_menu_items_check
+wmud_menu_items_free
+wmud_menu_present
 </SECTION>
 
 <SECTION>
 <TITLE></TITLE>
 <FILE>world</FILE>
+WMUD_WORLD_ERROR
+wmudWorldError
+wmud_world_assoc_exits_rooms
+wmud_world_assoc_planets_planes
+wmud_world_assoc_rooms_areas
+wmud_world_assoc_rooms_planets
+wmud_world_check_areas
+wmud_world_check_exits
+wmud_world_check_planes
+wmud_world_check_planets
+wmud_world_check_rooms
+wmud_world_error_quark
+wmud_world_load
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
+<FILE>area</FILE>
+wmudArea
+</SECTION>
+
+<SECTION>
+<TITLE></TITLE>
+<FILE>room</FILE>
+wmudRoom
+wmudRoomExit
 </SECTION>
