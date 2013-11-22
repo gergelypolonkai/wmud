@@ -180,8 +180,6 @@ main(int argc, char **argv)
 
 	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK , wmud_logger, NULL);
 	/* Initialize the thread and type system */
-	g_thread_init(NULL);
-	g_type_init();
 	wmud_type_init();
 
 	/* TODO: Command line parsing */
