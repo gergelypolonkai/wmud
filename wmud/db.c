@@ -62,7 +62,7 @@ wmud_db_init(GError **err)
 	gda_init();
 
 	/* TODO: error checking! */
-	dbh = gda_connection_open_from_string("sqlite", active_config->database_dsn, NULL, 0, &local_err);
+	dbh = gda_connection_open_from_string(NULL, active_config->database_dsn, NULL, GDA_CONNECTION_OPTIONS_THREAD_SAFE, &local_err);
 
 	if (dbh == NULL) {
 		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_CANTOPEN, "Can not open databsae (%s): %s", active_config->database_dsn, local_err->message);
