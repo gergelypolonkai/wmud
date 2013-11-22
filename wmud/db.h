@@ -37,7 +37,8 @@ GQuark wmud_db_error_quark();
 typedef enum {
 	WMUD_DB_ERROR_CANTOPEN,
 	WMUD_DB_ERROR_NOINIT,
-	WMUD_DB_ERROR_BADQUERY
+	WMUD_DB_ERROR_BADQUERY,
+	WMUD_DB_ERROR_SELECT_ERROR
 } wmudDbError;
 
 gboolean wmud_db_init(GError **err);

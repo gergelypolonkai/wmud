@@ -91,6 +91,7 @@ wmud_db_load_players(GError **err)
 	GdaStatement *sth = NULL;
 	GdaDataModel *res;
 	GdaDataModelIter *iter;
+	GError *local_err = NULL;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading players");
 	if (dbh == NULL) {
@@ -101,7 +102,15 @@ wmud_db_load_players(GError **err)
 	}
 
 	sth = gda_sql_parser_parse_string(parser, "SELECT id, login, password, email FROM players", NULL, NULL);
-	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+
+	/* TODO: error checking! */
+	if ((res = gda_connection_statement_execute_select(dbh, sth, NULL, &local_err)) == NULL) {
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "Unable to load players: %s", local_err->message);
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_SELECT_ERROR, "SELECT error: %s", local_err->message);
+
+		return FALSE;
+	}
+
 	iter = gda_data_model_create_iter(res);
 	gda_data_model_iter_move_next(iter);
 
@@ -287,8 +296,10 @@ wmud_db_load_directions(GSList **directions, GError **err)
 	GdaStatement *sth = NULL;
 	GdaDataModel *res = NULL;
 	GdaDataModelIter *iter;
+	GError *local_err = NULL;
 
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading directions");
+
 	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
@@ -297,7 +308,13 @@ wmud_db_load_directions(GSList **directions, GError **err)
 	}
 
 	sth = gda_sql_parser_parse_string(parser, "SELECT id, short_name, name FROM directions", NULL, NULL);
-	res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+
+	if ((res = gda_connection_statement_execute_select(dbh, sth, NULL, &local_err)) == NULL) {
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_SELECT_ERROR, "Unable to load directions: %s", local_err->message);
+
+		return FALSE;
+	}
+
 	iter = gda_data_model_create_iter(res);
 	gda_data_model_iter_move_next(iter);
 
