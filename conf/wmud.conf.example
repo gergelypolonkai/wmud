@@ -3,7 +3,7 @@
 port = 4000
 
 # The e-mail address of the MUD's administrator
-admin email = polesz@w00d5t0ck.info
+admin email = gergely@polonkai.eu
 
 # If set to true and only one race is defined in the database, registering
 # players will automatically "choose" that, and they will not get any
