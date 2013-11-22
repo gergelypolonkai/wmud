@@ -64,5 +64,8 @@ smtp sender = wMUD <polesz@w00d5t0ck.info>
 [database]
 # The world database file. This file holds everything needed to create the
 # in-game world and let players login.
-dsn = SQLite://DB_DIR={statedir};DB_NAME=iminiru.db
+#
+# WARNING!  If you are using SQLite as a backend, your database filename will
+# WARNING!  automatically have .db appended after the name you specify here!
+dsn = SQLite://DB_DIR={statedir};DB_NAME=iminiru
 
