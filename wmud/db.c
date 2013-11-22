@@ -59,9 +59,11 @@ wmud_db_init(GError **err)
 {
 	GError *local_err = NULL;
 
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Initializing database");
+
 	gda_init();
 
-	/* TODO: error checking! */
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Database DSN is \"%s\"", active_config->database_dsn);
 	dbh = gda_connection_open_from_string(NULL, active_config->database_dsn, NULL, GDA_CONNECTION_OPTIONS_THREAD_SAFE, &local_err);
 
 	if (dbh == NULL) {
@@ -71,6 +73,8 @@ wmud_db_init(GError **err)
 	}
 
 	parser = gda_sql_parser_new();
+
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Database initialization finished.");
 
 	return TRUE;
 }
@@ -128,6 +132,7 @@ wmud_db_load_players(GError **err)
 
 	g_object_unref(iter);
 	g_object_unref(sth);
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Finished loading players");
 
 	return FALSE;
 }
