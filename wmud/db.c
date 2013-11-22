@@ -143,7 +143,7 @@ wmud_db_load_players(GError **err)
 	g_object_unref(sth);
 	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Finished loading players");
 
-	return FALSE;
+	return TRUE;
 }
 
 /**
