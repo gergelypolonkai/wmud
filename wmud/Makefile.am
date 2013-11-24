@@ -1,5 +1,5 @@
 bin_PROGRAMS = wmud
-AM_CPPFLAGS = -DWMUD_STATEDIR=\""$(localstatedir)"\" -DWMUD_CONFDIR=\""$(sysconfdir)"\" $(MEMCACHED_CFLAGS) $(GLIB_CFLAGS) $(GIO_CFLAGS) $(GTHREAD_CFLAGS) $(GDA_CFLAGS) $(CURL_CFLAGS)
+AM_CPPFLAGS = -DWMUD_STATEDIR=\""$(localstatedir)"\" -DWMUD_CONFDIR=\""$(sysconfdir)"\" -DG_LOG_DOMAIN=\""wMUD"\" $(MEMCACHED_CFLAGS) $(GLIB_CFLAGS) $(GIO_CFLAGS) $(GTHREAD_CFLAGS) $(GDA_CFLAGS) $(CURL_CFLAGS)
 
 wmud_SOURCES =            \
 	main.c            \

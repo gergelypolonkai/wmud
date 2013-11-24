@@ -140,25 +140,25 @@ wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 
 	switch (log_level) {
 		case G_LOG_LEVEL_DEBUG:
-			g_print("[%s] DEBUG:             %s\n", timestamp, message);
+			g_print("[%s] [%s] DEBUG:             %s\n", log_domain, timestamp, message);
 #ifndef DEBUG
 			g_warning("Logging a debug-level message without debugging support!");
 #endif
 			break;
 		case G_LOG_LEVEL_MESSAGE:
-			g_print("[%s] MESSAGE:           %s\n", timestamp, message);
+			g_print("[%s] [%s] MESSAGE:           %s\n", log_domain, timestamp, message);
 			break;
 		case G_LOG_LEVEL_INFO:
-			g_print("[%s] INFO:              %s\n", timestamp, message);
+			g_print("[%s] [%s] INFO:              %s\n", log_domain, timestamp, message);
 			break;
 		case G_LOG_LEVEL_WARNING:
-			g_print("[%s] WARNING:           %s\n", timestamp, message);
+			g_print("[%s] [%s] WARNING:           %s\n", log_domain, timestamp, message);
 			break;
 		case G_LOG_LEVEL_CRITICAL:
-			g_print("[%s] CRITICAL:          %s\n", timestamp, message);
+			g_print("[%s] [%s] CRITICAL:          %s\n", log_domain, timestamp, message);
 			break;
 		default:
-			g_print("[%s] UNKNOWN LEVEL %03d: %s\n", timestamp, log_level, message);
+			g_print("[%s] [%s] UNKNOWN LEVEL %03d: %s\n", log_domain, timestamp, log_level, message);
 			break;
 	}
 }
