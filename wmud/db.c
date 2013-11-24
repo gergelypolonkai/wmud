@@ -159,10 +159,11 @@ wmud_db_load_players(GError **err)
 gboolean
 wmud_db_save_player(WmudPlayer *player, GError **err)
 {
-	/*
-	sqlite3_stmt *sth = NULL;
-	int sqlite_code;
+	GError *local_err = NULL;
+	GValue *login_value,
+	       *email_value;
 
+	g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Saving player");
 	if (dbh == NULL) {
 		if (err)
 			g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
@@ -170,34 +171,16 @@ wmud_db_save_player(WmudPlayer *player, GError **err)
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_prepare_v2(dbh, "INSERT INTO players (id, login, password, email) VALUES (NULL, ?, NULL, ?)", -1, &sth, NULL)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad query in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
+	login_value = gda_value_new_from_string(wmud_player_get_player_name(player), G_TYPE_STRING);
+	email_value = gda_value_new_from_string(wmud_player_get_email(player), G_TYPE_STRING);
+
+	if (!gda_connection_insert_row_into_table(dbh, "players", &local_err, "id", NULL, "login", login_value, "password", NULL, "email", email_value, NULL)) {
+		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Error saving player: %s", local_err->message);
 
 		return FALSE;
 	}
 
-	if ((sqlite_code = sqlite3_bind_text(sth, 1, wmud_player_get_player_name(player), -1, SQLITE_STATIC)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
-
-		return FALSE;
-	}
-
-	if ((sqlite_code = sqlite3_bind_text(sth, 2, wmud_player_get_email(player), -1, SQLITE_STATIC)) != SQLITE_OK) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Bad parameter in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
-
-		return FALSE;
-	}
-
-	if ((sqlite_code = sqlite3_step(sth)) != SQLITE_DONE) {
-		g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Statement cannot be executed in wmud_db_save_player(): %s", sqlite3_errmsg(dbh));
-
-		return FALSE;
-	}
-
-	g_clear_error(err);
 	return TRUE;
-	*/
-	return FALSE;
 }
 
 gboolean
