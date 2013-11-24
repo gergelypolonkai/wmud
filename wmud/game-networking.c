@@ -543,11 +543,11 @@ state_regemail_confirm(WmudClient *client)
 
 	if (g_ascii_strcasecmp(wmud_player_get_email(wmud_client_get_player(client)), wmud_client_get_buffer(client)->str) == 0) {
 		if (wmud_db_save_player(wmud_client_get_player(client), &err)) {
-			wmud_client_send(client, "Good. We will generate the password for this player name, and send it to you\r\nvia e-mail. Please come back to us, if you get that code, so you can log\r\nin.\r\n");
+			wmud_client_send(client, "\r\nGood. We will generate the password for this player name, and send it to you\r\nvia e-mail. Please come back to us, if you get that code, so you can log\r\nin.\r\n");
 			players = g_slist_prepend(players, wmud_player_dup(wmud_client_get_player(client)));
 		} else {
 			g_critical("wmud_db_save_player() error: %s", err->message);
-			wmud_client_send(client, "There was an error during the database update. Please try again later!\r\n");
+			wmud_client_send(client, "\r\nThere was an error during the database update. Please try again later!\r\n");
 		}
 
 		remove_client(client, TRUE);
