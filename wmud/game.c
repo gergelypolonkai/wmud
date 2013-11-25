@@ -39,12 +39,12 @@
  */
 
 /**
- * elapsed_seconds:
+ * elapsed_ticks:
  *
  * the number of seconds elapsed since game boot. May be inaccurate, as it
  * simply gets updated by a timeout function which should run every second
  */
-guint32 elapsed_seconds = 0;
+guint32 elapsed_ticks = 0;
 
 /**
  * elapsed_cycle:
@@ -65,13 +65,13 @@ guint32 elapsed_cycle = 0;
 gboolean
 rl_sec_elapsed(gpointer user_data)
 {
-	elapsed_seconds++;
-	if (elapsed_seconds == G_MAXUINT32) {
-		elapsed_seconds = 0;
+	elapsed_ticks++;
+	if (elapsed_ticks == G_MAXUINT32) {
+		elapsed_ticks = 0;
 		elapsed_cycle++;
 	}
 
-	if (elapsed_seconds % 30 == 0) {
+	if (elapsed_ticks % 30 == 0) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "Heartbeat");
 	}
 
