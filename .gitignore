@@ -28,4 +28,5 @@ drop-world.sh
 libtool
 nbproject/private
 conf/wmud.conf
+cscope.out
 var
