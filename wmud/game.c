@@ -54,7 +54,8 @@ guint32 elapsed_ticks = 0;
  * elapsed_cycle:
  *
  * yes, I'm optimistic. This counter is increased if, for some reason,
- * #elapsed_seconds reaches the maximum value
+ * #elapsed_ticks reaches the maximum value (which comes after almost 68
+ * years)
  */
 guint32 elapsed_cycle = 0;
 
