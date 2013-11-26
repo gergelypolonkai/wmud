@@ -187,7 +187,7 @@ gboolean
 wmud_db_update_player_password(WmudPlayer *player, gchar *crypted_password, GError **err)
 {
     GValue *cpw,
-           player_id = G_VALUE_INIT;
+           *player_id;
     GError *local_err = NULL;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Saving player password for %s", wmud_player_get_player_name(player));
@@ -198,11 +198,11 @@ wmud_db_update_player_password(WmudPlayer *player, gchar *crypted_password, GErr
         return FALSE;
     }
 
-    g_value_init(&player_id, G_TYPE_UINT);
-    g_value_set_uint(&player_id, wmud_player_get_id(player));
+    player_id = gda_value_new(G_TYPE_UINT);
+    g_value_set_uint(player_id, wmud_player_get_id(player));
     cpw = gda_value_new_from_string(crypted_password, G_TYPE_STRING);
 
-    if (!gda_connection_update_row_in_table(dbh, "players", "id", &player_id, &local_err, "password", cpw)) {
+    if (!gda_connection_update_row_in_table(dbh, "players", "id", player_id, &local_err, "password", cpw, NULL)) {
         g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Error saving player password: %s", local_err->message);
 
         return FALSE;
