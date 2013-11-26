@@ -194,7 +194,7 @@ wmud_maintenance_init(void)
 	maint_loop = g_main_loop_new(maint_context, FALSE);
 
 	/* Create the timeout source which will do the maintenance tasks */
-	timeout_source = g_timeout_source_new_seconds(600);
+	timeout_source = g_timeout_source_new_seconds(WMUD_MAINTENANCE_TIME);
 	g_source_set_callback(timeout_source, wmud_maintenance, NULL, NULL);
 	g_source_attach(timeout_source, maint_context);
 	g_source_unref(timeout_source);

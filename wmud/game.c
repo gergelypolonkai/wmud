@@ -17,6 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <glib.h>
 
 #include "main.h"
@@ -71,7 +75,7 @@ rl_sec_elapsed(gpointer user_data)
 		elapsed_cycle++;
 	}
 
-	if (elapsed_ticks % 30 == 0) {
+	if (elapsed_ticks % WMUD_HEARTBEAT_LENGTH == 0) {
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "Heartbeat");
 	}
 
@@ -108,7 +112,7 @@ wmud_game_init(GThread **game_thread, GMainContext **game_context)
 
 	/* Create the timeout source which keeps track of elapsed real-world
 	 * time */
-	timeout_source = g_timeout_source_new(1000);
+	timeout_source = g_timeout_source_new(WMUD_TICK_LENGTH);
 	g_source_set_callback(timeout_source, rl_sec_elapsed, NULL, NULL);
 	g_source_attach(timeout_source, *game_context);
 	g_source_unref(timeout_source);

@@ -24,6 +24,10 @@ if test "$enable_debug" = "yes"; then
 	AC_DEFINE([DEBUG], [1], [Define to compile with debugging support])
 fi
 
+AC_DEFINE([WMUD_TICK_LENGTH], [500], [Length of a game tick, in milliseconds])
+AC_DEFINE([WMUD_HEARTBEAT_LENGTH], [30], [Length of a heartbeat, in ticks])
+AC_DEFINE([WMUD_MAINTENANCE_TIME], [600], [Time between maintenance runs, in seconds])
+
 m4_ifdef([GTK_DOC_CHECK], [
 GTK_DOC_CHECK([1.14], [--flavour no-tmpl])
 ],[
