@@ -32,6 +32,7 @@
 #include "players.h"
 #include "configuration.h"
 #include "wmudplayer.h"
+#include "db.h"
 
 /**
  * SECTION:maintenance-thread
@@ -69,6 +70,7 @@ wmud_maintenance_check_players(WmudPlayer *player, gpointer user_data)
 		wmud_player_set_cpassword(player, cpw);
 		/* TODO: Send e-mail about the new password. Upon completion, set it in
 		 * the database */
+		wmud_db_update_player_password(player, cpw, NULL);
 
 		g_free(pw);
 		g_free(salt);
