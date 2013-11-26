@@ -184,6 +184,34 @@ wmud_db_save_player(WmudPlayer *player, GError **err)
 }
 
 gboolean
+wmud_db_update_player_password(WmudPlayer *player, gchar *crypted_password, GError **err)
+{
+    GValue *cpw,
+           player_id = G_VALUE_INIT;
+    GError *local_err = NULL;
+
+    g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Saving player password for %s", wmud_player_get_player_name(player));
+
+    if (dbh == NULL) {
+        g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT, "Database backend not initialized");
+
+        return FALSE;
+    }
+
+    g_value_init(&player_id, G_TYPE_UINT);
+    g_value_set_uint(&player_id, wmud_player_get_id(player));
+    cpw = gda_value_new_from_string(crypted_password, G_TYPE_STRING);
+
+    if (!gda_connection_update_row_in_table(dbh, "players", "id", &player_id, &local_err, "password", cpw)) {
+        g_set_error(err, WMUD_DB_ERROR, WMUD_DB_ERROR_BADQUERY, "Error saving player password: %s", local_err->message);
+
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+gboolean
 wmud_db_load_planes(GSList **planes, GError **err)
 {
 	GdaStatement *sth = NULL;
