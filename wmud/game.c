@@ -76,7 +76,7 @@ rl_sec_elapsed(gpointer user_data)
 	}
 
 	if (elapsed_ticks % WMUD_HEARTBEAT_LENGTH == 0) {
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "Heartbeat");
+		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "Heartbeat (%d ticks)", elapsed_ticks);
 	}
 
 	return TRUE;
