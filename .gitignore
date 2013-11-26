@@ -28,3 +28,4 @@ drop-world.sh
 libtool
 nbproject/private
 conf/wmud.conf
+var
