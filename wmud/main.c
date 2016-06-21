@@ -176,7 +176,7 @@ main(int argc, char **argv)
 	GError *err = NULL;
 	GThread *game_thread;
 	GMainContext *game_context;
-	GSList *game_menu;
+    GSList *game_menu = NULL;
 
 	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK , wmud_logger, NULL);
 	/* Initialize the thread and type system */
