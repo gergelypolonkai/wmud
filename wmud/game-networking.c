@@ -436,11 +436,25 @@ state_passwait(WmudClient *client)
 
 		if (wmud_player_password_valid(player, wmud_client_get_buffer(client)->str)) {
 			gint fail_count;
+            GSocketAddress *socket_address;
+            GInetAddress *inet_address;
+            gchar *ip_addr;
+            GError *err = NULL;
 
 			wmud_client_send(client, "%c%c%c\r\nLogin successful."
 					 "\r\n", TELNET_IAC, TELNET_WONT,
 			                 TELNET_ECHO);
 			wmud_client_set_authenticated(client, TRUE);
+
+            socket_address = g_socket_get_remote_address(wmud_client_get_socket(client), &err);
+            g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "socket family: %d", g_socket_address_get_family(socket_address));
+            inet_address = g_object_ref(g_inet_socket_address_get_address(G_INET_SOCKET_ADDRESS(socket_address)));
+            ip_addr = g_inet_address_to_string(inet_address);
+
+            g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Login by %s from %s", wmud_player_get_player_name(player), ip_addr);
+
+            g_free(ip_addr);
+            g_object_unref(socket_address);
 
 			if ((fail_count = wmud_player_get_fail_count(player)) > 0) {
 				wmud_client_send(client, "There %s %d failed"
