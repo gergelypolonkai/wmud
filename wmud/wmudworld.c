@@ -30,41 +30,40 @@ G_DEFINE_TYPE(WmudWorld, wmud_world, G_TYPE_OBJECT);
 
 #define WMUD_WORLD_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE((obj), WMUD_TYPE_WORLD, WmudWorldPrivate))
 
-struct _WmudWorldPrivate
-{
+struct _WmudWorldPrivate {
 };
 
 static void
 wmud_world_dispose(GObject *gobject)
 {
-	G_OBJECT_CLASS(wmud_world_parent_class)->dispose(gobject);
+    G_OBJECT_CLASS(wmud_world_parent_class)->dispose(gobject);
 }
 
 static void
 wmud_world_finalize(GObject *gobject)
 {
-	G_OBJECT_CLASS(wmud_world_parent_class)->finalize(gobject);
+    G_OBJECT_CLASS(wmud_world_parent_class)->finalize(gobject);
 }
 
 static void
 wmud_world_class_init(WmudWorldClass *klass)
 {
-	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+    GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
 
-	gobject_class->dispose = wmud_world_dispose;
-	gobject_class->finalize = wmud_world_finalize;
+    gobject_class->dispose  = wmud_world_dispose;
+    gobject_class->finalize = wmud_world_finalize;
 
-	g_type_class_add_private(klass, sizeof(WmudWorldPrivate));
+    g_type_class_add_private(klass, sizeof(WmudWorldPrivate));
 }
 
 static void
 wmud_world_init(WmudWorld *self)
 {
-	self->priv = WMUD_WORLD_GET_PRIVATE(self);
+    self->priv = WMUD_WORLD_GET_PRIVATE(self);
 }
 
 WmudWorld *
 wmud_world_new(void)
 {
-	return g_object_new(WMUD_TYPE_WORLD, NULL, NULL);
+    return g_object_new(WMUD_TYPE_WORLD, NULL, NULL);
 }

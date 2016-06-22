@@ -106,12 +106,12 @@ gboolean
 wmud_game_init(GThread **game_thread, GMainContext **game_context)
 {
     GMainLoop *game_loop;
-    GSource *timeout_source;
-    GError *err = NULL;
+    GSource   *timeout_source;
+    GError    *err = NULL;
 
     /* Create the game context and main loop */
     *game_context = g_main_context_new();
-    game_loop = g_main_loop_new(*game_context, FALSE);
+    game_loop     = g_main_loop_new(*game_context, FALSE);
 
     /* Create the timeout source which keeps track of elapsed real-world
      * time */

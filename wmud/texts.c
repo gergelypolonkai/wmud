@@ -24,62 +24,65 @@
 #include "wmudclient.h"
 
 static const gchar *text_files[] = {
-	"motd",
-	NULL
+    "motd",
+    NULL
 };
-GHashTable *text_table = NULL;
+GHashTable         *text_table = NULL;
 
 void
 wmud_texts_init(void)
 {
-	int i;
-	gchar *texts_dir = g_strconcat(WMUD_STATEDIR, "/texts/", NULL);
+    int   i;
+    gchar *texts_dir = g_strconcat(WMUD_STATEDIR, "/texts/", NULL);
 
-	text_table = g_hash_table_new(g_str_hash, g_str_equal);
+    text_table = g_hash_table_new(g_str_hash, g_str_equal);
 
-	for (i = 0; i < g_strv_length((gchar **)text_files); i++) {
-		GFile *tf;
-		GFileInfo *tfi;
-		GError *err = NULL;
-		guint64 tfs;
-		gchar *contents;
-		gsize length;
+    for (i = 0; i < g_strv_length((gchar **)text_files); i++) {
+        GFile     *tf;
+        GFileInfo *tfi;
+        GError    *err = NULL;
+        guint64   tfs;
+        gchar     *contents;
+        gsize     length;
+        gchar     *text_file = g_strconcat(texts_dir, text_files[i], NULL);
 
-		gchar *text_file = g_strconcat(texts_dir, text_files[i], NULL);
-		g_debug("Loading text file %s from %s", text_files[i], text_file);
-		tf = g_file_new_for_path(text_file);
-		tfi = g_file_query_info(tf, G_FILE_ATTRIBUTE_STANDARD_SIZE, G_FILE_QUERY_INFO_NONE, NULL, &err);
+        g_debug("Loading text file %s from %s", text_files[i], text_file);
+        tf  = g_file_new_for_path(text_file);
+        tfi = g_file_query_info(tf, G_FILE_ATTRIBUTE_STANDARD_SIZE, G_FILE_QUERY_INFO_NONE, NULL, &err);
 
-		if (err) {
-			g_warning("Error loading %s: %s", text_files[i], err->message);
-			continue;
-		}
+        if (err) {
+            g_warning("Error loading %s: %s", text_files[i], err->message);
 
-		tfs = g_file_info_get_attribute_uint64(tfi, G_FILE_ATTRIBUTE_STANDARD_SIZE);
+            continue;
+        }
 
-		contents = g_malloc0(tfs + 1);
+        tfs = g_file_info_get_attribute_uint64(tfi, G_FILE_ATTRIBUTE_STANDARD_SIZE);
 
-		g_clear_error(&err);
+        contents = g_malloc0(tfs + 1);
 
-		if (!g_file_load_contents(tf, NULL, &contents, &length, NULL, &err)) {
-			g_object_unref(tfi);
-			g_object_unref(tf);
-			continue;
-		}
+        g_clear_error(&err);
 
-		g_hash_table_insert(text_table, (char *)text_files[i], contents);
+        if (!g_file_load_contents(tf, NULL, &contents, &length, NULL, &err)) {
+            g_object_unref(tfi);
+            g_object_unref(tf);
 
-		g_object_unref(tfi);
-		g_object_unref(tf);
-		g_free(text_file);
-	}
+            continue;
+        }
 
-	g_free(texts_dir);
+        g_hash_table_insert(text_table, (char *)text_files[i], contents);
+
+        g_object_unref(tfi);
+        g_object_unref(tf);
+        g_free(text_file);
+    }
+
+    g_free(texts_dir);
 }
 
 void
 wmud_text_send_to_client(gchar *text_name, WmudClient *client)
 {
-	gchar *text = g_hash_table_lookup(text_table, text_name);
-	wmud_client_send(client, "%s\r\n", text);
+    gchar *text = g_hash_table_lookup(text_table, text_name);
+
+    wmud_client_send(client, "%s\r\n", text);
 }

@@ -96,13 +96,14 @@ wmud_configdata_free(ConfigData **config_data)
 gboolean
 wmud_config_init(ConfigData **config_data, GError **err)
 {
-    GString *config_file = g_string_new(WMUD_CONFDIR);
+    GString  *config_file = g_string_new(WMUD_CONFDIR);
     GKeyFile *config;
-    GError *in_err = NULL;
-    gchar *pos;
+    GError   *in_err = NULL;
+    gchar    *pos;
 
-    if (!config_data)
+    if (!config_data) {
         return FALSE;
+    }
 
     if (*config_data) {
         g_clear_error(err);
@@ -255,8 +256,8 @@ wmud_config_init(ConfigData **config_data, GError **err)
 
     if ((pos = g_strstr_len((*config_data)->database_dsn,
                             -1, "{statedir}")) != NULL) {
-        guint real_pos = pos - (*config_data)->database_dsn;
-        GString *tmp = g_string_new((*config_data)->database_dsn);
+        guint   real_pos = pos - (*config_data)->database_dsn;
+        GString *tmp     = g_string_new((*config_data)->database_dsn);
 
         g_string_erase(tmp, real_pos, 10);
         g_string_insert(tmp, real_pos, WMUD_STATEDIR);

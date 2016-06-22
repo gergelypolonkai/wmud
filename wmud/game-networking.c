@@ -45,7 +45,7 @@
  */
 
 struct AcceptData {
-    GMainContext *context;
+    GMainContext    *context;
     GSocketListener *listener;
 };
 
@@ -54,7 +54,7 @@ struct AcceptData {
  *
  * The full #GSList of the currently connected #WmudClient objects.
  */
-GSList *clients = NULL;
+GSList        *clients = NULL;
 
 static GRegex *email_regex = NULL;
 
@@ -91,11 +91,11 @@ hup_client(WmudClient *client)
 static void
 recv_client(WmudClient *client)
 {
-    GError *err = NULL;
+    GError  *err = NULL;
     GSocket *client_socket;
-    gssize len;
-    gchar *buf2;
-    gchar *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
+    gssize  len;
+    gchar   *buf2;
+    gchar   *buf = g_malloc0(sizeof(gchar) * (MAX_RECV_LEN + 1));
 
     client_socket = wmud_client_get_socket(client);
 
@@ -120,29 +120,32 @@ recv_client(WmudClient *client)
                  sloc = -1;
 
             if ((r < n) && r) {
-                if (wmud_client_get_buffer_length(client) > 0)
+                if (wmud_client_get_buffer_length(client) > 0) {
                     g_string_append_len(wmud_client_get_buffer(client),
                                         buf2,
                                         (r - buf2));
-                else
+                } else {
                     g_string_overwrite_len(
-                            wmud_client_get_buffer(client),
-                            0,
-                            buf2,
-                            (r - buf2));
+                        wmud_client_get_buffer(client),
+                        0,
+                        buf2,
+                        (r - buf2));
+                }
+
                 buf2 = r;
             } else if (n) {
-                if (wmud_client_get_buffer_length(client) > 0)
+                if (wmud_client_get_buffer_length(client) > 0) {
                     g_string_append_len(
-                            wmud_client_get_buffer(client),
-                            buf2,
-                            (n - buf2));
-                else
+                        wmud_client_get_buffer(client),
+                        buf2,
+                        (n - buf2));
+                } else {
                     g_string_overwrite_len(
-                            wmud_client_get_buffer(client),
-                            0,
-                            buf2,
-                            (n - buf2));
+                        wmud_client_get_buffer(client),
+                        0,
+                        buf2,
+                        (n - buf2));
+                }
                 buf2 = n;
             }
 
@@ -151,57 +154,67 @@ recv_client(WmudClient *client)
                 guchar c = (wmud_client_get_buffer(client)->str)[i];
 
                 if ((c >= 240) || (c == 1)) {
-                    if (sloc == -1)
+                    if (sloc == -1) {
                         sloc = i;
+                    }
                 } else {
                     if (sloc != -1) {
                         g_string_erase(
-                                wmud_client_get_buffer(client),
-                                sloc,
-                                i - sloc);
+                            wmud_client_get_buffer(client),
+                            sloc,
+                            i - sloc);
                         sloc = -1;
                     }
                 }
             }
 
-            if (sloc != -1)
+            if (sloc != -1) {
                 g_string_erase(wmud_client_get_buffer(client), sloc, -1);
+            }
 
-            switch (wmud_client_get_state(client))
-            {
+            switch (wmud_client_get_state(client)) {
                 case WMUD_CLIENT_STATE_FRESH:
                     state_fresh(client);
+
                     break;
                 case WMUD_CLIENT_STATE_PASSWAIT:
                     state_passwait(client);
+
                     break;
                 case WMUD_CLIENT_STATE_MENU:
                     state_menu(client);
+
                     break;
                 case WMUD_CLIENT_STATE_INGAME:
                     wmud_interpret_game_command(client);
+
                     break;
                 case WMUD_CLIENT_STATE_YESNO:
                     state_yesno(client);
+
                     break;
                 case WMUD_CLIENT_STATE_REGISTERING:
                     state_registering(client);
+
                     break;
                 case WMUD_CLIENT_STATE_REGEMAIL_CONFIRM:
                     state_regemail_confirm(client);
+
                     break;
             }
             g_string_erase(wmud_client_get_buffer(client), 0, -1);
 
             for (; ((*buf2 == '\r') || (*buf2 == '\n')) && *buf2; buf2++);
 
-            if (!*buf2)
+            if (!*buf2) {
                 break;
+            }
         } else {
-            if (wmud_client_get_buffer_length(client) > 0)
+            if (wmud_client_get_buffer_length(client) > 0) {
                 g_string_append(wmud_client_get_buffer(client), buf2);
-            else
+            } else {
                 g_string_overwrite(wmud_client_get_buffer(client), 0, buf2);
+            }
 
             break;
         }
@@ -222,14 +235,14 @@ recv_client(WmudClient *client)
  * Return value: this function always returns %TRUE
  */
 gboolean
-game_source_callback(GSocket *socket,
-                     GIOCondition condition,
+game_source_callback(GSocket           *socket,
+                     GIOCondition      condition,
                      struct AcceptData *accept_data)
 {
-    GSocket *client_socket;
-    GError *err = NULL;
+    GSocket        *client_socket;
+    GError         *err = NULL;
     GSocketAddress *remote_addr;
-    WmudClient *client;
+    WmudClient     *client;
 
     /* This function should never return an error. If so, it is a huge bug,
      * and will trigger a higher level error. */
@@ -247,19 +260,20 @@ game_source_callback(GSocket *socket,
 
     if ((remote_addr = g_socket_get_remote_address(client_socket, &err)) != NULL) {
         GInetAddress *addr;
-        gchar *ip_addr;
+        gchar        *ip_addr;
 
-        addr = g_inet_socket_address_get_address(G_INET_SOCKET_ADDRESS(remote_addr));
+        addr    = g_inet_socket_address_get_address(G_INET_SOCKET_ADDRESS(remote_addr));
         ip_addr = g_inet_address_to_string(addr);
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "New game connection from %s", ip_addr);
         g_free(ip_addr);
         g_object_unref(addr);
         g_object_unref(remote_addr);
     } else {
-        if (err)
+        if (err) {
             g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "New game connection. The remote address is unknown. This is a bug. Message from upper level: %s", err->message);
-        else
+        } else {
             g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "New game connection. The remote address is unknown. This is a bug.");
+        }
     }
 
     g_clear_error(&err);
@@ -284,34 +298,34 @@ gboolean
 wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu_items, GError **err)
 {
     struct AcceptData *accept_data;
-    GSocketListener *game_listener;
-    gboolean need_ipv4_socket = TRUE;
-    GSocket *game_socket6,
-            *game_socket4;
-    GError *in_err = NULL;
-    GSource *game_net_source4 = NULL,
-            *game_net_source6 = NULL;
+    GSocketListener   *game_listener;
+    gboolean          need_ipv4_socket = TRUE;
+    GSocket           *game_socket6,
+                      *game_socket4;
+    GError            *in_err           = NULL;
+    GSource           *game_net_source4 = NULL,
+                      *game_net_source6 = NULL;
 
-    clients = NULL;
+    clients       = NULL;
     game_listener = g_socket_listener_new();
 
     /* The following snippet is borrowed from GLib 2.30's gsocketlistener.c
      * code, to create the necessary sockets to listen on both IPv4 and
      * IPv6 address */
     if ((game_socket6 = g_socket_new(G_SOCKET_FAMILY_IPV6, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL) {
-        GInetAddress *inet_address;
+        GInetAddress   *inet_address;
         GSocketAddress *address;
-        gboolean result;
+        gboolean       result;
 
         inet_address = g_inet_address_new_any(G_SOCKET_FAMILY_IPV6);
-        address = g_inet_socket_address_new(inet_address, port_number);
+        address      = g_inet_socket_address_new(inet_address, port_number);
         g_object_unref(inet_address);
 
         g_socket_set_listen_backlog(game_socket6, 10);
 
         result =
-                 g_socket_bind(game_socket6, address, TRUE, NULL)
-                 && g_socket_listen(game_socket6, NULL);
+            g_socket_bind(game_socket6, address, TRUE, NULL) &&
+            g_socket_listen(game_socket6, NULL);
 
         g_object_unref(address);
 
@@ -322,8 +336,9 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
             return FALSE;
         }
 
-        if (g_socket_speaks_ipv4(game_socket6))
+        if (g_socket_speaks_ipv4(game_socket6)) {
             need_ipv4_socket = FALSE;
+        }
 
         game_net_source6 = g_socket_create_source(game_socket6, G_IO_IN, NULL);
 
@@ -334,26 +349,27 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
 
     if (need_ipv4_socket) {
         if ((game_socket4 = g_socket_new(G_SOCKET_FAMILY_IPV4, G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_DEFAULT, NULL)) != NULL) {
-            GInetAddress *inet_address;
+            GInetAddress   *inet_address;
             GSocketAddress *address;
-            gboolean result;
+            gboolean       result;
 
             inet_address = g_inet_address_new_any(G_SOCKET_FAMILY_IPV4);
-            address = g_inet_socket_address_new(inet_address, port_number);
+            address      = g_inet_socket_address_new(inet_address, port_number);
             g_object_unref(inet_address);
 
             g_socket_set_listen_backlog(game_socket4, 10);
 
-            result = g_socket_bind(game_socket4, address, TRUE, NULL)
-                && g_socket_listen(game_socket4, NULL);
+            result = g_socket_bind(game_socket4, address, TRUE, NULL) &&
+                     g_socket_listen(game_socket4, NULL);
 
             g_object_unref(address);
 
             if (!result) {
                 g_object_unref(game_socket4);
 
-                if (!game_socket6)
+                if (!game_socket6) {
                     g_object_unref(game_socket6);
+                }
 
                 g_log(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "Unable to create listener IPv4 socket!\n");
 
@@ -364,15 +380,16 @@ wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu
             g_socket_listener_add_socket(game_listener, game_socket4, NULL, NULL);
         }
     } else {
-        if (game_socket6 != NULL)
+        if (game_socket6 != NULL) {
             g_clear_error(&in_err);
-        else
+        } else {
             return FALSE;
+        }
     }
 
-    accept_data = g_new(struct AcceptData, 1);
+    accept_data           = g_new(struct AcceptData, 1);
     accept_data->listener = game_listener;
-    accept_data->context = game_context;
+    accept_data->context  = game_context;
 
     if (game_net_source6) {
         g_source_set_callback(game_net_source6, (GSourceFunc)game_source_callback, (gpointer)accept_data, NULL);
@@ -423,12 +440,12 @@ state_fresh(WmudClient *client)
 
         if ((player = wmud_player_exists(wmud_client_get_buffer(client)->str)) != NULL) {
             g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Trying to"
-                      " login with playername '%s'",
-                      wmud_client_get_buffer(client)->str);
+                                                   " login with playername '%s'",
+                  wmud_client_get_buffer(client)->str);
 
             if (wmud_player_get_cpassword(player) == NULL) {
                 wmud_client_send(client, "Your registration is"
-                                 " not finished yet.\r\n");
+                                         " not finished yet.\r\n");
                 remove_client(client, TRUE);
             } else {
                 wmud_client_set_state(client, WMUD_CLIENT_STATE_PASSWAIT);
@@ -457,21 +474,21 @@ state_passwait(WmudClient *client)
         player = wmud_client_get_player(client);
 
         if (wmud_player_password_valid(player, wmud_client_get_buffer(client)->str)) {
-            gint fail_count;
+            gint           fail_count;
             GSocketAddress *socket_address;
-            GInetAddress *inet_address;
-            gchar *ip_addr;
-            GError *err = NULL;
+            GInetAddress   *inet_address;
+            gchar          *ip_addr;
+            GError         *err = NULL;
 
             wmud_client_send(client, "%c%c%c\r\nLogin successful."
-                     "\r\n", TELNET_IAC, TELNET_WONT,
+                                     "\r\n", TELNET_IAC, TELNET_WONT,
                              TELNET_ECHO);
             wmud_client_set_authenticated(client, TRUE);
 
             socket_address = g_socket_get_remote_address(wmud_client_get_socket(client), &err);
             g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "socket family: %d", g_socket_address_get_family(socket_address));
             inet_address = g_object_ref(g_inet_socket_address_get_address(G_INET_SOCKET_ADDRESS(socket_address)));
-            ip_addr = g_inet_address_to_string(inet_address);
+            ip_addr      = g_inet_address_to_string(inet_address);
 
             g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "Login by %s from %s", wmud_player_get_player_name(player), ip_addr);
 
@@ -480,30 +497,30 @@ state_passwait(WmudClient *client)
 
             if ((fail_count = wmud_player_get_fail_count(player)) > 0) {
                 wmud_client_send(client, "There %s %d failed"
-                                 " login attempt%s with your"
-                                 " account since your last"
-                                 " visit\r\n",
-                         (fail_count == 1) ? "was" : "were",
-                         fail_count,
-                         (fail_count == 1) ? "" : "s");
+                                         " login attempt%s with your"
+                                         " account since your last"
+                                         " visit\r\n",
+                                 (fail_count == 1) ? "was" : "were",
+                                 fail_count,
+                                 (fail_count == 1) ? "" : "s");
             }
 
             wmud_text_send_to_client("motd", client);
             wmud_menu_present(client);
         } else {
             wmud_client_send(client, "%c%c%cThis password doesn't"
-                             " seem to be valid. Let's try it again..."
-                             " \r\nBy what name would you like to be"
-                     " be called? ", TELNET_IAC,
-                     TELNET_WONT, TELNET_ECHO);
+                                     " seem to be valid. Let's try it again..."
+                                     " \r\nBy what name would you like to be"
+                                     " be called? ", TELNET_IAC,
+                             TELNET_WONT, TELNET_ECHO);
             wmud_client_set_state(client, WMUD_CLIENT_STATE_FRESH);
             wmud_player_increase_fail_count(player);
             wmud_client_increase_login_fail_count(client);
             if (wmud_client_get_login_fail_count(client) == 3) {
                 wmud_client_send(client, "You are trying "
-                         " these bad passwords for"
-                         " too many times. Please"
-                         " stop that!\r\n");
+                                         " these bad passwords for"
+                                         " too many times. Please"
+                                         " stop that!\r\n");
                 remove_client(client, TRUE);
 
                 /* TODO: Increase IP fail count, and ban IP if it's too high */
@@ -515,7 +532,7 @@ state_passwait(WmudClient *client)
         }
     } else {
         wmud_client_send(client, "\r\nEmpty passwords are"
-                 " not valid.\r\nTry again: ");
+                                 " not valid.\r\nTry again: ");
     }
 }
 
@@ -524,51 +541,55 @@ state_menu(WmudClient *client)
 {
     gchar *menu_command;
 
-    if ((menu_command = wmud_menu_get_command_by_menuchar(*(wmud_client_get_buffer(client)->str), game_menu)) != NULL)
+    if ((menu_command = wmud_menu_get_command_by_menuchar(*(wmud_client_get_buffer(client)->str), game_menu)) != NULL) {
         wmud_menu_execute_command(client, menu_command);
-    else
+    } else {
         wmud_client_send(client, "Unknown menu command.\r\n");
+    }
 }
 
 static void
 state_yesno(WmudClient *client)
 {
-    if (g_ascii_strcasecmp(wmud_client_get_buffer(client)->str, "y") == 0)
+    if (g_ascii_strcasecmp(wmud_client_get_buffer(client)->str, "y") == 0) {
         (wmud_client_get_yesno_callback(client))(client, TRUE);
-    else if (g_ascii_strcasecmp(wmud_client_get_buffer(client)->str, "n") == 0)
+    } else if (g_ascii_strcasecmp(wmud_client_get_buffer(client)->str, "n") == 0) {
         (wmud_client_get_yesno_callback(client))(client, FALSE);
-    else
+    } else {
         wmud_client_send(client, "Please enter a 'Y' or 'N'"
-             " character: ");
+                                 " character: ");
+    }
 }
 
 static void
 state_registering(WmudClient *client)
 {
-    if (!*(wmud_client_get_buffer(client)->str) && (wmud_client_get_bademail(client) == TRUE))
+    if (!*(wmud_client_get_buffer(client)->str) && (wmud_client_get_bademail(client) == TRUE)) {
         remove_client(client, TRUE);
+    }
 
     if (g_regex_match(email_regex, wmud_client_get_buffer(client)->str, 0, NULL)) {
         wmud_player_set_email(wmud_client_get_player(client), wmud_client_get_buffer(client)->str);
         wmud_client_set_state(client, WMUD_CLIENT_STATE_REGEMAIL_CONFIRM);
         wmud_client_send(client, "It seems to be a valid"
-                 " address to me, but could you"
-                 " write it again? ");
+                                 " address to me, but could you"
+                                 " write it again? ");
     } else {
         wmud_client_send(client, "\r\nSorry, but this"
-                 "e-mail address doesn't seem to be"
-                 " valid to me.\r\n\r\nIf you think"
-                 " this is a valid address, simply"
-                 " press enter to quit, and send an"
-                 " e-mail to %s from that address,"
-                 " so we can fix our e-mail"
-                 " validation code.\r\n\r\nIf you"
-                 " just mistyped your address, type"
-                 " it now: ",
-                 active_config->admin_email);
+                                 "e-mail address doesn't seem to be"
+                                 " valid to me.\r\n\r\nIf you think"
+                                 " this is a valid address, simply"
+                                 " press enter to quit, and send an"
+                                 " e-mail to %s from that address,"
+                                 " so we can fix our e-mail"
+                                 " validation code.\r\n\r\nIf you"
+                                 " just mistyped your address, type"
+                                 " it now: ",
+                         active_config->admin_email);
 
-        if (*(wmud_client_get_buffer(client)->str))
+        if (*(wmud_client_get_buffer(client)->str)) {
             wmud_client_set_bademail(client, TRUE);
+        }
     }
 }
 
@@ -594,4 +615,3 @@ state_regemail_confirm(WmudClient *client)
         wmud_client_set_state(client, WMUD_CLIENT_STATE_REGISTERING);
     }
 }
-

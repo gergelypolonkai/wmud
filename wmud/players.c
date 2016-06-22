@@ -45,7 +45,7 @@ GSList *players = NULL;
 static gint
 find_player_by_name(WmudPlayer *player, gchar *player_name)
 {
-	return g_ascii_strcasecmp(wmud_player_get_player_name(player), player_name);
+    return g_ascii_strcasecmp(wmud_player_get_player_name(player), player_name);
 }
 
 /**
@@ -60,12 +60,11 @@ find_player_by_name(WmudPlayer *player, gchar *player_name)
 WmudPlayer *
 wmud_player_exists(gchar *player_name)
 {
-	GSList *player_elem;
-	
-	if ((player_elem = g_slist_find_custom(players, player_name, (GCompareFunc)find_player_by_name)) == NULL)
-		return NULL;
+    GSList *player_elem;
 
-	return player_elem->data;
+    if ((player_elem = g_slist_find_custom(players, player_name, (GCompareFunc)find_player_by_name)) == NULL) {
+        return NULL;
+    }
 
+    return player_elem->data;
 }
-

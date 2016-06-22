@@ -53,7 +53,7 @@
  */
 struct {
     char *file;
-    int line;
+    int  line;
 } debug_context_loc = {NULL, 0};
 
 /**
@@ -66,15 +66,16 @@ gchar *
 wmud_random_string(gint len)
 {
     gchar *ret = g_malloc0(len + 1);
-    gint i;
+    gint  i;
 
     for (i = 0; i < len; i++) {
         gchar c = 0;
         /* Include only printable characters, but exclude $ because of
          * salt generation, and space to avoid misunderstanding in the
          * random generated passwords */
-        while (!g_ascii_isprint(c) || (c == '$') || (c == ' ') || (c == '\t'))
+        while (!g_ascii_isprint(c) || (c == '$') || (c == ' ') || (c == '\t')) {
             c = random_number(1, 127);
+        }
 
         ret[i] = c;
     }
@@ -97,8 +98,9 @@ void
  */
 debug_context(char *file, int line)
 {
-    if (debug_context_loc.file != NULL)
+    if (debug_context_loc.file != NULL) {
         g_free(debug_context_loc.file);
+    }
 
     debug_context_loc.file = g_strdup(file);
     debug_context_loc.line = line;
@@ -125,19 +127,19 @@ wmud_type_init(void)
 {}
 
 void
-wmud_logger(const gchar *log_domain,
+wmud_logger(const gchar    *log_domain,
             GLogLevelFlags log_level,
-            const gchar *message,
-            gpointer user_data)
+            const gchar    *message,
+            gpointer       user_data)
 {
     static char timestamp[20];
-    struct tm *tm;
-    time_t ts = time(NULL);
-    size_t last_char;
+    struct tm   *tm;
+    time_t      ts = time(NULL);
+    size_t      last_char;
 
     tm = localtime(&ts);
 
-    last_char = strftime((char *)&timestamp, 20, "%F %T", tm);
+    last_char            = strftime((char *)&timestamp, 20, "%F %T", tm);
     timestamp[last_char] = '\0';
 
     switch (log_level) {
@@ -200,12 +202,12 @@ wmud_logger(const gchar *log_domain,
 int
 main(int argc, char **argv)
 {
-    GError *err = NULL;
-    GThread *game_thread;
+    GError       *err = NULL;
+    GThread      *game_thread;
     GMainContext *game_context;
-    GSList *game_menu = NULL;
+    GSList       *game_menu = NULL;
 
-    g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK , wmud_logger, NULL);
+    g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK, wmud_logger, NULL);
     /* Initialize the thread and type system */
     wmud_type_init();
 

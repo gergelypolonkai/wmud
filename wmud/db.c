@@ -39,8 +39,8 @@
  * different (e.g MySQL or PostgreSQL) database.
  */
 
-static GdaConnection *dbh = NULL;
-static GdaSqlParser *parser = NULL;
+static GdaConnection *dbh    = NULL;
+static GdaSqlParser  *parser = NULL;
 
 GQuark
 wmud_db_error_quark()
@@ -98,33 +98,34 @@ wmud_db_init(GError **err)
 gboolean
 wmud_db_load_players(GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res;
     GdaDataModelIter *iter;
-    GError *local_err = NULL;
+    GError           *local_err = NULL;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading players");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     sth = gda_sql_parser_parse_string(
-            parser,
-            "SELECT id, login, password, email FROM players",
-            NULL,
-            NULL);
+        parser,
+        "SELECT id, login, password, email FROM players",
+        NULL,
+        NULL);
 
     /* TODO: error checking! */
     if ((res = gda_connection_statement_execute_select(
-                 dbh,
-                 sth,
-                 NULL,
-                 &local_err)) == NULL) {
+             dbh,
+             sth,
+             NULL,
+             &local_err)) == NULL) {
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
               "Unable to load players: %s",
               local_err->message);
@@ -141,7 +142,7 @@ wmud_db_load_players(GError **err)
 
     while (gda_data_model_iter_is_valid(iter)) {
         const GValue *val;
-        WmudPlayer *player;
+        WmudPlayer   *player;
 
         player = wmud_player_new();
 
@@ -192,20 +193,21 @@ wmud_db_save_player(WmudPlayer *player, GError **err)
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Saving player");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     login_value = gda_value_new_from_string(
-            wmud_player_get_player_name(player),
-            G_TYPE_STRING);
+        wmud_player_get_player_name(player),
+        G_TYPE_STRING);
     email_value = gda_value_new_from_string(
-            wmud_player_get_email(player),
-            G_TYPE_STRING);
+        wmud_player_get_email(player),
+        G_TYPE_STRING);
 
     if (!gda_connection_insert_row_into_table(dbh,
                                               "players",
@@ -228,8 +230,8 @@ wmud_db_save_player(WmudPlayer *player, GError **err)
 
 gboolean
 wmud_db_update_player_password(WmudPlayer *player,
-                               gchar *crypted_password,
-                               GError **err)
+                               gchar      *crypted_password,
+                               GError     **err)
 {
     GValue *cpw,
            *player_id;
@@ -271,16 +273,17 @@ wmud_db_update_player_password(WmudPlayer *player,
 gboolean
 wmud_db_load_planes(GSList **planes, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planes");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
@@ -289,20 +292,20 @@ wmud_db_load_planes(GSList **planes, GError **err)
                                       "SELECT id, name FROM planes",
                                       NULL,
                                       NULL);
-    res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+    res  = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
     iter = gda_data_model_create_iter(res);
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
         const GValue *val;
-        wmudPlane *plane;
+        wmudPlane    *plane;
 
         plane = g_new0(wmudPlane, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val       = gda_data_model_iter_get_value_at(iter, 0);
         plane->id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val         = gda_data_model_iter_get_value_at(iter, 1);
         plane->name = g_strdup(g_value_get_string(val));
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
@@ -323,16 +326,17 @@ wmud_db_load_planes(GSList **planes, GError **err)
 gboolean
 wmud_db_load_planets(GSList **planets, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading planets");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
@@ -341,20 +345,20 @@ wmud_db_load_planets(GSList **planets, GError **err)
                                       "SELECT id, name FROM planets",
                                       NULL,
                                       NULL);
-    res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+    res  = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
     iter = gda_data_model_create_iter(res);
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
         const GValue *val;
-        wmudPlanet *planet;
+        wmudPlanet   *planet;
 
         planet = g_new0(wmudPlanet, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val        = gda_data_model_iter_get_value_at(iter, 0);
         planet->id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val          = gda_data_model_iter_get_value_at(iter, 1);
         planet->name = g_strdup(g_value_get_string(val));
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
@@ -375,31 +379,32 @@ wmud_db_load_planets(GSList **planets, GError **err)
 gboolean
 wmud_db_load_directions(GSList **directions, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
-    GError *local_err = NULL;
+    GError           *local_err = NULL;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading directions");
 
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     sth = gda_sql_parser_parse_string(
-            parser,
-            "SELECT id, short_name, name FROM directions",
-            NULL,
-            NULL);
+        parser,
+        "SELECT id, short_name, name FROM directions",
+        NULL,
+        NULL);
 
     if ((res = gda_connection_statement_execute_select(
-                 dbh, sth,
-                 NULL, &local_err)) == NULL) {
+             dbh, sth,
+             NULL, &local_err)) == NULL) {
         g_set_error(err,
                     WMUD_DB_ERROR, WMUD_DB_ERROR_SELECT_ERROR,
                     "Unable to load directions: %s",
@@ -412,18 +417,18 @@ wmud_db_load_directions(GSList **directions, GError **err)
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
-        const GValue *val;
+        const GValue  *val;
         wmudDirection *dir;
 
         dir = g_new0(wmudDirection, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val     = gda_data_model_iter_get_value_at(iter, 0);
         dir->id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val             = gda_data_model_iter_get_value_at(iter, 1);
         dir->short_name = g_strdup(g_value_get_string(val));
 
-        val = gda_data_model_iter_get_value_at(iter, 2);
+        val       = gda_data_model_iter_get_value_at(iter, 2);
         dir->name = g_strdup(g_value_get_string(val));
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
@@ -444,39 +449,40 @@ wmud_db_load_directions(GSList **directions, GError **err)
 gboolean
 wmud_db_load_areas(GSList **areas, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading areas");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     sth = gda_sql_parser_parse_string(
-            parser,
-            "SELECT id, name FROM areas",
-            NULL,
-            NULL);
-    res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+        parser,
+        "SELECT id, name FROM areas",
+        NULL,
+        NULL);
+    res  = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
     iter = gda_data_model_create_iter(res);
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
         const GValue *val;
-        wmudArea *area;
+        wmudArea     *area;
 
         area = g_new0(wmudArea, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val      = gda_data_model_iter_get_value_at(iter, 0);
         area->id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val        = gda_data_model_iter_get_value_at(iter, 1);
         area->name = g_strdup(g_value_get_string(val));
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loaded area _%s_", area->name);
@@ -495,48 +501,49 @@ wmud_db_load_areas(GSList **areas, GError **err)
 gboolean
 wmud_db_load_rooms(GSList **rooms, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading rooms");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     sth = gda_sql_parser_parse_string(
-            parser,
-            "SELECT id, area, name, distant_description, close_description FROM rooms",
-            NULL,
-            NULL);
-    res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+        parser,
+        "SELECT id, area, name, distant_description, close_description FROM rooms",
+        NULL,
+        NULL);
+    res  = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
     iter = gda_data_model_create_iter(res);
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
         const GValue *val;
-        wmudRoom *room;
+        wmudRoom     *room;
 
         room = g_new0(wmudRoom, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val      = gda_data_model_iter_get_value_at(iter, 0);
         room->id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val           = gda_data_model_iter_get_value_at(iter, 1);
         room->area_id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 2);
+        val        = gda_data_model_iter_get_value_at(iter, 2);
         room->name = g_strdup(g_value_get_string(val));
 
-        val = gda_data_model_iter_get_value_at(iter, 3);
+        val                       = gda_data_model_iter_get_value_at(iter, 3);
         room->distant_description = g_strdup(g_value_get_string(val));
 
-        val = gda_data_model_iter_get_value_at(iter, 4);
+        val                     = gda_data_model_iter_get_value_at(iter, 4);
         room->close_description = g_strdup(g_value_get_string(val));
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
@@ -558,42 +565,43 @@ wmud_db_load_rooms(GSList **rooms, GError **err)
 gboolean
 wmud_db_load_exits(GSList **exits, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading exits");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     sth = gda_sql_parser_parse_string(
-            parser,
-            "SELECT room_id, direction, other_side FROM room_exits",
-            NULL,
-            NULL);
-    res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+        parser,
+        "SELECT room_id, direction, other_side FROM room_exits",
+        NULL,
+        NULL);
+    res  = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
     iter = gda_data_model_create_iter(res);
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
         const GValue *val;
-        wmudExit *room_exit;
+        wmudExit     *room_exit;
 
         room_exit = g_new0(wmudExit, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val                       = gda_data_model_iter_get_value_at(iter, 0);
         room_exit->source_room_id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val                     = gda_data_model_iter_get_value_at(iter, 1);
         room_exit->direction_id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 2);
+        val                            = gda_data_model_iter_get_value_at(iter, 2);
         room_exit->destination_room_id = g_value_get_int(val);
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
@@ -616,40 +624,41 @@ wmud_db_load_exits(GSList **exits, GError **err)
 gboolean
 wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
           "Loading planet<->plane associations");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     sth = gda_sql_parser_parse_string(
-            parser,
-            "SELECT planet_id, plane_id FROM planet_planes",
-            NULL,
-            NULL);
-    res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+        parser,
+        "SELECT planet_id, plane_id FROM planet_planes",
+        NULL,
+        NULL);
+    res  = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
     iter = gda_data_model_create_iter(res);
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
-        const GValue *val;
+        const GValue         *val;
         wmudPlanetPlaneAssoc *planet_plane;
 
         planet_plane = g_new0(wmudPlanetPlaneAssoc, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val                     = gda_data_model_iter_get_value_at(iter, 0);
         planet_plane->planet_id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val                    = gda_data_model_iter_get_value_at(iter, 1);
         planet_plane->plane_id = g_value_get_int(val);
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
@@ -671,51 +680,52 @@ wmud_db_load_planet_planes(GSList **planet_planes, GError **err)
 gboolean
 wmud_db_load_menu(GSList **menu_items, GError **err)
 {
-    GdaStatement *sth = NULL;
-    GdaDataModel *res = NULL;
+    GdaStatement     *sth = NULL;
+    GdaDataModel     *res = NULL;
     GdaDataModelIter *iter;
 
     g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, "Loading menu items");
     if (dbh == NULL) {
-        if (err)
+        if (err) {
             g_set_error(err,
                         WMUD_DB_ERROR, WMUD_DB_ERROR_NOINIT,
                         "Database backend not initialized");
+        }
 
         return FALSE;
     }
 
     sth = gda_sql_parser_parse_string(
-            parser,
-            "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu ORDER BY placement",
-            NULL,
-            NULL);
-    res = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
+        parser,
+        "SELECT id, menuchar, need_active_char, placement, display_text, fnctn FROM menu ORDER BY placement",
+        NULL,
+        NULL);
+    res  = gda_connection_statement_execute_select(dbh, sth, NULL, NULL);
     iter = gda_data_model_create_iter(res);
     gda_data_model_iter_move_next(iter);
 
     while (gda_data_model_iter_is_valid(iter)) {
         const GValue *val;
-        wmudMenu *menu_item;
+        wmudMenu     *menu_item;
 
         menu_item = g_new0(wmudMenu, 1);
 
-        val = gda_data_model_iter_get_value_at(iter, 0);
+        val           = gda_data_model_iter_get_value_at(iter, 0);
         menu_item->id = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 1);
+        val                 = gda_data_model_iter_get_value_at(iter, 1);
         menu_item->menuchar = *(g_value_get_string(val));
 
-        val = gda_data_model_iter_get_value_at(iter, 2);
+        val                         = gda_data_model_iter_get_value_at(iter, 2);
         menu_item->need_active_char = g_value_get_boolean(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 3);
+        val                  = gda_data_model_iter_get_value_at(iter, 3);
         menu_item->placement = g_value_get_int(val);
 
-        val = gda_data_model_iter_get_value_at(iter, 4);
+        val             = gda_data_model_iter_get_value_at(iter, 4);
         menu_item->text = g_strdup(g_value_get_string(val));
 
-        val = gda_data_model_iter_get_value_at(iter, 5);
+        val             = gda_data_model_iter_get_value_at(iter, 5);
         menu_item->func = g_strdup(g_value_get_string(val));
 
         g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
