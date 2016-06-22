@@ -42,7 +42,7 @@ ConfigData *active_config = NULL;
 GQuark
 wmud_config_error_quark()
 {
-	return g_quark_from_static_string("wmud-config-error");
+    return g_quark_from_static_string("wmud-config-error");
 }
 
 /**
@@ -54,26 +54,32 @@ wmud_config_error_quark()
 void
 wmud_configdata_free(ConfigData **config_data)
 {
-	if ((*config_data)->admin_email)
-		g_free((*config_data)->admin_email);
+    if ((*config_data)->admin_email) {
+        g_free((*config_data)->admin_email);
+    }
 
-	if ((*config_data)->database_dsn)
-		g_free((*config_data)->database_dsn);
+    if ((*config_data)->database_dsn) {
+        g_free((*config_data)->database_dsn);
+    }
 
-	if ((*config_data)->smtp_server)
-		g_free((*config_data)->smtp_server);
+    if ((*config_data)->smtp_server) {
+        g_free((*config_data)->smtp_server);
+    }
 
-	if ((*config_data)->smtp_username)
-		g_free((*config_data)->smtp_username);
+    if ((*config_data)->smtp_username) {
+        g_free((*config_data)->smtp_username);
+    }
 
-	if ((*config_data)->smtp_password)
-		g_free((*config_data)->smtp_password);
+    if ((*config_data)->smtp_password) {
+        g_free((*config_data)->smtp_password);
+    }
 
-	if ((*config_data)->smtp_sender)
-		g_free((*config_data)->smtp_sender);
+    if ((*config_data)->smtp_sender) {
+        g_free((*config_data)->smtp_sender);
+    }
 
-	g_free(*config_data);
-	*config_data = NULL;
+    g_free(*config_data);
+    *config_data = NULL;
 }
 
 /**
@@ -90,127 +96,176 @@ wmud_configdata_free(ConfigData **config_data)
 gboolean
 wmud_config_init(ConfigData **config_data, GError **err)
 {
-	GString *config_file = g_string_new(WMUD_CONFDIR);
-	GKeyFile *config;
-	GError *in_err = NULL;
-	gchar *pos;
+    GString *config_file = g_string_new(WMUD_CONFDIR);
+    GKeyFile *config;
+    GError *in_err = NULL;
+    gchar *pos;
 
-	if (!config_data)
-		return FALSE;
+    if (!config_data)
+        return FALSE;
 
-	if (*config_data) {
-		g_clear_error(err);
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_REUSE, "Configuration pointer reuse. Please file a bug report!");
-		return FALSE;
-	}
+    if (*config_data) {
+        g_clear_error(err);
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_REUSE,
+                    "Configuration pointer reuse. Please file a bug report!");
+        return FALSE;
+    }
 
-	*config_data = g_new0(ConfigData, 1);
+    *config_data = g_new0(ConfigData, 1);
 
-	g_string_append(config_file, "/wmud.conf");
+    g_string_append(config_file, "/wmud.conf");
 
-	config = g_key_file_new();
-	/* TODO: Error checking */
-	g_key_file_load_from_file(config, config_file->str, 0, &in_err);
+    config = g_key_file_new();
+    /* TODO: Error checking */
+    g_key_file_load_from_file(config, config_file->str, 0, &in_err);
 
-	if (!g_key_file_has_group(config, "global")) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOGLOBAL, "Config file (%s) does not contain a [global] group", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
+    if (!g_key_file_has_group(config, "global")) {
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOGLOBAL,
+                    "Config file (%s) does not contain a [global] group",
+                    config_file->str);
+        g_key_file_free(config);
+        g_string_free(config_file, TRUE);
 
-		return FALSE;
-	}
+        return FALSE;
+    }
 
-	if (!g_key_file_has_group(config, "smtp")) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTP, "Config file (%s) does not contain an [smtp] group", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
+    if (!g_key_file_has_group(config, "smtp")) {
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTP,
+                    "Config file (%s) does not contain an [smtp] group",
+                    config_file->str);
+        g_key_file_free(config);
+        g_string_free(config_file, TRUE);
 
-		return FALSE;
-	}
+        return FALSE;
+    }
 
-	if (!g_key_file_has_group(config, "database")) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NODATABASE, "Config file (%s) does not contain a [database] group", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
+    if (!g_key_file_has_group(config, "database")) {
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR,
+                    WMUD_CONFIG_ERROR_NODATABASE,
+                    "Config file (%s) does not contain a [database] group",
+                    config_file->str);
+        g_key_file_free(config);
+        g_string_free(config_file, TRUE);
 
-		return FALSE;
-	}
+        return FALSE;
+    }
 
-	g_clear_error(&in_err);
-	(*config_data)->port = g_key_file_get_integer(config, "global", "port", &in_err);
-	if (in_err)
-	{
-		if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
-			(*config_data)->port = DEFAULT_PORT;
-		} else if (g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE)) {
-			g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_BADPORT, "Config file (%s) contains an invalid port number", config_file->str);
-			g_key_file_free(config);
-			g_string_free(config_file, TRUE);
-			(*config_data)->port = 0;
+    g_clear_error(&in_err);
+    (*config_data)->port = g_key_file_get_integer(config,
+                                                  "global", "port",
+                                                  &in_err);
 
-			return FALSE;
-		}
+    if (in_err) {
+        if (g_error_matches(in_err,
+                            G_KEY_FILE_ERROR,
+                            G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+            (*config_data)->port = DEFAULT_PORT;
+        } else if (g_error_matches(in_err,
+                                   G_KEY_FILE_ERROR,
+                                   G_KEY_FILE_ERROR_INVALID_VALUE)) {
+            g_set_error(err,
+                        WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_BADPORT,
+                        "Config file (%s) contains an invalid port number",
+                        config_file->str);
+            g_key_file_free(config);
+            g_string_free(config_file, TRUE);
+            (*config_data)->port = 0;
 
-		return FALSE;
-	}
+            return FALSE;
+        }
 
-	g_clear_error(&in_err);
-	(*config_data)->admin_email = g_key_file_get_string(config, "global", "admin email", &in_err);
-	if (in_err  && g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOEMAIL, "Config file (%s) does not contain an admin e-mail address", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
-		wmud_configdata_free(config_data);
+        return FALSE;
+    }
 
-		return FALSE;
-	}
+    g_clear_error(&in_err);
+    (*config_data)->admin_email = g_key_file_get_string(config,
+                                                        "global", "admin email",
+                                                        &in_err);
+    if (in_err  && g_error_matches(in_err,
+                                   G_KEY_FILE_ERROR,
+                                   G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOEMAIL,
+                    "Config file (%s) does not contain an admin e-mail address",
+                    config_file->str);
+        g_key_file_free(config);
+        g_string_free(config_file, TRUE);
+        wmud_configdata_free(config_data);
 
-	g_clear_error(&in_err);
-	(*config_data)->smtp_server = g_key_file_get_string(config, "smtp", "smtp server", &in_err);
-	if (in_err && g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTPSERVER, "Config file (%s) does not contain an smtp server address", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
-		wmud_configdata_free(config_data);
+        return FALSE;
+    }
 
-		return FALSE;
-	}
+    g_clear_error(&in_err);
+    (*config_data)->smtp_server = g_key_file_get_string(config,
+                                                        "smtp", "smtp server",
+                                                        &in_err);
+    if (in_err && g_error_matches(in_err,
+                                  G_KEY_FILE_ERROR,
+                                  G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTPSERVER,
+                    "Config file (%s) does not contain an smtp server address",
+                    config_file->str);
+        g_key_file_free(config);
+        g_string_free(config_file, TRUE);
+        wmud_configdata_free(config_data);
 
-	g_clear_error(&in_err);
-	(*config_data)->smtp_sender = g_key_file_get_string(config, "smtp", "smtp sender", &in_err);
-	if (in_err && g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTPSENDER, "Config file (%s) does not contain an smtp sender name", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
-		wmud_configdata_free(config_data);
+        return FALSE;
+    }
 
-		return FALSE;
-	}
+    g_clear_error(&in_err);
+    (*config_data)->smtp_sender = g_key_file_get_string(config,
+                                                        "smtp", "smtp sender",
+                                                        &in_err);
+    if (in_err && g_error_matches(in_err,
+                                  G_KEY_FILE_ERROR,
+                                  G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOSMTPSENDER,
+                    "Config file (%s) does not contain an smtp sender name",
+                    config_file->str);
+        g_key_file_free(config);
+        g_string_free(config_file, TRUE);
+        wmud_configdata_free(config_data);
 
-	g_clear_error(&in_err);
-	(*config_data)->database_dsn = g_key_file_get_string(config, "database", "dsn", &in_err);
-	if (in_err && g_error_matches(in_err, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
-		g_set_error(err, WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOWORLD, "Config file (%s) does not contain a database dsn", config_file->str);
-		g_key_file_free(config);
-		g_string_free(config_file, TRUE);
-		wmud_configdata_free(config_data);
+        return FALSE;
+    }
 
-		return FALSE;
-	}
+    g_clear_error(&in_err);
+    (*config_data)->database_dsn = g_key_file_get_string(config,
+                                                         "database", "dsn",
+                                                         &in_err);
+    if (in_err && g_error_matches(in_err,
+                                  G_KEY_FILE_ERROR,
+                                  G_KEY_FILE_ERROR_KEY_NOT_FOUND)) {
+        g_set_error(err,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOWORLD,
+                    "Config file (%s) does not contain a database dsn",
+                    config_file->str);
+        g_key_file_free(config);
+        g_string_free(config_file, TRUE);
+        wmud_configdata_free(config_data);
 
-	if ((pos = g_strstr_len((*config_data)->database_dsn, -1, "{statedir}")) != NULL) {
-		guint real_pos = pos - (*config_data)->database_dsn;
-		GString *tmp = g_string_new((*config_data)->database_dsn);
+        return FALSE;
+    }
 
-		g_string_erase(tmp, real_pos, 10);
-		g_string_insert(tmp, real_pos, WMUD_STATEDIR);
-		(*config_data)->database_dsn = tmp->str;
-		g_string_free(tmp, FALSE);
-	}
+    if ((pos = g_strstr_len((*config_data)->database_dsn,
+                            -1, "{statedir}")) != NULL) {
+        guint real_pos = pos - (*config_data)->database_dsn;
+        GString *tmp = g_string_new((*config_data)->database_dsn);
 
-	g_key_file_free(config);
-	g_string_free(config_file, TRUE);
+        g_string_erase(tmp, real_pos, 10);
+        g_string_insert(tmp, real_pos, WMUD_STATEDIR);
+        (*config_data)->database_dsn = tmp->str;
+        g_string_free(tmp, FALSE);
+    }
 
-	return TRUE;
+    g_key_file_free(config);
+    g_string_free(config_file, TRUE);
+
+    return TRUE;
 }
-

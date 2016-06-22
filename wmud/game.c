@@ -70,17 +70,19 @@ guint32 elapsed_cycle = 0;
 gboolean
 rl_sec_elapsed(gpointer user_data)
 {
-	elapsed_ticks++;
-	if (elapsed_ticks == G_MAXUINT32) {
-		elapsed_ticks = 0;
-		elapsed_cycle++;
-	}
+    elapsed_ticks++;
+    if (elapsed_ticks == G_MAXUINT32) {
+        elapsed_ticks = 0;
+        elapsed_cycle++;
+    }
 
-	if (elapsed_ticks % WMUD_HEARTBEAT_LENGTH == 0) {
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "Heartbeat (%d ticks)", elapsed_ticks);
-	}
+    if (elapsed_ticks % WMUD_HEARTBEAT_LENGTH == 0) {
+        g_log(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE,
+              "Heartbeat (%d ticks)",
+              elapsed_ticks);
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 /**
@@ -94,36 +96,41 @@ rl_sec_elapsed(gpointer user_data)
 gpointer
 game_thread_func(GMainLoop *game_loop)
 {
-	/* Run the game loop */
-	g_main_loop_run(game_loop);
+    /* Run the game loop */
+    g_main_loop_run(game_loop);
 
-	return NULL;
+    return NULL;
 }
 
 gboolean
 wmud_game_init(GThread **game_thread, GMainContext **game_context)
 {
-	GMainLoop *game_loop;
-	GSource *timeout_source;
-	GError *err = NULL;
+    GMainLoop *game_loop;
+    GSource *timeout_source;
+    GError *err = NULL;
 
-	/* Create the game context and main loop */
-	*game_context = g_main_context_new();
-	game_loop = g_main_loop_new(*game_context, FALSE);
+    /* Create the game context and main loop */
+    *game_context = g_main_context_new();
+    game_loop = g_main_loop_new(*game_context, FALSE);
 
-	/* Create the timeout source which keeps track of elapsed real-world
-	 * time */
-	timeout_source = g_timeout_source_new(WMUD_TICK_LENGTH);
-	g_source_set_callback(timeout_source, rl_sec_elapsed, NULL, NULL);
-	g_source_attach(timeout_source, *game_context);
-	g_source_unref(timeout_source);
+    /* Create the timeout source which keeps track of elapsed real-world
+     * time */
+    timeout_source = g_timeout_source_new(WMUD_TICK_LENGTH);
+    g_source_set_callback(timeout_source, rl_sec_elapsed, NULL, NULL);
+    g_source_attach(timeout_source, *game_context);
+    g_source_unref(timeout_source);
 
-	g_clear_error(&err);
+    g_clear_error(&err);
 #if GLIB_CHECK_VERSION(2, 32, 0)
-	*game_thread = g_thread_new("game", (GThreadFunc)game_thread_func, game_loop);
+    *game_thread = g_thread_new("game",
+                                (GThreadFunc)game_thread_func,
+                                game_loop);
 #else
-	*game_thread = g_thread_create((GThreadFunc)game_thread_func, game_loop, TRUE, &err);
+    *game_thread = g_thread_create((GThreadFunc)game_thread_func,
+                                   game_loop,
+                                   TRUE,
+                                   &err);
 #endif
 
-	return TRUE;
+    return TRUE;
 }

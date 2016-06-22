@@ -52,8 +52,8 @@
  * This variable holds the location of the last context marker
  */
 struct {
-	char *file;
-	int line;
+    char *file;
+    int line;
 } debug_context_loc = {NULL, 0};
 
 /**
@@ -65,21 +65,21 @@ struct {
 gchar *
 wmud_random_string(gint len)
 {
-	gchar *ret = g_malloc0(len + 1);
-	gint i;
+    gchar *ret = g_malloc0(len + 1);
+    gint i;
 
-	for (i = 0; i < len; i++) {
-		gchar c = 0;
-		/* Include only printable characters, but exclude $ because of
-		 * salt generation, and space to avoid misunderstanding in the
-		 * random generated passwords */
-		while (!g_ascii_isprint(c) || (c == '$') || (c == ' ') || (c == '\t'))
-			c = random_number(1, 127);
+    for (i = 0; i < len; i++) {
+        gchar c = 0;
+        /* Include only printable characters, but exclude $ because of
+         * salt generation, and space to avoid misunderstanding in the
+         * random generated passwords */
+        while (!g_ascii_isprint(c) || (c == '$') || (c == ' ') || (c == '\t'))
+            c = random_number(1, 127);
 
-		ret[i] = c;
-	}
+        ret[i] = c;
+    }
 
-	return ret;
+    return ret;
 }
 
 #ifdef DEBUG
@@ -97,11 +97,11 @@ void
  */
 debug_context(char *file, int line)
 {
-	if (debug_context_loc.file != NULL)
-		g_free(debug_context_loc.file);
+    if (debug_context_loc.file != NULL)
+        g_free(debug_context_loc.file);
 
-	debug_context_loc.file = g_strdup(file);
-	debug_context_loc.line = line;
+    debug_context_loc.file = g_strdup(file);
+    debug_context_loc.line = line;
 }
 
 /**
@@ -122,45 +122,72 @@ debug_context(char *file, int line)
  */
 void
 wmud_type_init(void)
-{
-}
+{}
 
 void
-wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
+wmud_logger(const gchar *log_domain,
+            GLogLevelFlags log_level,
+            const gchar *message,
+            gpointer user_data)
 {
-	static char timestamp[20];
-	struct tm *tm;
-	time_t ts = time(NULL);
-	size_t last_char;
+    static char timestamp[20];
+    struct tm *tm;
+    time_t ts = time(NULL);
+    size_t last_char;
 
-	tm = localtime(&ts);
+    tm = localtime(&ts);
 
-	last_char = strftime((char *)&timestamp, 20, "%F %T", tm);
-	timestamp[last_char] = '\0';
+    last_char = strftime((char *)&timestamp, 20, "%F %T", tm);
+    timestamp[last_char] = '\0';
 
-	switch (log_level) {
-		case G_LOG_LEVEL_DEBUG:
-			g_print("[%s] [%s] DEBUG:             %s\n", log_domain, timestamp, message);
+    switch (log_level) {
+        case G_LOG_LEVEL_DEBUG:
+            g_print("[%s] [%s] DEBUG:             %s\n",
+                    log_domain,
+                    timestamp,
+                    message);
 #ifndef DEBUG
-			g_warning("Logging a debug-level message without debugging support!");
+            g_warning("Logging a debug-level message without debugging support!");
 #endif
-			break;
-		case G_LOG_LEVEL_MESSAGE:
-			g_print("[%s] [%s] MESSAGE:           %s\n", log_domain, timestamp, message);
-			break;
-		case G_LOG_LEVEL_INFO:
-			g_print("[%s] [%s] INFO:              %s\n", log_domain, timestamp, message);
-			break;
-		case G_LOG_LEVEL_WARNING:
-			g_print("[%s] [%s] WARNING:           %s\n", log_domain, timestamp, message);
-			break;
-		case G_LOG_LEVEL_CRITICAL:
-			g_print("[%s] [%s] CRITICAL:          %s\n", log_domain, timestamp, message);
-			break;
-		default:
-			g_print("[%s] [%s] UNKNOWN LEVEL %03d: %s\n", log_domain, timestamp, log_level, message);
-			break;
-	}
+
+            break;
+        case G_LOG_LEVEL_MESSAGE:
+            g_print("[%s] [%s] MESSAGE:           %s\n",
+                    log_domain,
+                    timestamp,
+                    message);
+
+            break;
+        case G_LOG_LEVEL_INFO:
+            g_print("[%s] [%s] INFO:              %s\n",
+                    log_domain,
+                    timestamp,
+                    message);
+
+            break;
+        case G_LOG_LEVEL_WARNING:
+            g_print("[%s] [%s] WARNING:           %s\n",
+                    log_domain,
+                    timestamp,
+                    message);
+
+            break;
+        case G_LOG_LEVEL_CRITICAL:
+            g_print("[%s] [%s] CRITICAL:          %s\n",
+                    log_domain,
+                    timestamp,
+                    message);
+
+            break;
+        default:
+            g_print("[%s] [%s] UNKNOWN LEVEL %03d: %s\n",
+                    log_domain,
+                    timestamp,
+                    log_level,
+                    message);
+
+            break;
+    }
 }
 
 /**
@@ -173,70 +200,80 @@ wmud_logger(const gchar *log_domain, GLogLevelFlags log_level, const gchar *mess
 int
 main(int argc, char **argv)
 {
-	GError *err = NULL;
-	GThread *game_thread;
-	GMainContext *game_context;
+    GError *err = NULL;
+    GThread *game_thread;
+    GMainContext *game_context;
     GSList *game_menu = NULL;
 
-	g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK , wmud_logger, NULL);
-	/* Initialize the thread and type system */
-	wmud_type_init();
+    g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK , wmud_logger, NULL);
+    /* Initialize the thread and type system */
+    wmud_type_init();
 
-	/* TODO: Command line parsing */
-	/* TODO: Create signal handlers! */
+    /* TODO: Command line parsing */
+    /* TODO: Create signal handlers! */
 
-	if (!wmud_config_init(&active_config, &err)) {
-		if (err)
-			g_critical("Config file parsing error: %s", err->message);
-		else
-			g_critical("Config file parsing error!");
+    if (!wmud_config_init(&active_config, &err)) {
+        if (err) {
+            g_critical("Config file parsing error: %s", err->message);
+        } else {
+            g_critical("Config file parsing error!");
+        }
 
-		return 1;
-	}
+        return 1;
+    }
 
-	g_clear_error(&err);
-	if (!wmud_db_init(&err)) {
-		if (err)
-			g_critical("Database initialization error: %s", err->message);
-		else
-			g_critical("Database initialization error!");
+    g_clear_error(&err);
 
-		return 1;
-	}
+    if (!wmud_db_init(&err)) {
+        if (err) {
+            g_critical("Database initialization error: %s", err->message);
+        } else {
+            g_critical("Database initialization error!");
+        }
 
-	g_clear_error(&err);
-	wmud_db_load_players(&err);
-	if (!wmud_world_load(&err))
-		return 1;
+        return 1;
+    }
 
-	if (!wmud_menu_init(&game_menu)) {
-		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "An error occured during menu loading.");
+    g_clear_error(&err);
+    wmud_db_load_players(&err);
 
-		return 1;
-	}
+    if (!wmud_world_load(&err)) {
+        return 1;
+    }
 
-	wmud_texts_init();
+    if (!wmud_menu_init(&game_menu)) {
+        g_log(G_LOG_DOMAIN,
+              G_LOG_LEVEL_CRITICAL,
+              "An error occured during menu loading.");
 
-	/* Non-thread initialization ends here */
+        return 1;
+    }
 
-	wmud_game_init(&game_thread, &game_context);
+    wmud_texts_init();
 
-	g_clear_error(&err);
-	if (!wmud_networking_init(active_config->port, game_context, game_menu, &err)) {
-		if (err)
-			g_critical("Database initialization error: %s", err->message);
-		else
-			g_critical("Database initialization error: unknown error!");
+    /* Non-thread initialization ends here */
 
-		return 1;
-	}
+    wmud_game_init(&game_thread, &game_context);
 
-	wmud_maintenance_init();
+    g_clear_error(&err);
+    if (!wmud_networking_init(active_config->port,
+                              game_context,
+                              game_menu,
+                              &err)) {
+        if (err) {
+            g_critical("Database initialization error: %s", err->message);
+        } else {
+            g_critical("Database initialization error: unknown error!");
+        }
 
-	/* Initialize other threads here */
+        return 1;
+    }
 
-	g_thread_join(game_thread);
+    wmud_maintenance_init();
 
-	return 0;
+    /* Initialize other threads here */
+
+    g_thread_join(game_thread);
+
+    return 0;
 }
-
