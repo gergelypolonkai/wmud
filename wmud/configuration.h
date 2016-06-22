@@ -30,15 +30,15 @@ GQuark wmud_config_error_quark();
  * Error codes returned by configuration file parsing functions.
  */
 typedef enum {
-	WMUD_CONFIG_ERROR_NOGLOBAL,
-	WMUD_CONFIG_ERROR_BADPORT,
-	WMUD_CONFIG_ERROR_NOWORLD,
-	WMUD_CONFIG_ERROR_NOEMAIL,
-	WMUD_CONFIG_ERROR_REUSE,
-	WMUD_CONFIG_ERROR_NOSMTP,
-	WMUD_CONFIG_ERROR_NOSMTPSERVER,
-	WMUD_CONFIG_ERROR_NOSMTPSENDER,
-	WMUD_CONFIG_ERROR_NODATABASE
+    WMUD_CONFIG_ERROR_NOGLOBAL,
+    WMUD_CONFIG_ERROR_BADPORT,
+    WMUD_CONFIG_ERROR_NOWORLD,
+    WMUD_CONFIG_ERROR_NOEMAIL,
+    WMUD_CONFIG_ERROR_REUSE,
+    WMUD_CONFIG_ERROR_NOSMTP,
+    WMUD_CONFIG_ERROR_NOSMTPSERVER,
+    WMUD_CONFIG_ERROR_NOSMTPSENDER,
+    WMUD_CONFIG_ERROR_NODATABASE
 } wmudConfigError;
 
 /**
@@ -55,14 +55,14 @@ typedef enum {
  * @smtp_sender: the sender address who sends the outgoing mails
  */
 typedef struct _ConfigData {
-	guint port;
-	gchar *database_dsn;
-	gchar *admin_email;
-	gchar *smtp_server;
-	gboolean smtp_tls;
-	gchar *smtp_username;
-	gchar *smtp_password;
-	gchar *smtp_sender;
+    guint port;
+    gchar *database_dsn;
+    gchar *admin_email;
+    gchar *smtp_server;
+    gboolean smtp_tls;
+    gchar *smtp_username;
+    gchar *smtp_password;
+    gchar *smtp_sender;
 } ConfigData;
 
 extern ConfigData *active_config;
@@ -70,4 +70,3 @@ extern ConfigData *active_config;
 gboolean wmud_config_init(ConfigData **config_data, GError **err);
 
 #endif /* __WMUD_CONFIGURATION_H__ */
-
