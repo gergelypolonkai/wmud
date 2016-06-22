@@ -35,24 +35,34 @@ GQuark wmud_db_error_quark();
  * Error codes returned by database handling functions.
  */
 typedef enum {
-	WMUD_DB_ERROR_CANTOPEN,
-	WMUD_DB_ERROR_NOINIT,
-	WMUD_DB_ERROR_BADQUERY,
-	WMUD_DB_ERROR_SELECT_ERROR
+    WMUD_DB_ERROR_CANTOPEN,
+    WMUD_DB_ERROR_NOINIT,
+    WMUD_DB_ERROR_BADQUERY,
+    WMUD_DB_ERROR_SELECT_ERROR
 } wmudDbError;
 
 gboolean wmud_db_init(GError **err);
 gboolean wmud_db_load_players(GError **err);
-gboolean wmud_db_save_player(WmudPlayer *player, GError **err);
-gboolean wmud_db_load_planes(GSList **planes, GError **err);
-gboolean wmud_db_load_planets(GSList **planets, GError **err);
-gboolean wmud_db_load_directions(GSList **directions, GError **err);
-gboolean wmud_db_load_areas(GSList **areas, GError **err);
-gboolean wmud_db_load_rooms(GSList **rooms, GError **err);
-gboolean wmud_db_load_exits(GSList **exits, GError **err);
-gboolean wmud_db_load_planet_planes(GSList **planet_planes, GError **err);
-gboolean wmud_db_load_menu(GSList **menu_items, GError **err);
-gboolean wmud_db_update_player_password(WmudPlayer *player, gchar *crypted_password, GError **err);
+gboolean wmud_db_save_player(WmudPlayer *player,
+                             GError     **err);
+gboolean wmud_db_load_planes(GSList **planes,
+                             GError **err);
+gboolean wmud_db_load_planets(GSList **planets,
+                              GError **err);
+gboolean wmud_db_load_directions(GSList **directions,
+                                 GError **err);
+gboolean wmud_db_load_areas(GSList **areas,
+                            GError **err);
+gboolean wmud_db_load_rooms(GSList **rooms,
+                            GError **err);
+gboolean wmud_db_load_exits(GSList **exits,
+                            GError **err);
+gboolean wmud_db_load_planet_planes(GSList **planet_planes,
+                                    GError **err);
+gboolean wmud_db_load_menu(GSList **menu_items,
+                           GError **err);
+gboolean wmud_db_update_player_password(WmudPlayer *player,
+                                        gchar      *crypted_password,
+                                        GError     **err);
 
 #endif /* __WMUD__DB_H__ */
-

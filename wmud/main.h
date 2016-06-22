@@ -22,7 +22,7 @@
 # include <glib.h>
 
 extern GMainContext *game_context;
-extern guint32 elapsed_seconds;
+extern guint32      elapsed_seconds;
 
 /**
  * random_number:

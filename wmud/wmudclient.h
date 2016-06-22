@@ -37,8 +37,8 @@
  *
  * A connected game client
  */
-typedef struct _WmudClient WmudClient;
-typedef struct _WmudClientClass WmudClientClass;
+typedef struct _WmudClient        WmudClient;
+typedef struct _WmudClientClass   WmudClientClass;
 typedef struct _WmudClientPrivate WmudClientPrivate;
 
 /**
@@ -50,39 +50,47 @@ typedef struct _WmudClientPrivate WmudClientPrivate;
  */
 typedef void (*WmudClientYesnoCallback)(WmudClient *client, gboolean answer);
 
-struct _WmudClient
-{
-	/*< private >*/
-	GObject  parent_instance;
-	WmudClientPrivate *priv;
+struct _WmudClient {
+    /*< private >*/
+    GObject           parent_instance;
+    WmudClientPrivate *priv;
 };
 
-struct _WmudClientClass
-{
-	GObjectClass parent_class;
+struct _WmudClientClass {
+    GObjectClass parent_class;
 };
 
 GType wmud_client_get_type(void);
 WmudClient *wmud_client_new(void);
-void wmud_client_set_socket(WmudClient *client, GSocket *socket);
+void wmud_client_set_socket(WmudClient *client,
+                            GSocket    *socket);
 GSocket *wmud_client_get_socket(WmudClient *client);
 GSource *wmud_client_get_socket_source(WmudClient *client);
-void wmud_client_send(WmudClient *client, const gchar *fmt, ...);
-void wmud_client_close(WmudClient *self, gboolean send_goodbye);
+void wmud_client_send(WmudClient  *client,
+                      const gchar *fmt,
+                      ...);
+void wmud_client_close(WmudClient *self,
+                       gboolean   send_goodbye);
 GString *wmud_client_get_buffer(WmudClient *client);
 gsize wmud_client_get_buffer_length(WmudClient *client);
-void wmud_client_set_state(WmudClient *client, WmudClientState state);
+void wmud_client_set_state(WmudClient      *client,
+                           WmudClientState state);
 WmudClientState wmud_client_get_state(WmudClient *client);
-void wmud_client_set_player(WmudClient *client, WmudPlayer *player);
+void wmud_client_set_player(WmudClient *client,
+                            WmudPlayer *player);
 WmudPlayer *wmud_client_get_player(WmudClient *client);
-void wmud_client_set_yesno_callback(WmudClient *client, WmudClientYesnoCallback yesno_callback);
+void wmud_client_set_yesno_callback(WmudClient              *client,
+                                    WmudClientYesnoCallback yesno_callback);
 WmudClientYesnoCallback wmud_client_get_yesno_callback(WmudClient *client);
-void wmud_client_set_authenticated(WmudClient *client, gboolean authenticated);
+void wmud_client_set_authenticated(WmudClient *client,
+                                   gboolean   authenticated);
 void wmud_client_increase_login_fail_count(WmudClient *client);
 gint wmud_client_get_login_fail_count(WmudClient *client);
-void wmud_client_set_bademail(WmudClient *client, gboolean bademail);
+void wmud_client_set_bademail(WmudClient *client,
+                              gboolean   bademail);
 gboolean wmud_client_get_bademail(WmudClient *client);
 guint32 wmud_client_get_last_recv_age(WmudClient *client);
-void wmud_client_set_context(WmudClient *client, GMainContext *context);
+void wmud_client_set_context(WmudClient   *client,
+                             GMainContext *context);
 
 #endif /* __WMUD_WMUDCLIENT_H__ */

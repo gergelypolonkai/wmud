@@ -39,14 +39,14 @@
  * @func: the menu item's function. See menu.c for the list of possible values.
  */
 typedef struct _wmudMenu {
-	guint id;
-	gchar menuchar;
-	gboolean need_active_char;
-	guint placement;
-	gchar *text;
-	gchar *display_text;
-	gchar *display_text_ansi;
-	gchar *func;
+    guint    id;
+    gchar    menuchar;
+    gboolean need_active_char;
+    guint    placement;
+    gchar    *text;
+    gchar    *display_text;
+    gchar    *display_text_ansi;
+    gchar    *func;
 } wmudMenu;
 
 typedef void (*wmudMenuCommandFunc)(WmudClient *client);
@@ -63,10 +63,13 @@ GSList *game_menu;
 #define WMUD_MENU_ERROR wmud_menu_error_quark()
 GQuark wmud_menu_error_quark();
 gboolean wmud_menu_init(GSList **menu);
-gboolean wmud_menu_items_check(GSList *menu_items, GError **err);
+gboolean wmud_menu_items_check(GSList *menu_items,
+                               GError **err);
 void wmud_menu_items_free(GSList **menu_items);
-gchar *wmud_menu_get_command_by_menuchar(gchar menuchar, GSList *game_menu);
-void wmud_menu_execute_command(WmudClient *client, gchar *command);
+gchar *wmud_menu_get_command_by_menuchar(gchar  menuchar,
+                                         GSList *game_menu);
+void wmud_menu_execute_command(WmudClient *client,
+                               gchar      *command);
 void wmud_menu_present(WmudClient *client);
 
 #endif /* __WMUD_MENU_H__ */

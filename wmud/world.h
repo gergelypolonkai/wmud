@@ -25,12 +25,12 @@
 GQuark wmud_world_error_quark();
 
 typedef enum {
-	WMUD_WORLD_ERROR_DUPPLANE,
-	WMUD_WORLD_ERROR_DUPPLANET,
-	WMUD_WORLD_ERROR_DUPAREA,
-	WMUD_WORLD_ERROR_DUPROOM,
-	WMUD_WORLD_ERROR_BADASSOC,
-	WMUD_WORLD_ERROR_BADPLANET
+    WMUD_WORLD_ERROR_DUPPLANE,
+    WMUD_WORLD_ERROR_DUPPLANET,
+    WMUD_WORLD_ERROR_DUPAREA,
+    WMUD_WORLD_ERROR_DUPROOM,
+    WMUD_WORLD_ERROR_BADASSOC,
+    WMUD_WORLD_ERROR_BADPLANET
 } wmudWorldError;
 
 /**
@@ -39,8 +39,8 @@ typedef enum {
  * @name: The name of the plane
  */
 typedef struct _wmudPlane {
-	guint id;
-	gchar *name;
+    guint id;
+    gchar *name;
 } wmudPlane;
 
 /**
@@ -52,9 +52,9 @@ typedef struct _wmudPlane {
  *          g_slist_free()
  */
 typedef struct _wmudPlanet {
-	guint id;
-	gchar *name;
-	GSList *planes;
+    guint  id;
+    gchar  *name;
+    GSList *planes;
 } wmudPlanet;
 
 /**
@@ -64,9 +64,9 @@ typedef struct _wmudPlanet {
  * @rooms: a #GSList of rooms in this area
  */
 typedef struct _wmudArea {
-	guint id;
-	gchar *name;
-	GSList *rooms;
+    guint  id;
+    gchar  *name;
+    GSList *rooms;
 } wmudArea;
 
 /**
@@ -80,13 +80,13 @@ typedef struct _wmudArea {
  *                     when standing in it
  */
 typedef struct _wmudRoom {
-	guint id;
-	guint area_id;
-	gchar *name;
-	gchar *distant_description;
-	gchar *close_description;
-	GSList *planes;
-	GSList *exits;
+    guint  id;
+    guint  area_id;
+    gchar  *name;
+    gchar  *distant_description;
+    gchar  *close_description;
+    GSList *planes;
+    GSList *exits;
 } wmudRoom;
 
 /**
@@ -96,9 +96,9 @@ typedef struct _wmudRoom {
  * @name: The normal name of the direction's command
  */
 typedef struct _wmudDirection {
-	guint id;
-	gchar *short_name;
-	gchar *name;
+    guint id;
+    gchar *short_name;
+    gchar *name;
 } wmudDirection;
 
 /**
@@ -109,9 +109,9 @@ typedef struct _wmudDirection {
  *                       opens
  */
 typedef struct _wmudExit {
-	guint source_room_id;
-	guint direction_id;
-	guint destination_room_id;
+    guint source_room_id;
+    guint direction_id;
+    guint destination_room_id;
 } wmudExit;
 
 /**
@@ -120,8 +120,8 @@ typedef struct _wmudExit {
  * @other_side: the room to which this exit leads to
  */
 typedef struct _wmudRoomExit {
-	wmudDirection *direction;
-	wmudRoom *other_side;
+    wmudDirection *direction;
+    wmudRoom      *other_side;
 } wmudRoomExit;
 
 /**
@@ -130,22 +130,38 @@ typedef struct _wmudRoomExit {
  * @plane_id: The database ID of the plane @planet is on
  */
 typedef struct _wmudPlanetPlaneAssoc {
-	guint planet_id;
-	guint plane_id;
+    guint planet_id;
+    guint plane_id;
 } wmudPlanetPlaneAssoc;
 
-gboolean wmud_world_check_planes(GSList *planes, GError **err);
-gboolean wmud_world_check_planets(GSList *planets, GError **err);
-gboolean wmud_world_check_areas(GSList *areas, GError **err);
-gboolean wmud_world_check_rooms(GSList *rooms, GError **err);
-gboolean wmud_world_check_exits(GSList *exits, GSList *directions, GSList *rooms, GError **err);
+gboolean wmud_world_check_planes(GSList *planes,
+                                 GError **err);
+gboolean wmud_world_check_planets(GSList *planets,
+                                  GError **err);
+gboolean wmud_world_check_areas(GSList *areas,
+                                GError **err);
+gboolean wmud_world_check_rooms(GSList *rooms,
+                                GError **err);
+gboolean wmud_world_check_exits(GSList *exits,
+                                GSList *directions,
+                                GSList *rooms,
+                                GError **err);
 
-gboolean wmud_world_assoc_planets_planes(GSList *planets, GSList *planes, GSList *planet_planes, GError **err);
-gboolean wmud_world_assoc_rooms_areas(GSList *rooms, GSList *areas, GError **err);
-gboolean wmud_world_assoc_rooms_planets(GSList *rooms, GSList *planets, GError **err);
-void wmud_world_assoc_exits_rooms(GSList *exits, GSList *directions, GSList *rooms, GError **err);
+gboolean wmud_world_assoc_planets_planes(GSList *planets,
+                                         GSList *planes,
+                                         GSList *planet_planes,
+                                         GError **err);
+gboolean wmud_world_assoc_rooms_areas(GSList *rooms,
+                                      GSList *areas,
+                                      GError **err);
+gboolean wmud_world_assoc_rooms_planets(GSList *rooms,
+                                        GSList *planets,
+                                        GError **err);
+void wmud_world_assoc_exits_rooms(GSList *exits,
+                                  GSList *directions,
+                                  GSList *rooms,
+                                  GError **err);
 
 gboolean wmud_world_load(GError **err);
 
 #endif /* __WMUD_WORLD_H__ */
-

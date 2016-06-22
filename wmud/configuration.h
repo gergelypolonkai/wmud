@@ -55,18 +55,19 @@ typedef enum {
  * @smtp_sender: the sender address who sends the outgoing mails
  */
 typedef struct _ConfigData {
-    guint port;
-    gchar *database_dsn;
-    gchar *admin_email;
-    gchar *smtp_server;
+    guint    port;
+    gchar    *database_dsn;
+    gchar    *admin_email;
+    gchar    *smtp_server;
     gboolean smtp_tls;
-    gchar *smtp_username;
-    gchar *smtp_password;
-    gchar *smtp_sender;
+    gchar    *smtp_username;
+    gchar    *smtp_password;
+    gchar    *smtp_sender;
 } ConfigData;
 
 extern ConfigData *active_config;
 
-gboolean wmud_config_init(ConfigData **config_data, GError **err);
+gboolean wmud_config_init(ConfigData **config_data,
+                          GError     **err);
 
 #endif /* __WMUD_CONFIGURATION_H__ */

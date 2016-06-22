@@ -62,8 +62,13 @@
 
 extern GSList *clients;
 
-gboolean wmud_networking_init(guint port_number, GMainContext *game_context, GSList *menu_items, GError **err);
-void wmud_client_quitanswer(WmudClient *client, gboolean answer);
-void wmud_client_newchar_answer(WmudClient *client, gboolean answer);
+gboolean wmud_networking_init(guint        port_number,
+                              GMainContext *game_context,
+                              GSList       *menu_items,
+                              GError       **err);
+void wmud_client_quitanswer(WmudClient *client,
+                            gboolean   answer);
+void wmud_client_newchar_answer(WmudClient *client,
+                                gboolean   answer);
 
 #endif

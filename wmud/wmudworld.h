@@ -35,20 +35,18 @@
  *
  * An online wMUD world
  */
-typedef struct _WmudWorld WmudWorld;
-typedef struct _WmudWorldClass WmudWorldClass;
+typedef struct _WmudWorld        WmudWorld;
+typedef struct _WmudWorldClass   WmudWorldClass;
 typedef struct _WmudWorldPrivate WmudWorldPrivate;
 
-struct _WmudWorld
-{
-	/*<private>*/
-	GObject  parent_instance;
-	WmudWorldPrivate *priv;
+struct _WmudWorld {
+    /*<private>*/
+    GObject          parent_instance;
+    WmudWorldPrivate *priv;
 };
 
-struct _WmudWorldClass
-{
-	GObjectClass parent_class;
+struct _WmudWorldClass {
+    GObjectClass parent_class;
 };
 
 WmudWorld *wmud_world_new(void);

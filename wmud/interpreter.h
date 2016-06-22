@@ -47,19 +47,19 @@ typedef void (*wmudCommandFunc)(WmudClient *client, gchar *command, GSList *toke
  * This structure holds the different properties of the in-game commands.
  */
 typedef struct _wmudCommand {
-	gchar *command;
-	wmudCommandFunc commandFunc;
+    gchar           *command;
+    wmudCommandFunc commandFunc;
 } wmudCommand;
 
 #define WMUD_INTERPRETER_ERROR wmud_interpreter_error_quark()
 GQuark wmud_interpreter_error_quark();
 
 typedef enum {
-	WMUD_INTERPRETER_ERROR_DUPCMD
+    WMUD_INTERPRETER_ERROR_DUPCMD
 } wmudInterpreterError;
 
-gboolean wmud_interpreter_check_directions(GSList *directions, GError **err);
+gboolean wmud_interpreter_check_directions(GSList *directions,
+                                           GError **err);
 void wmud_interpret_game_command(WmudClient *client);
 
 #endif /* __WMUD_INTERPRETER_H__ */
-
