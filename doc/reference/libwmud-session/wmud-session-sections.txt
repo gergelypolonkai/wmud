@@ -1,0 +1,19 @@
+<SECTION>
+<FILE>wmud-session</FILE>
+<TITLE>wMUDSession</TITLE>
+wMUDSession
+wMUDSessionClass
+wMUDSessionPrivate
+wmud_session_new
+wmud_session_new_with_connection
+wmud_session_set_connection
+<SUBSECTION Standard>
+WMUD_SESSION
+WMUD_IS_SESSION
+WMUD_TYPE_SESSION
+wmud_session_get_type
+WMUD_SESSION_CLASS
+WMUD_IS_SESSION_CLASS
+WMUD_SESSION_GET_CLASS
+</SECTION>
+

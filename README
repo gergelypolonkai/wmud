@@ -1,0 +1,11 @@
+What is wMUD?
+=============
+  On one hand, wMUD is a new (well, yet another) MUD (Multi-User Dungeon)
+server. It is designed to run as smoothly as possible, which is achieved by
+using threads. During development I tried to eliminate everything which is not
+GLib, so, although not tested yet, it should by highly portable.
+
+  On the other hand, wMUD is a learning project for GLib's several features.
+This means that although I double check every byte of code, it can still have
+bugs or not-so-effective code chunks. If you find one, please don't hesitate to
+contact me, or send a patch!

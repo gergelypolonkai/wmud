@@ -1,0 +1,76 @@
+CLIENT FLOW
+===========
+
+[X] connection arrives
+[X] connection gets accept()'ed
+[ ] connection is closed if the IP is banned
+[X] session object created
+[ ] welcome banner gets sent
+[X] user sends commans
+[ ] commands get processed
+[X] user sends the QUIT command
+[X] session gets destroyed
+[X] connection gets destroyed
+
+
+TO-DO LIST
+==========
+
+[X] Create own text formatting style
+
+[o] Create converter that can convert from own style to
+      [X] ANSI
+      [ ] colourless text
+      [ ] HTML
+      [ ] Pango markup
+      only the first two are very important
+
+[X] Do basic jobs for later threading support
+
+[X] Create and run the world object in a separate thread
+
+[X] Implement session handling
+
+[X] Create telnet interface that can process commands and send colourful
+      responses. This should go in a separate thread.
+
+[X] Plan configurable parameters and configuration file format
+
+[X] Write configuration reading code
+
+[o] Create XML schemas for world description
+
+[ ] Specify a way how new attribute and object types can be inserted into
+      a running system
+
+[ ] Specify state-saving backends:
+      [ ] SQLite3
+      [ ] MySQL
+      [ ] PostgreSQL
+      [ ] XML
+      [ ] GDBM
+
+[ ] Specify data to be saved during state-save
+
+[ ] Write state saving (command and timed hook) and loading (command and
+      startup time) code
+
+[o] Write world description loading and reloading code
+
+[ ] Write User Account management code (possibility of registration,
+      login, logout, account deletion, ban, kick and purge
+
+[o] Write chat possibility
+
+[ ] Write Light-calculation code
+
+[ ] Plan initial character state (what attributes to use, look, cloths,
+      armour, weapon, etc.)
+
+[ ] Create the possibility to enter the world
+
+[ ] Create the possibility to move in the world
+
+[ ] Create a DBus module to control the whole program
+
+# vim: textwidth=78 : tabstop=8 : expandtab

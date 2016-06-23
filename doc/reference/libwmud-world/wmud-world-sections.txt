@@ -1,0 +1,17 @@
+<SECTION>
+<FILE>wmud-world</FILE>
+<TITLE>wMUDWorld</TITLE>
+wMUDWorld
+wMUDWorldClass
+wMUDWorldPrivate
+wmud_world_new
+<SUBSECTION Standard>
+WMUD_WORLD
+WMUD_IS_WORLD
+WMUD_TYPE_WORLD
+wmud_world_get_type
+WMUD_WORLD_CLASS
+WMUD_IS_WORLD_CLASS
+WMUD_WORLD_GET_CLASS
+</SECTION>
+

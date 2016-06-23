@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: wMUDSession
+Description: Library to handle wMUD sessions
+Requires: glib-2.0 gobject-2.0
+Version: PACKAGE_VERSION
+Libs: -L${libdir} -lwmud-session-1.0
+Cflags: -I${includedir}/wmud-session -I${libdir}/wmud-session/include

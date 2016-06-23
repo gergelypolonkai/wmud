@@ -1,0 +1,29 @@
+All texts must conform to the following standards:
+
+They must provide a valid XML is wrapped with this template:
+
+<?xml version="1.0" encoding="utf-8"?>
+<wmud>
+	<formatted-text>
+		THE TEXT ITSELF
+	</formatted-text>
+</wmud>
+
+Text can be formatted with the following tags:
+<normal>TEXT</normal>            - provides normal text (clears all formatting)
+<bold>TEXT</bold>                - provides bold text
+<underline>TEXT</underline>      - provides underlined text
+<COLOUR>TEXT</COLOUR>            - provides coloured text in the given colour, see below for exact tag names
+
+Possible values for COLOUR:
+* black
+* red
+* green
+* yellow
+* blue
+* magenta
+* cyan
+* white
+
+Please note that although most MUD clients support the above text formatting, some older terminals not.
+Also, for telnet-like clients, the text is wrapped into 78 columns after formatting has been applied.
