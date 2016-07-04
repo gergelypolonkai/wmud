@@ -30,3 +30,8 @@ nbproject/private
 conf/wmud.conf
 cscope.out
 var
+
+/GPATH
+/GRTAGS
+/GSYMS
+/GTAGS
