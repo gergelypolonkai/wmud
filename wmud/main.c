@@ -39,6 +39,8 @@
 #include "menu.h"
 #include "texts.h"
 
+#include "wmud-configuration.h"
+
 /**
  * SECTION:utils
  * @short_description: Utilities and uncategorized functions
@@ -193,15 +195,31 @@ wmud_logger(const gchar    *log_domain,
 int
 main(int argc, char **argv)
 {
-    GError       *err = NULL;
-    GThread      *game_thread;
-    GMainContext *game_context;
-    GSList       *game_menu = NULL;
+    GThread           *game_thread;
+    GMainContext      *game_context;
+    GError            *err            = NULL;
+    GSList            *game_menu      = NULL;
+    WmudConfiguration *current_config = NULL;
+    gchar             *filename       = NULL;
 
     g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK, wmud_logger, NULL);
 
-    /* TODO: Command line parsing */
+    current_config = wmud_configuration_new();
+
+    // Process command line options
+    wmud_configuration_update_from_cmdline(
+            current_config,
+            &argc, &argv,
+            NULL);
+
     /* TODO: Create signal handlers! */
+
+    if ((filename = wmud_configuration_get_filename(current_config)) == NULL) {
+        filename = WMUD_CONFDIR "/wmud.conf";
+    }
+
+    // Process configuration file
+    wmud_configuration_update_from_file(current_config, filename, NULL);
 
     if (!wmud_config_init(&active_config, &err)) {
         if (err) {

@@ -1,5 +1,5 @@
-#ifndef __WMUD_CONFIGURATION_H__
-#define __WMUD_CONFIGURATION_H__
+#ifndef __WMUD_WMUD_CONFIGURATION_H__
+#define __WMUD_WMUD_CONFIGURATION_H__
 
 #include <glib-object.h>
 
@@ -17,17 +17,28 @@ typedef struct _WmudConfigurationClass WmudConfigurationClass;
 
 struct _WmudConfiguration {
     /* Parent instance structure */
-    GKeyFile parent_instance;
+    GObject parent_instance;
 
     /* Instance members */
 };
 
 struct _WmudConfigurationClass {
-    GKeyFileClass parent_class;
+    GObjectClass parent_class;
 };
 
 GType wmud_configuration_get_type(void) G_GNUC_CONST;
 
+WmudConfiguration *wmud_configuration_new(void);
+void wmud_configuration_update_from_cmdline(WmudConfiguration *configuration,
+                                            gint *argc,
+                                            gchar **argv[],
+                                            GError **error);
+void wmud_configuration_update_from_file(WmudConfiguration *configuration,
+                                         gchar *filename,
+                                         GError **error);
+
+gchar *wmud_configuration_get_filename(WmudConfiguration *configuration);
+
 G_END_DECLS
 
-#endif /* __WMUD_CONFIGURATION_H__ */
+#endif /* __WMUD_WMUD_CONFIGURATION_H__ */
