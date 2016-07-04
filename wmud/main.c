@@ -117,15 +117,6 @@ debug_context(char *file, int line)
 #define DebugContext
 #endif
 
-/**
- * wmud_type_init:
- *
- * Initializes the wMUD types.
- */
-void
-wmud_type_init(void)
-{}
-
 void
 wmud_logger(const gchar    *log_domain,
             GLogLevelFlags log_level,
@@ -208,8 +199,6 @@ main(int argc, char **argv)
     GSList       *game_menu = NULL;
 
     g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK, wmud_logger, NULL);
-    /* Initialize the thread and type system */
-    wmud_type_init();
 
     /* TODO: Command line parsing */
     /* TODO: Create signal handlers! */
