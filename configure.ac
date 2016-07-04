@@ -14,19 +14,28 @@ AC_CHECK_HEADERS([crypt.h])
 AC_SEARCH_LIBS([crypt], [crypt])
 AC_CHECK_FUNC([crypt], ac_have_crypt=yes, ac_have_crypt=no)
 if test "$ac_have_crypt" != "yes"; then
-	echo "The crypt() function call can not be found."
-	exit 1
+    echo "The crypt() function call can not be found."
+    exit 1
 fi
 
-AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [Enable debugging support (default: disabled)]), [enable_debug=yes; CFLAGS="$CFLAGS -g -Wall"], [enable_debug=no])
+AC_ARG_ENABLE(
+    [debug],
+    AS_HELP_STRING(
+        [--enable-debug],
+        [Enable debugging support (default: disabled)]),
+    [enable_debug=yes; CFLAGS="$CFLAGS -g -Wall"],
+    [enable_debug=no])
 AM_CONDITIONAL([ENABLE_DEBUG], [test "$enable_debug" = "yes"])
+
 if test "$enable_debug" = "yes"; then
-	AC_DEFINE([DEBUG], [1], [Define to compile with debugging support])
+    AC_DEFINE([DEBUG], [1], [Define to compile with debugging support])
 fi
 
 AC_DEFINE([WMUD_TICK_LENGTH], [500], [Length of a game tick, in milliseconds])
 AC_DEFINE([WMUD_HEARTBEAT_LENGTH], [30], [Length of a heartbeat, in ticks])
-AC_DEFINE([WMUD_MAINTENANCE_TIME], [600], [Time between maintenance runs, in seconds])
+AC_DEFINE([WMUD_MAINTENANCE_TIME],
+          [600],
+          [Time between maintenance runs, in seconds])
 
 m4_ifdef([GTK_DOC_CHECK], [
 GTK_DOC_CHECK([1.14], [--flavour no-tmpl])
@@ -34,15 +43,28 @@ GTK_DOC_CHECK([1.14], [--flavour no-tmpl])
 AM_CONDITIONAL([ENABLE_GTK_DOC], false)
 ])
 
-AC_ARG_ENABLE([memcached], AS_HELP_STRING([--disable-memcached], [Disable Memcached support (default: enabled)]), [], [enable_memcached=yes])
+AC_ARG_ENABLE(
+    [memcached],
+    AS_HELP_STRING(
+        [--disable-memcached],
+        [Disable Memcached support (default: enabled)]),
+    [],
+    [enable_memcached=yes])
 AM_CONDITIONAL([ENABLE_MEMCACHED], [test "$enable_memcached" = "yes"])
+
 if test "$enable_memcached" = "yes"; then
-	PKG_CHECK_MODULES([MEMCACHED], libmemcached);
-	AC_DEFINE([ENABLE_MEMCACHED], [1], [Define to compile with Memcached support])
+    PKG_CHECK_MODULES([MEMCACHED], libmemcached);
+    AC_DEFINE([ENABLE_MEMCACHED],
+              [1],
+              [Define to compile with Memcached support])
 fi
 
-AC_DEFINE([DEFAULT_PORT], [4000], [The default port number if not specified in the config file])
-AC_DEFINE([MAX_RECV_LEN], [1024], [The maximum length of the recv() queue in bytes])
+AC_DEFINE([DEFAULT_PORT],
+          [4000],
+          [The default port number if not specified in the config file])
+AC_DEFINE([MAX_RECV_LEN],
+          [1024],
+          [The maximum length of the recv() queue in bytes])
 
 PKG_CHECK_MODULES([GIO], gio-2.0)
 PKG_CHECK_MODULES([GLIB], glib-2.0)
@@ -51,10 +73,16 @@ PKG_CHECK_MODULES([GDA], libgda-5.0)
 PKG_CHECK_MODULES([CURL], libcurl)
 LIBCURL_CHECK_CONFIG
 if test "$libcurl_protocol_SMTP" != "yes"; then
-	echo "Your libCURL installation does not support the SMTP protocol."
-	exit 1
+    echo "Your libCURL installation does not support the SMTP protocol."
+    exit 1
 fi
 
 AM_PATH_GLIB_2_0
 
-AC_OUTPUT(Makefile wmud/Makefile docs/reference/wmud/Makefile create-world.sh drop-world.sh)
+AC_OUTPUT(
+    Makefile
+    wmud/Makefile
+    docs/reference/wmud/Makefile
+    create-world.sh
+    drop-world.sh
+)
