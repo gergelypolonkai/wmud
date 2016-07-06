@@ -98,8 +98,12 @@ wmud_configuration_update_from_file(WmudConfiguration *configuration,
     WmudConfigurationPrivate *priv = wmud_configuration_get_instance_private(
             configuration);
 
-    // Save the file name for possible later use
-    priv->file_name = g_strdup(filename);
+    if (filename != NULL) {
+        g_free(priv->file_name);
+        priv->file_name = g_strdup(filename);
+    } else if (priv->file_name == NULL) {
+        priv->file_name = g_strdup(WMUD_CONFDIR "/wmud.conf");
+    }
 
     priv->key_file = g_key_file_new();
 

@@ -200,7 +200,6 @@ main(int argc, char **argv)
     GError            *err            = NULL;
     GSList            *game_menu      = NULL;
     WmudConfiguration *current_config = NULL;
-    gchar             *filename       = NULL;
 
     g_log_set_handler(G_LOG_DOMAIN, G_LOG_LEVEL_MASK, wmud_logger, NULL);
 
@@ -214,12 +213,8 @@ main(int argc, char **argv)
 
     /* TODO: Create signal handlers! */
 
-    if ((filename = wmud_configuration_get_filename(current_config)) == NULL) {
-        filename = WMUD_CONFDIR "/wmud.conf";
-    }
-
     // Process configuration file
-    wmud_configuration_update_from_file(current_config, filename, NULL);
+    wmud_configuration_update_from_file(current_config, NULL, NULL);
 
     if (!wmud_config_init(&active_config, &err)) {
         if (err) {
