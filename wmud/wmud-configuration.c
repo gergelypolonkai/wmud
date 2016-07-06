@@ -120,8 +120,13 @@ wmud_configuration_new(void)
 {
     WmudConfiguration *configuration = g_object_new(
             WMUD_TYPE_CONFIGURATION, NULL);
+    WmudConfigurationPrivate *priv = wmud_configuration_get_instance_private(
+            configuration);
 
-    // TODO: Update with built-in defaults
+    priv->maximum_group_size = g_new(gint, 1);
+    *(priv->maximum_group_size) = 5;
+    priv->reborn = g_new(gboolean, 1);
+    *(priv->reborn) = TRUE;
 
     return configuration;
 }
