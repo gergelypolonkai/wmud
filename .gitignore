@@ -31,6 +31,8 @@ conf/wmud.conf
 cscope.out
 var
 
+/wmud/enumtypes.[ch]
+
 /GPATH
 /GRTAGS
 /GSYMS
