@@ -10,9 +10,40 @@ typedef struct _WmudConfigurationPrivate {
     guint *minimum_deities;
     gboolean *clan_wars;
     guint *maximum_group_size;
-    guint *trainable_abilities;
+    gboolean *trainable_abilities;
     gboolean *reborn;
 } WmudConfigurationPrivate;
+
+// The following defines are the default values for configurable
+// items. These can be changed in run time!
+
+// If there is only one race, should the race changing step be hidden?
+#define DEFAULT_HIDE_SINGLE_RACE FALSE
+
+// If there is only one class, should the class changing step be hidden?
+#define DEFAULT_HIDE_SINGLE_CLASS FALSE
+
+// If the owner of the house is not present to this many (real world)
+// days, their house can be occupied (traps and the like may still
+// trigger, though! If this is set to 0, houses cannot be occupied.
+#define DEFAULT_HOUSE_OCCUPY_TIME 0
+
+// The minimum number of deities that must be choosen during character
+// generation. If the number of available deities is less than this,
+// it will be decremented runtime!
+#define DEFAULT_MINIMUM_DEITIES 0
+
+// TRUE if clans can declare war on each other (ie. PvP)
+#define DEFAULT_CLAN_WARS FALSE
+
+// The maximum size of a group
+#define DEFAULT_MAXIMUM_GROUP_SIZE 5
+
+// If TRUE, abilities (Strength, Intelligence, etc.) are trainable
+#define DEFAULT_TRAINABLE_ABILITIES FALSE
+
+// If TRUE, characters can choose to reborn (ie. reroll)
+#define DEFAULT_REBORN FALSE
 
 G_DEFINE_TYPE_WITH_PRIVATE(WmudConfiguration,
                            wmud_configuration,
@@ -115,6 +146,10 @@ wmud_configuration_update_from_file(WmudConfiguration *configuration,
     }
 }
 
+#define wmud_new(type, var, value) \
+    var = g_new(type, 1);            \
+    *(var) = value;
+
 WmudConfiguration *
 wmud_configuration_new(void)
 {
@@ -123,10 +158,14 @@ wmud_configuration_new(void)
     WmudConfigurationPrivate *priv = wmud_configuration_get_instance_private(
             configuration);
 
-    priv->maximum_group_size = g_new(gint, 1);
-    *(priv->maximum_group_size) = 5;
-    priv->reborn = g_new(gboolean, 1);
-    *(priv->reborn) = TRUE;
+    wmud_new(gboolean, priv->hide_single_race, DEFAULT_HIDE_SINGLE_RACE);
+    wmud_new(gboolean, priv->hide_single_class, DEFAULT_HIDE_SINGLE_CLASS);
+    wmud_new(guint, priv->house_occupy_time, DEFAULT_HOUSE_OCCUPY_TIME);
+    wmud_new(guint, priv->minimum_deities, DEFAULT_MINIMUM_DEITIES);
+    wmud_new(gboolean, priv->clan_wars, DEFAULT_CLAN_WARS);
+    wmud_new(guint, priv->maximum_group_size, DEFAULT_MAXIMUM_GROUP_SIZE);
+    wmud_new(gboolean, priv->trainable_abilities, DEFAULT_TRAINABLE_ABILITIES);
+    wmud_new(gboolean, priv->reborn, DEFAULT_REBORN);
 
     return configuration;
 }
