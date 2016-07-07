@@ -139,7 +139,7 @@ wmud_configuration_update_from_file(WmudConfiguration *configuration,
     priv->key_file = g_key_file_new();
 
     if (!g_key_file_load_from_file(priv->key_file,
-                                   filename,
+                                   priv->file_name,
                                    G_KEY_FILE_NONE,
                                    error)) {
         return;
