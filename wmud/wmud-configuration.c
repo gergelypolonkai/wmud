@@ -1,5 +1,7 @@
 #include "wmud-configuration.h"
 
+#include "configuration.h"
+
 typedef struct _WmudConfigurationPrivate {
     gchar *file_name;
     GKeyFile *key_file;
@@ -121,12 +123,49 @@ wmud_configuration_update_from_cmdline(WmudConfiguration *configuration,
     g_print("Config file: %s\n", priv->file_name);
 }
 
+#define wmud_configuration_read_value_from_file(configuration_priv,     \
+                                                type,                   \
+                                                group,                  \
+                                                key,                    \
+                                                tmp_var,                \
+                                                default_value,          \
+                                                target,                 \
+                                                target_is_ptr,          \
+                                                tmp_err,                \
+                                                error)                  \
+    tmp_var = g_key_file_get_ ## type ((configuration_priv)->key_file,  \
+                                      group, key,                       \
+                                      &tmp_err);                        \
+                                                                        \
+    if (tmp_err && (tmp_err->domain == G_KEY_FILE_ERROR)) {             \
+        if (tmp_err->code == G_KEY_FILE_ERROR_KEY_NOT_FOUND) {          \
+            tmp_var = default_value;                                    \
+        } else if (tmp_err->code == G_KEY_FILE_ERROR_INVALID_VALUE) {   \
+            g_propagate_error(error, tmp_err);                          \
+            g_clear_error(&tmp_err);                                    \
+                                                                        \
+            return;                                                     \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    if (target_is_ptr) {                                                \
+        g_free(target);                                                 \
+        target = g_new(g ## type, 1);                                   \
+        *(target) = tmp_var;                                            \
+    } else {                                                            \
+        target = tmp_var;                                               \
+    }
+
 void
 wmud_configuration_update_from_file(WmudConfiguration *configuration,
                                     gchar *filename,
                                     GError **error)
 {
-    WmudConfigurationPrivate *priv = wmud_configuration_get_instance_private(
+    gboolean tmp_bool;
+    guint    tmp_uint;
+
+    GError                   *tmp_err = NULL;
+    WmudConfigurationPrivate *priv    = wmud_configuration_get_instance_private(
             configuration);
 
     if (filename != NULL) {
@@ -144,6 +183,62 @@ wmud_configuration_update_from_file(WmudConfiguration *configuration,
                                    error)) {
         return;
     }
+
+    if (!g_key_file_has_group(priv->key_file, "global")) {
+        g_set_error(error,
+                    WMUD_CONFIG_ERROR, WMUD_CONFIG_ERROR_NOGLOBAL,
+                    "Configuration file (%s) does not contain "
+                    "the required [global] group!",
+                    priv->file_name);
+
+        return;
+    }
+
+    priv->admin_email = g_key_file_get_string(
+            priv->key_file,
+            "global", "admin email",
+            NULL);
+
+    wmud_configuration_read_value_from_file(priv, boolean,
+                                            "global", "hide single race",
+                                            tmp_bool, DEFAULT_HIDE_SINGLE_RACE,
+                                            priv->hide_single_race, TRUE,
+                                            tmp_err, error);
+    wmud_configuration_read_value_from_file(priv, boolean,
+                                            "global", "hide single class",
+                                            tmp_bool, DEFAULT_HIDE_SINGLE_CLASS,
+                                            priv->hide_single_class, TRUE,
+                                            tmp_err, error);
+    wmud_configuration_read_value_from_file(priv, uint,
+                                            "global", "house occupy time",
+                                            tmp_uint, DEFAULT_HOUSE_OCCUPY_TIME,
+                                            priv->house_occupy_time, TRUE,
+                                            tmp_err, error);
+    wmud_configuration_read_value_from_file(priv, uint,
+                                            "global", "minimum deities",
+                                            tmp_uint, DEFAULT_MINIMUM_DEITIES,
+                                            priv->minimum_deities, TRUE,
+                                            tmp_err, error);
+    wmud_configuration_read_value_from_file(priv, boolean,
+                                            "global", "clan wars",
+                                            tmp_bool, DEFAULT_CLAN_WARS,
+                                            priv->clan_wars, TRUE,
+                                            tmp_err, error);
+    wmud_configuration_read_value_from_file(priv, uint,
+                                            "global", "maximum group size",
+                                            tmp_uint, DEFAULT_MAXIMUM_GROUP_SIZE,
+                                            priv->maximum_group_size, TRUE,
+                                            tmp_err, error);
+    wmud_configuration_read_value_from_file(priv, boolean,
+                                            "global", "trainable abilities",
+                                            tmp_bool, DEFAULT_TRAINABLE_ABILITIES,
+                                            priv->trainable_abilities, TRUE,
+                                            tmp_err, error);
+    wmud_configuration_read_value_from_file(priv, boolean,
+                                            "global", "reborn",
+                                            tmp_bool, DEFAULT_REBORN,
+                                            priv->reborn, TRUE,
+                                            tmp_err, error);
 }
 
 #define wmud_new(type, var, value) \
