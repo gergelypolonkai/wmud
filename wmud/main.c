@@ -206,10 +206,10 @@ main(int argc, char **argv)
     current_config = wmud_configuration_new();
 
     // Process command line options
-    wmud_configuration_update_from_cmdline(
-            current_config,
-            &argc, &argv,
-            NULL);
+    //    wmud_configuration_update_from_cmdline(
+    //            current_config,
+    //            &argc, &argv,
+    //            NULL);
 
     /* TODO: Create signal handlers! */
 
