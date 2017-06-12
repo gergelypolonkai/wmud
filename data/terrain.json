@@ -1,0 +1,23 @@
+{
+    "water": {
+        "icon": "~",
+        "map_char": "~",
+        "color16": 12,
+        "color256": 57,
+        "color": "#0000bb"
+    },
+    "field": {
+        "icon": "=",
+        "map_char": "=",
+        "color16": 11,
+        "color256": 228,
+        "color": "#bbbb00"
+    },
+    "road": {
+        "icon": "#",
+        "map_char": "#",
+        "color16": 8,
+        "color256": 244,
+        "color": "#808080"
+    }
+}
